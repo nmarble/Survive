@@ -41,7 +41,7 @@ public class Survive
   private Inventory stone;
   
   private String direction = "up";
-  private double movementSpeed = 20.0D;
+  private double movementSpeed = 20;
   private String message = "";
   
   private boolean waitingForKeyPress = true;
@@ -52,7 +52,7 @@ public class Survive
   private boolean spacePressed = false;
   private boolean iPressed = false;
   
-  private int xRes = 1024;
+  private int xRes = 800;
   private int yRes = 600;
   private int playerX = this.xRes / 2;
   private int playerY = this.yRes / 2;
@@ -475,7 +475,7 @@ public class Survive
         Object object = (Object)this.objects.get(i);
         object.draw(g);
       }
-      for (int i = 1; i < this.huds.size(); i++)
+      for (int i = 0; i < this.huds.size(); i++)
       {
         Hud hud = (Hud)this.huds.get(i);
         hud.draw(g);
