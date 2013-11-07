@@ -1,5 +1,6 @@
 package survive;
 
+
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -7,8 +8,11 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
 import java.awt.image.BufferStrategy;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -24,29 +28,40 @@ public class Survive
   extends Canvas
 {
   private BufferStrategy strategy;
+  
   private LowerLayer grass;
   private LowerLayer gravel;
+  
   private Object tree;
   private Object boulder;
+  
   private Hud player;
+  
   private Inventory log;
   private Inventory stone;
+  
   private String direction = "up";
   private double movementSpeed = 20.0D;
   private String message = "";
+  
   private boolean waitingForKeyPress = true;
   private boolean leftPressed = false;
   private boolean rightPressed = false;
   private boolean upPressed = false;
   private boolean downPressed = false;
   private boolean spacePressed = false;
-  private int xRes = 800;
+  private boolean iPressed = false;
+  
+  private int xRes = 1024;
   private int yRes = 600;
   private int playerX = this.xRes / 2;
   private int playerY = this.yRes / 2;
   private int treeLikely = 10;
   private int boulderLikely = 20;
+  
   private boolean gameRunning = true;
+  private boolean inventoryOpen = false;
+  
   private ArrayList lowerLayers = new ArrayList();
   private ArrayList objects = new ArrayList();
   private ArrayList huds = new ArrayList();
@@ -55,6 +70,7 @@ public class Survive
   
   public Survive()
   {
+   
     JFrame container = new JFrame("Survive");
     
 
@@ -83,6 +99,8 @@ public class Survive
       }
     });
     addKeyListener(new KeyInputHandler());
+    addMouseListener(new MouseInputHandler());
+    
     
 
     requestFocus();
@@ -408,9 +426,20 @@ public class Survive
       }
     }
   }
+  public void drawInventory()
+  {
+      //Draw Inventory screen
+      Graphics2D g = (Graphics2D)this.strategy.getDrawGraphics();
+      g.setColor(Color.GRAY);
+      g.fill3DRect(xRes - (xRes / 5), 0, yRes, xRes, true);
+      g.setColor(Color.BLACK);
+      g.drawLine(xRes - (xRes / 5), (yRes / 2), xRes, (yRes / 2));
+      g.dispose();
+  }
   
   public void gameLoop()
   {
+    
     long lastLoopTime = System.currentTimeMillis();
     while (this.gameRunning)
     {
@@ -418,10 +447,13 @@ public class Survive
       lastLoopTime = System.currentTimeMillis();
       
 
-
+      
       Graphics2D g = (Graphics2D)this.strategy.getDrawGraphics();
       g.setColor(Color.black);
-      g.fillRect(0, 0, 800, 800);
+      g.fillRect(0, 0, xRes, yRes);
+     
+      
+      
       for (int i = 0; i < this.lowerLayers.size(); i++)
       {
         LowerLayer lowerLayer = (LowerLayer)this.lowerLayers.get(i);
@@ -435,12 +467,15 @@ public class Survive
       }
       this.objects.removeAll(this.removeList);
       this.removeList.clear();
+      
+      
+      
       for (int i = 0; i < this.objects.size(); i++)
       {
         Object object = (Object)this.objects.get(i);
         object.draw(g);
       }
-      for (int i = 0; i < this.huds.size(); i++)
+      for (int i = 1; i < this.huds.size(); i++)
       {
         Hud hud = (Hud)this.huds.get(i);
         hud.draw(g);
@@ -448,11 +483,18 @@ public class Survive
       if (this.waitingForKeyPress)
       {
         g.setColor(Color.white);
-        g.drawString(this.message, (800 - g.getFontMetrics().stringWidth(this.message)) / 2, 250);
-        g.drawString("Press any key", (800 - g.getFontMetrics().stringWidth("Press any key")) / 2, 300);
+        g.drawString(this.message, (xRes - g.getFontMetrics().stringWidth(this.message)) / 2, 250);
+        g.drawString("Press any key", (xRes - g.getFontMetrics().stringWidth("Press space to continue")) / 2, (yRes / 2));
       }
-      g.dispose();
+      if (inventoryOpen == true)
+      {    
+          drawInventory();
+      }
       this.strategy.show();
+      if (this.iPressed)
+      {
+          inventoryOpen = !inventoryOpen;
+      }
       if (this.leftPressed)
       {
         this.direction = "left";
@@ -515,6 +557,16 @@ public class Survive
       catch (Exception e) {}
     }
   }
+  private class MouseInputHandler
+    extends MouseAdapter
+  {
+      public void mouseClicked(MouseEvent e)
+      {
+         
+          System.err.println(e.getX());
+          System.err.println(e.getY());
+      }
+  }
   
   private class KeyInputHandler
     extends KeyAdapter
@@ -543,6 +595,10 @@ public class Survive
       if (e.getKeyCode() == 32) {
         Survive.this.spacePressed = true;
       }
+      if (e.getKeyCode() == 73) {
+          Survive.this.iPressed = true;
+   
+      }
     }
     
     public void keyReleased(KeyEvent e)
@@ -564,6 +620,9 @@ public class Survive
       }
       if (e.getKeyCode() == 32) {
         Survive.this.spacePressed = false;
+      }
+      if (e.getKeyCode() == 73) {
+        Survive.this.iPressed = false;
       }
     }
     
