@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Map;
 import javax.imageio.ImageIO;
 
 public class SpriteStore
@@ -21,7 +22,7 @@ public class SpriteStore
     return single;
   }
   
-  private HashMap sprites = new HashMap();
+  private Map<String, Sprite> sprites = new HashMap<String, Sprite>();
   
   public Sprite getSprite(String ref)
   {
@@ -52,7 +53,7 @@ public class SpriteStore
   }
   
   private void fail(String message)
-  {
+  { 
     System.err.println(message);
     System.exit(0);
   }

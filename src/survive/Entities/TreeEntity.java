@@ -1,10 +1,10 @@
  package survive.Entities;
  
- import survive.Object;
+ import survive.MiddleLayer;
  import survive.Survive;
  
  public class TreeEntity
-   extends Object
+   extends MiddleLayer
  {
    private Survive survive;
    
@@ -26,10 +26,10 @@
      int modifiedY = 40;
      return modifiedY;
    }
-   
-   public void interact()
+
+    public void interact()
    {
-     this.survive.removeObject(this);
+     this.survive.removeMiddleLayer(this);
      this.survive.addToInventory(1);
    }
  }

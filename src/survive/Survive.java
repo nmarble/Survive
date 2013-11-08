@@ -32,8 +32,8 @@ public class Survive
   private LowerLayer grass;
   private LowerLayer gravel;
   
-  private Object tree;
-  private Object boulder;
+  private MiddleLayer tree;
+  private MiddleLayer boulder;
   
   private Hud player;
   
@@ -63,7 +63,7 @@ public class Survive
   private boolean inventoryOpen = false;
   
   private ArrayList lowerLayers = new ArrayList();
-  private ArrayList objects = new ArrayList();
+  private ArrayList middleLayers = new ArrayList();
   private ArrayList huds = new ArrayList();
   private ArrayList inventorys = new ArrayList();
   private ArrayList removeList = new ArrayList();
@@ -273,25 +273,30 @@ public class Survive
   
   public void interact()
   {
-    for (int i = 0; i < this.objects.size(); i++)
-    {
-      Object object = (Object)this.objects.get(i);
-      if ((this.direction == "up") && (this.playerX == object.getX() + object.getModifiedX()) && (this.playerY == object.getY() + object.getModifiedY() + 20)) {
-        object.interact();
+  
+   for (int i = 0; i < this.middleLayers.size(); i++)
+      
+      {
+        MiddleLayer middleLayer = (MiddleLayer)this.middleLayers.get(i);
+    
+      
+      //MiddleLayer object = (MiddleLayer)this.middleLayers.get(i);
+      if ((this.direction == "up") && (this.playerX == middleLayer.getX() + middleLayer.getModifiedX()) && (this.playerY == middleLayer.getY() + middleLayer.getModifiedY() + 20)) {
+        middleLayer.interact();
       }
-      if ((this.direction == "down") && (this.playerX == object.getX() + object.getModifiedX()) && (this.playerY == object.getY() + object.getModifiedY() - 20)) {
-        object.interact();
+      if ((this.direction == "down") && (this.playerX == middleLayer.getX() + middleLayer.getModifiedX()) && (this.playerY == middleLayer.getY() + middleLayer.getModifiedY() - 20)) {
+        middleLayer.interact();
       }
-      if ((this.direction == "left") && (this.playerX == object.getX() + object.getModifiedX() + 20) && (this.playerY == object.getY() + object.getModifiedY())) {
-        object.interact();
+      if ((this.direction == "left") && (this.playerX == middleLayer.getX() + middleLayer.getModifiedX() + 20) && (this.playerY == middleLayer.getY() + middleLayer.getModifiedY())) {
+        middleLayer.interact();
       }
-      if ((this.direction == "right") && (this.playerX == object.getX() + object.getModifiedX() - 20) && (this.playerY == object.getY() + object.getModifiedY())) {
-        object.interact();
+      if ((this.direction == "right") && (this.playerX == middleLayer.getX() + middleLayer.getModifiedX() - 20) && (this.playerY == middleLayer.getY() + middleLayer.getModifiedY())) {
+        middleLayer.interact();
       }
     }
   }
   
-  public void removeObject(Object object)
+  public void removeMiddleLayer(MiddleLayer object)
   {
     this.removeList.add(object);
   }
@@ -318,13 +323,13 @@ public class Survive
   
   public void checkCollisionObject(String direction)
   {
-    for (int i = 0; i < this.objects.size(); i++)
+    for (int i = 0; i < this.middleLayers.size(); i++)
     {
-      Object object = (Object)this.objects.get(i);
-      String type = object.getType();
-      int modifiedX = object.getModifiedX();
-      int modifiedY = object.getModifiedY();
-      if (object.collideWith(object.getX() + modifiedX, object.getY() + modifiedY, this.playerX, this.playerY) == true)
+      MiddleLayer middleLayer = (MiddleLayer)this.middleLayers.get(i);
+      String type = middleLayer.getType();
+      int modifiedX = middleLayer.getModifiedX();
+      int modifiedY = middleLayer.getModifiedY();
+      if (middleLayer.collideWith(middleLayer.getX() + modifiedX, middleLayer.getY() + modifiedY, this.playerX, this.playerY) == true)
       {
         if (direction == "left") {
           moveAll("right");
@@ -373,7 +378,7 @@ public class Survive
       if (Chance == 1)
       {
         this.tree = new TreeEntity(this, "sprites/tree.png", x, y - 20, "tree");
-        this.objects.add(this.tree);
+        this.middleLayers.add(this.tree);
       }
       Chance = (int)(Math.random() * this.boulderLikely);
     }
@@ -386,16 +391,16 @@ public class Survive
       if (Chance == 1)
       {
         this.boulder = new BoulderEntity(this, "sprites/boulder.png", x, y, "boulder");
-        this.objects.add(this.boulder);
+        this.middleLayers.add(this.boulder);
       }
     }
   }
   
   public void moveAll(String direction)
   {
-    for (int i = 0; i < this.objects.size(); i++)
+    for (int i = 0; i < this.middleLayers.size(); i++)
     {
-      Object object = (Object)this.objects.get(i);
+      MiddleLayer object = (MiddleLayer)this.middleLayers.get(i);
       if (direction == "left") {
         object.moveLeft(this.movementSpeed);
       }
@@ -426,6 +431,68 @@ public class Survive
       }
     }
   }
+  public void checkButtonPushed ()
+  {
+    if (this.iPressed)
+      {
+          inventoryOpen = !inventoryOpen;
+      }
+      if (this.leftPressed)
+      {
+        this.direction = "left";
+            
+        moveAll(this.direction);
+        for (int i = 0; i < 1; i++)
+        {
+          Hud hud = (Hud)this.huds.get(i);
+          hud.changeFrame(2);
+        }
+        checkMissingFloorLeft();
+        checkCollisionObject(this.direction);
+      }
+      if (this.rightPressed)
+      {
+        this.direction = "right";
+        checkMissingFloorRight();
+        
+        moveAll(this.direction);
+        for (int i = 0; i < 1; i++)
+        {
+          Hud hud = (Hud)this.huds.get(i);
+          hud.changeFrame(3);
+        }
+        checkCollisionObject(this.direction);
+      }
+      if (this.upPressed)
+      {
+        this.direction = "up";
+        
+        moveAll(this.direction);
+        for (int i = 0; i < 1; i++)
+        {
+          Hud hud = (Hud)this.huds.get(i);
+          hud.changeFrame(0);
+        }
+        checkMissingFloorTop();
+        checkCollisionObject(this.direction);
+      }
+      if (this.downPressed)
+      {
+        this.direction = "down";
+        checkMissingFloorBottom();
+        
+        moveAll(this.direction);
+        for (int i = 0; i < 1; i++)
+        {
+          Hud hud = (Hud)this.huds.get(i);
+          hud.changeFrame(1);
+        }
+        checkCollisionObject(this.direction);
+      }
+      if (this.spacePressed) {
+        interact();
+      }  
+  }
   public void drawInventory()
   {
       //Draw Inventory screen
@@ -453,7 +520,7 @@ public class Survive
       g.fillRect(0, 0, xRes, yRes);
      
       
-      
+      checkButtonPushed();
       for (int i = 0; i < this.lowerLayers.size(); i++)
       {
         LowerLayer lowerLayer = (LowerLayer)this.lowerLayers.get(i);
@@ -465,14 +532,14 @@ public class Survive
           lowerLayer.draw(g);
         }
       }
-      this.objects.removeAll(this.removeList);
+      this.middleLayers.removeAll(this.removeList);
       this.removeList.clear();
       
       
       
-      for (int i = 0; i < this.objects.size(); i++)
+      for (int i = 0; i < this.middleLayers.size(); i++)
       {
-        Object object = (Object)this.objects.get(i);
+        MiddleLayer object = (MiddleLayer)this.middleLayers.get(i);
         object.draw(g);
       }
       for (int i = 0; i < this.huds.size(); i++)
@@ -491,65 +558,7 @@ public class Survive
           drawInventory();
       }
       this.strategy.show();
-      if (this.iPressed)
-      {
-          inventoryOpen = !inventoryOpen;
-      }
-      if (this.leftPressed)
-      {
-        this.direction = "left";
-        checkMissingFloorLeft();
-        
-        moveAll(this.direction);
-        for (int i = 0; i < 1; i++)
-        {
-          Hud hud = (Hud)this.huds.get(i);
-          hud.changeFrame(2);
-        }
-        checkCollisionObject(this.direction);
-      }
-      if (this.rightPressed)
-      {
-        this.direction = "right";
-        checkMissingFloorRight();
-        
-        moveAll(this.direction);
-        for (int i = 0; i < 1; i++)
-        {
-          Hud hud = (Hud)this.huds.get(i);
-          hud.changeFrame(3);
-        }
-        checkCollisionObject(this.direction);
-      }
-      if (this.upPressed)
-      {
-        this.direction = "up";
-        checkMissingFloorTop();
-        
-        moveAll(this.direction);
-        for (int i = 0; i < 1; i++)
-        {
-          Hud hud = (Hud)this.huds.get(i);
-          hud.changeFrame(0);
-        }
-        checkCollisionObject(this.direction);
-      }
-      if (this.downPressed)
-      {
-        this.direction = "down";
-        checkMissingFloorBottom();
-        
-        moveAll(this.direction);
-        for (int i = 0; i < 1; i++)
-        {
-          Hud hud = (Hud)this.huds.get(i);
-          hud.changeFrame(1);
-        }
-        checkCollisionObject(this.direction);
-      }
-      if (this.spacePressed) {
-        interact();
-      }
+      
       try
       {
         Thread.sleep(100L);
@@ -580,25 +589,28 @@ public class Survive
       if (Survive.this.waitingForKeyPress) {
         return;
       }
-      if (e.getKeyCode() == 37) {
-        Survive.this.leftPressed = true;
+      switch(e.getKeyCode()) {
+          
+          case 32:
+              Survive.this.spacePressed = true;
+              break;
+          case 37:
+              Survive.this.leftPressed = true;
+              break;
+          case 38:
+              Survive.this.upPressed = true;
+              break;
+          case 39:
+              Survive.this.rightPressed = true;
+              break;
+          case 40:
+              Survive.this.downPressed = true;
+              break;
+          case 73:
+              Survive.this.iPressed = true;
+              break;
       }
-      if (e.getKeyCode() == 39) {
-        Survive.this.rightPressed = true;
-      }
-      if (e.getKeyCode() == 38) {
-        Survive.this.upPressed = true;
-      }
-      if (e.getKeyCode() == 40) {
-        Survive.this.downPressed = true;
-      }
-      if (e.getKeyCode() == 32) {
-        Survive.this.spacePressed = true;
-      }
-      if (e.getKeyCode() == 73) {
-          Survive.this.iPressed = true;
-   
-      }
+     
     }
     
     public void keyReleased(KeyEvent e)
@@ -606,23 +618,26 @@ public class Survive
       if (Survive.this.waitingForKeyPress) {
         return;
       }
-      if (e.getKeyCode() == 37) {
-        Survive.this.leftPressed = false;
-      }
-      if (e.getKeyCode() == 39) {
-        Survive.this.rightPressed = false;
-      }
-      if (e.getKeyCode() == 38) {
-        Survive.this.upPressed = false;
-      }
-      if (e.getKeyCode() == 40) {
-        Survive.this.downPressed = false;
-      }
-      if (e.getKeyCode() == 32) {
-        Survive.this.spacePressed = false;
-      }
-      if (e.getKeyCode() == 73) {
-        Survive.this.iPressed = false;
+      switch(e.getKeyCode()) {
+          
+          case 32:
+              Survive.this.spacePressed = false;
+              break;
+          case 37:
+              Survive.this.leftPressed = false;
+              break;
+          case 38:
+              Survive.this.upPressed = false;
+              break;
+          case 39:
+              Survive.this.rightPressed = false;
+              break;
+          case 40:
+              Survive.this.downPressed = false;
+              break;
+          case 73:
+              Survive.this.iPressed = false;
+              break;
       }
     }
     

@@ -2,7 +2,7 @@ package survive;
 
 import java.awt.Graphics;
 
-public abstract class Object
+public abstract class MiddleLayer
 {
   protected double x;
   protected double y;
@@ -10,7 +10,7 @@ public abstract class Object
   protected double movementSpeed;
   protected Sprite sprite;
   
-  public Object(String ref, int x, int y, String type)
+  public MiddleLayer(String ref, int x, int y, String type)
   {
     this.sprite = SpriteStore.get().getSprite(ref);
     this.x = x;
@@ -80,8 +80,8 @@ public abstract class Object
     int modifiedY = 0;
     return modifiedY;
   }
+  public abstract void interact();
   
-  public void interact() {}
 }
 
 

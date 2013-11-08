@@ -1,10 +1,10 @@
  package survive.Entities;
  
- import survive.Object;
+ import survive.MiddleLayer;
  import survive.Survive;
  
  public class BoulderEntity
-   extends Object
+   extends MiddleLayer
  {
    private Survive survive;
    
@@ -29,7 +29,7 @@
    
    public void interact()
    {
-     this.survive.removeObject(this);
+     this.survive.removeMiddleLayer(this);
      this.survive.addToInventory(2);
    }
  }
