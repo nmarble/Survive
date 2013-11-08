@@ -144,7 +144,7 @@ public class Survive
     boolean match = true;
     for (int x = 0; x < this.xRes / 20; x++)
     {
-      match = false;
+      match = false; 
       for (int i = 0; i < this.lowerLayers.size(); i++)
       {
         LowerLayer lowerLayer = (LowerLayer)this.lowerLayers.get(i);
