@@ -305,9 +305,9 @@ public class Survive
   {
     if (this.inventorys.size() == 0)
     {
-      this.log = new Inventory(1, 0);
+      this.log = new Inventory("sprites/log.png", 1, 0);
       this.inventorys.add(this.log);
-      this.stone = new Inventory(2, 0);
+      this.stone = new Inventory("sprites/stone.png", 2, 0);
       this.inventorys.add(this.stone);
     }
     for (int i = 0; i < this.inventorys.size(); i++)
@@ -502,6 +502,9 @@ public class Survive
       g.setColor(Color.BLACK);
       g.drawLine(xRes - (xRes / 5), (yRes / 2), xRes, (yRes / 2));
       g.dispose();
+      
+      
+     
   }
   
   public void gameLoop()
@@ -556,6 +559,30 @@ public class Survive
       if (inventoryOpen == true)
       {    
           drawInventory();
+          int col = -20;
+          int row = 1;
+          for (int i = 0; i < this.inventorys.size(); i++)
+            
+            {
+            Inventory inventory = (Inventory)this.inventorys.get(i);
+        
+            
+            if (inventory.getQuantity() > 0)
+            {
+                col = col + 25;
+            }
+            inventory.changeX(xRes - (xRes / 5) + (col));
+            inventory.changeY((yRes / 2) + (15 * row));
+            
+            
+        
+            if (inventory.getQuantity() > 0)
+            {
+                inventory.draw(g);
+                String quantity = String.valueOf(inventory.getQuantity());
+                g.drawString(quantity, inventory.getX(), inventory.getY());
+            }
+         }
       }
       this.strategy.show();
       
