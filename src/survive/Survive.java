@@ -36,6 +36,7 @@ public class Survive
   
   private MiddleLayer tree;
   private MiddleLayer boulder;
+  private MiddleLayer LogWall;
   
   private Hud player;
   private Hud structureButton;
@@ -45,6 +46,7 @@ public class Survive
   
   private Inventory log;
   private Inventory stone;
+  private Inventory logWall;
   
   private String direction = "up";
   private double movementSpeed = 20;
@@ -69,6 +71,9 @@ public class Survive
   private boolean gameRunning = true;
   private boolean inventoryOpen = false;
   private boolean craftingOpen = false;
+  private boolean craftingStructure = false;
+  
+  private boolean logWallReceipe = false;
   
   private ArrayList lowerLayers = new ArrayList();
   private ArrayList middleLayers = new ArrayList();
@@ -340,8 +345,11 @@ public class Survive
   {
     this.removeList.add(object);
   }
-  
-  public void addToInventory(int itemCode)
+  public void removeButton(Hud object)
+  {
+    this.removeList.add(object);
+  }
+  public void addToInventory(int itemCode, int quantity)
   {
     if (this.inventorys.size() == 0)
     {
@@ -349,18 +357,31 @@ public class Survive
       this.inventorys.add(this.log);
       this.stone = new Inventory("sprites/stone.png", 2, 0);
       this.inventorys.add(this.stone);
+      this.logWall = new Inventory("sprites/LogWall.gif", 3, 0);
+      this.inventorys.add(this.logWall);
     }
     for (int i = 0; i < this.inventorys.size(); i++)
     {
       Inventory inventory = (Inventory)this.inventorys.get(i);
       if (inventory.getItemCode() == itemCode)
       {
-        inventory.addQuantity();
-        System.err.println(inventory.getQuantity());
+        inventory.addQuantity(quantity);
+   
       }
     }
   }
-  
+  public void removeFromInventory (int itemCode, int quantity)
+  {
+    for (int i = 0; i < this.inventorys.size(); i++)
+    {
+      Inventory inventory = (Inventory)this.inventorys.get(i);
+      if (inventory.getItemCode() == itemCode)
+      {
+        inventory.removeQuantity(quantity);
+     
+      }
+    }  
+  }
   public void checkCollisionObject(String direction)
   {
     for (int i = 0; i < this.middleLayers.size(); i++)
@@ -476,6 +497,10 @@ public class Survive
       if (this.cPressed)
       {
           craftingOpen = !craftingOpen;
+          if (craftingStructure = true)
+          {
+              craftingStructure = false;
+          }
       }
       if (this.iPressed)
       {
@@ -550,7 +575,48 @@ public class Survive
       
      
   }
-  
+  public void removeAllButtons()
+  {
+      for (int i = 5; i < this.huds.size(); i++)
+      {
+          Hud hud = (Hud)this.huds.get(i);
+          removeButton(hud);
+      }
+  }
+  public void findAvailReceipe()
+  {
+      int logQuantity = 0;
+      int stoneQuantity = 0;
+      int x = 0;
+      int y = yRes - 30;
+      for (int i = 0; i < this.inventorys.size(); i++)
+            
+        {
+            Inventory inventory = (Inventory)this.inventorys.get(i);
+            
+            if (inventory.getQuantity() > 0)
+            {
+                switch (inventory.getItemCode()) 
+                {
+                    case 1:
+                        logQuantity = inventory.getQuantity();
+                        break;
+                    case 2:
+                        stoneQuantity = inventory.getQuantity();
+                        break;
+                }
+            }
+        }
+      if (logQuantity >= 4)   
+      {
+          logWallReceipe = true;
+          
+          this.structureButton = new ButtonEntity(this, "sprites/logWall.gif", x, y, "LogWall", 20); 
+          this.huds.add(this.structureButton);
+          x = x + 25;
+      }
+      
+  }
   
   public void gameLoop()
   {
@@ -581,6 +647,8 @@ public class Survive
         }
       }
       this.middleLayers.removeAll(this.removeList);
+      this.huds.removeAll(this.removeList);
+      
       this.removeList.clear();
       
       for (int i = 0; i < 1; i++)
@@ -597,11 +665,33 @@ public class Survive
       
       if (craftingOpen == true)
       {    
-      for (int i = 1; i < this.huds.size(); i++)
+      for (int i = 1; i <= 4; i++)
       {
         Hud hud = (Hud)this.huds.get(i);
         hud.draw(g);
       }
+         
+      }
+      
+      
+      if (craftingStructure == true)
+      {
+          int x = 0;
+          removeAllButtons();
+          findAvailReceipe();
+          for (int i = 1; i < this.huds.size(); i++)
+            {
+                Hud hud = (Hud)this.huds.get(i);
+                if (hud.getType() == "LogWall" && logWallReceipe == true)
+                {
+                
+                hud.draw(g);
+                x = x + 25;
+                
+                }
+            }
+      
+          
       }
       if (this.waitingForKeyPress)
       {
@@ -656,7 +746,17 @@ public class Survive
           
           if (craftingOpen == true && what != "none")
           {    
-          System.err.println(what);
+          craftingOpen = false;
+          craftingStructure = true;
+          }
+          if (craftingStructure = true)
+          {
+              switch (what){
+                  case "LogWall":
+                    addToInventory(3, 1);
+                    removeFromInventory(1, 4);
+                    break;
+              }
           }
           
       }

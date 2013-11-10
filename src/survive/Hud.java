@@ -1,5 +1,6 @@
 package survive;
 
+
 import java.awt.Graphics;
 
 public abstract class Hud
@@ -58,6 +59,7 @@ public abstract class Hud
   {
     return (int)this.imageSize;
   }
+ 
   public void changeFrame(int frameNumber) {}
   
   public String getType()

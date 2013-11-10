@@ -36,9 +36,13 @@ import java.awt.Graphics;
    {
        return this.y;
    }
-   public void addQuantity()
+   public void addQuantity(int quantity)
    {
-     this.quantity += 1;
+     this.quantity += quantity;
+   }
+   public void removeQuantity(int quantity)
+   {
+     this.quantity -= quantity;
    }
    public void changeX(int x)
    {

@@ -30,7 +30,7 @@
     public void interact()
    {
      this.survive.removeMiddleLayer(this);
-     this.survive.addToInventory(1);
+     this.survive.addToInventory(1, 1);
    }
  }
 

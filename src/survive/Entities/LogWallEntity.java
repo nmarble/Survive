@@ -3,12 +3,12 @@
  import survive.MiddleLayer;
  import survive.Survive;
  
- public class BoulderEntity
+ public class LogWallEntity
    extends MiddleLayer
  {
    private Survive survive;
    
-   public BoulderEntity(Survive survive, String ref, int x, int y, String type)
+   public LogWallEntity(Survive survive, String ref, int x, int y, String type)
    {
      super(ref, x, y, type);
      
@@ -26,11 +26,11 @@
      int modifiedY = 0;
      return modifiedY;
    }
-   
-   public void interact()
+
+    public void interact()
    {
      this.survive.removeMiddleLayer(this);
-     this.survive.addToInventory(2, 1);
+     this.survive.addToInventory(3, 1);
    }
  }
 
