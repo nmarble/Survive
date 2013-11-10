@@ -12,9 +12,9 @@
    private Sprite[] frames = new Sprite[4];
    private String direction = "North";
    
-   public PlayerEntity(Survive survive, String ref, int x, int y, String type)
+   public PlayerEntity(Survive survive, String ref, int x, int y, String type, int imageSize)
    {
-     super(ref, x, y, type);
+     super(ref, x, y, type, imageSize);
      
  
  

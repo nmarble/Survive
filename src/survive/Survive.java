@@ -1,6 +1,7 @@
 package survive;
 
 
+
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import survive.Entities.BoulderEntity;
+import survive.Entities.ButtonEntity;
 import survive.Entities.GrassEntity;
 import survive.Entities.GravelEntity;
 import survive.Entities.PlayerEntity;
@@ -36,6 +38,10 @@ public class Survive
   private MiddleLayer boulder;
   
   private Hud player;
+  private Hud structureButton;
+  private Hud toolButton;
+  private Hud consumableButton;
+  private Hud decorativeButton;
   
   private Inventory log;
   private Inventory stone;
@@ -51,6 +57,7 @@ public class Survive
   private boolean downPressed = false;
   private boolean spacePressed = false;
   private boolean iPressed = false;
+  private boolean cPressed = false;
   
   private int xRes = 800;
   private int yRes = 600;
@@ -61,6 +68,7 @@ public class Survive
   
   private boolean gameRunning = true;
   private boolean inventoryOpen = false;
+  private boolean craftingOpen = false;
   
   private ArrayList lowerLayers = new ArrayList();
   private ArrayList middleLayers = new ArrayList();
@@ -124,8 +132,22 @@ public class Survive
   
   private void initEntities()
   {
-    this.player = new PlayerEntity(this, "sprites/PlayerN.png", this.playerX, this.playerY, "player");
+    this.player = new PlayerEntity(this, "sprites/PlayerN.png", this.playerX, this.playerY, "player", 20);
     this.huds.add(this.player);
+    
+    this.structureButton = new ButtonEntity(this, "sprites/StructureButton.jpg", 0, (yRes - 100), "Structure", 100); 
+    this.huds.add(this.structureButton);
+    
+    this.toolButton = new ButtonEntity(this, "sprites/ToolButton.jpg", 110,(yRes - 100), "Tool",100); 
+    this.huds.add(this.toolButton);
+    
+    this.consumableButton = new ButtonEntity(this, "sprites/ConsumableButton.jpg", 220, (yRes - 100), "Consumable",100); 
+    this.huds.add(this.consumableButton);
+    
+    this.decorativeButton = new ButtonEntity(this, "sprites/DecorativeButton.jpg", 330,(yRes - 100), "Decorative",100); 
+    this.huds.add(this.decorativeButton);
+    
+    
     for (int y = 0; y < 5; y++) {
       for (int x = 0; x < 5; x++)
       {
@@ -295,7 +317,25 @@ public class Survive
       }
     }
   }
-  
+  public String mouseInteract(int x, int y)
+  {
+      String type = "none";
+      //Check if button is there
+      for (int i = 1; i < this.huds.size(); i++)
+      {
+        Hud hud = (Hud)this.huds.get(i);
+        int xLimit = (hud.getX() + hud.getImageSize());
+        int yLimit = (hud.getY() + hud.getImageSize());
+        
+        if ((x >= hud.getX()) && (y >= hud.getY()) && (x <= xLimit) && (y <= yLimit))
+        {
+            type = hud.getType();
+           
+        }
+        
+      }
+     return type;
+  }
   public void removeMiddleLayer(MiddleLayer object)
   {
     this.removeList.add(object);
@@ -433,7 +473,11 @@ public class Survive
   }
   public void checkButtonPushed ()
   {
-    if (this.iPressed)
+      if (this.cPressed)
+      {
+          craftingOpen = !craftingOpen;
+      }
+      if (this.iPressed)
       {
           inventoryOpen = !inventoryOpen;
       }
@@ -507,6 +551,7 @@ public class Survive
      
   }
   
+  
   public void gameLoop()
   {
     
@@ -538,17 +583,25 @@ public class Survive
       this.middleLayers.removeAll(this.removeList);
       this.removeList.clear();
       
-      
+      for (int i = 0; i < 1; i++)
+      {
+        Hud hud = (Hud)this.huds.get(i);
+        hud.draw(g);
+      }
       
       for (int i = 0; i < this.middleLayers.size(); i++)
       {
         MiddleLayer object = (MiddleLayer)this.middleLayers.get(i);
         object.draw(g);
       }
-      for (int i = 0; i < this.huds.size(); i++)
+      
+      if (craftingOpen == true)
+      {    
+      for (int i = 1; i < this.huds.size(); i++)
       {
         Hud hud = (Hud)this.huds.get(i);
         hud.draw(g);
+      }
       }
       if (this.waitingForKeyPress)
       {
@@ -598,9 +651,14 @@ public class Survive
   {
       public void mouseClicked(MouseEvent e)
       {
-         
-          System.err.println(e.getX());
-          System.err.println(e.getY());
+          //Get what is clicked
+          String what = mouseInteract(e.getX(), e.getY());
+          
+          if (craftingOpen == true && what != "none")
+          {    
+          System.err.println(what);
+          }
+          
       }
   }
   
@@ -633,6 +691,9 @@ public class Survive
           case 40:
               Survive.this.downPressed = true;
               break;
+          case 67:
+              Survive.this.cPressed = true;
+              break;
           case 73:
               Survive.this.iPressed = true;
               break;
@@ -661,6 +722,9 @@ public class Survive
               break;
           case 40:
               Survive.this.downPressed = false;
+              break;
+          case 67:
+              Survive.this.cPressed = false;
               break;
           case 73:
               Survive.this.iPressed = false;
