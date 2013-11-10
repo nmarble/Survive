@@ -18,17 +18,17 @@
      
  
  
-     this.frames[0] = SpriteStore.get().getSprite("sprites/PlayerN.png");
-     this.frames[1] = SpriteStore.get().getSprite("sprites/PlayerS.png");
-     this.frames[2] = SpriteStore.get().getSprite("sprites/PlayerW.png");
-     this.frames[3] = SpriteStore.get().getSprite("sprites/PlayerE.png");
+     frames[0] = SpriteStore.get().getSprite("sprites/PlayerN.png");
+     frames[1] = SpriteStore.get().getSprite("sprites/PlayerS.png");
+     frames[2] = SpriteStore.get().getSprite("sprites/PlayerW.png");
+     frames[3] = SpriteStore.get().getSprite("sprites/PlayerE.png");
      
      this.survive = survive;
    }
    
    public void changeFrame(int frameNumber)
    {
-     this.sprite = this.frames[frameNumber];
+     sprite = frames[frameNumber];
    }
  }
 

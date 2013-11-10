@@ -12,7 +12,7 @@
    
    public LowerLayer(String ref, int x, int y, String type)
    {
-     this.sprite = SpriteStore.get().getSprite(ref);
+     sprite = SpriteStore.get().getSprite(ref);
      this.x = x;
      this.y = y;
      this.type = type;
@@ -20,44 +20,44 @@
    
    public void moveLeft(double movementSpeed)
    {
-     this.x += movementSpeed;
+     x += movementSpeed;
    }
    
    public void moveRight(double movementSpeed)
    {
-     this.x -= movementSpeed;
+     x -= movementSpeed;
    }
    
    public void moveUp(double movementSpeed)
    {
-     this.y += movementSpeed;
+     y += movementSpeed;
    }
    
    public void moveDown(double movementSpeed)
    {
-     this.y -= movementSpeed;
+     y -= movementSpeed;
    }
    
    public void draw(Graphics g)
    {
-     this.sprite.draw(g, (int)this.x, (int)this.y);
+     sprite.draw(g, (int)x, (int)y);
    }
    
    public int getX()
    {
-     return (int)this.x;
+     return (int)x;
    }
    
    public int getY()
    {
-     return (int)this.y;
+     return (int)y;
    }
    
    public void changeFrame(int frameNumber) {}
    
    public String getType()
    {
-     return this.type;
+     return type;
    }
  }
 

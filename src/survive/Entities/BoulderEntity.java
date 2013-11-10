@@ -29,8 +29,8 @@
    
    public void interact()
    {
-     this.survive.removeMiddleLayer(this);
-     this.survive.addToInventory(2, 1);
+     survive.removeMiddleLayer(this);
+     survive.addToInventory(2, 1);
    }
  }
 

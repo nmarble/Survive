@@ -14,17 +14,17 @@
    
    public int getWidth()
    {
-     return this.image.getWidth(null);
+     return image.getWidth(null);
    }
    
    public int getHeight()
    {
-     return this.image.getHeight(null);
+     return image.getHeight(null);
    }
    
    public void draw(Graphics g, int x, int y)
    {
-     g.drawImage(this.image, x, y, null);
+     g.drawImage(image, x, y, null);
    }
  }
 

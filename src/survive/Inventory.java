@@ -12,29 +12,29 @@ import java.awt.Graphics;
    
    public Inventory(String ref, int itemCode, int quantity)
    {
-     this.sprite = SpriteStore.get().getSprite(ref);
+     sprite = SpriteStore.get().getSprite(ref);
      this.itemCode = itemCode;
      this.quantity = quantity;
-     this.x = 0;
-     this.y = 0;
+     x = 0;
+     y = 0;
    }
    
    public int getItemCode()
    {
-     return this.itemCode;
+     return itemCode;
    }
    
    public int getQuantity()
    {
-     return this.quantity;
+     return quantity;
    }
    public int getX()
    {
-       return this.x;
+       return x;
    }
    public int getY()
    {
-       return this.y;
+       return y;
    }
    public void addQuantity(int quantity)
    {
@@ -54,7 +54,7 @@ import java.awt.Graphics;
    }
    public void draw(Graphics g)
   {
-    this.sprite.draw(g, (int)this.x, (int)this.y);
+    sprite.draw(g, (int)x, (int)y);
   }
  }
 

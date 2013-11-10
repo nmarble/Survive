@@ -26,8 +26,9 @@ public class SpriteStore
   
   public Sprite getSprite(String ref)
   {
-    if (this.sprites.get(ref) != null) {
-      return (Sprite)this.sprites.get(ref);
+    if (sprites.containsKey(ref)) 
+    {
+      return sprites.get(ref);
     }
     BufferedImage sourceImage = null;
     try
@@ -47,7 +48,7 @@ public class SpriteStore
     
 
     Sprite sprite = new Sprite(image);
-    this.sprites.put(ref, sprite);
+    sprites.put(ref, sprite);
     
     return sprite;
   }
