@@ -3,12 +3,12 @@
  import survive.MiddleLayer;
  import survive.Survive;
  
- public class TreeEntity
+ public class StoneEntity
    extends MiddleLayer
  {
    private Survive survive;
    
-   public TreeEntity(Survive survive, String ref, int x, int y, String type)
+   public StoneEntity(Survive survive, String ref, int x, int y, String type)
    {
      super(ref, x, y, type);
      
@@ -23,18 +23,18 @@
    
    public int getModifiedY()
    {
-     int modifiedY = 40;
+     int modifiedY = 0;
      return modifiedY;
    }
 
     public void interact()
    {
      survive.removeMiddleLayer(this);
-     survive.addToInventory(1, 1);
+     survive.addToInventory(2, 1);
    }
     public boolean passable()
    {
-       return false;
+       return true;
    }
  }
 

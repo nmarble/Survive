@@ -4,8 +4,8 @@ package survive;
 
 import java.awt.Canvas;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
-
 import java.awt.Graphics2D;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -19,13 +19,10 @@ import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import survive.Entities.BoulderEntity;
-import survive.Entities.ButtonEntity;
-import survive.Entities.GrassEntity;
-import survive.Entities.GravelEntity;
-import survive.Entities.PlayerEntity;
-import survive.Entities.TreeEntity;
+
+import survive.Entities.*;
 
 public class Survive
   extends Canvas
@@ -38,6 +35,8 @@ public class Survive
   private MiddleLayer tree;
   private MiddleLayer boulder;
   private MiddleLayer LogWall;
+  private MiddleLayer Log;
+  private MiddleLayer Stone;
   
   private Hud player;
   private Hud structureButton;
@@ -68,11 +67,13 @@ public class Survive
   private int playerY = yRes / 2;
   private int treeLikely = 10;
   private int boulderLikely = 20;
+  private int itemSelection = 0;
   
   private boolean gameRunning = true;
   private boolean inventoryOpen = false;
   private boolean craftingOpen = false;
   private boolean craftingStructure = false;
+  private boolean holdingItem = false;
   
   private boolean logWallReceipe = false;
   
@@ -81,6 +82,8 @@ public class Survive
   private List<Hud> huds = new ArrayList<Hud>();
   private List<Inventory> inventorys = new ArrayList<Inventory>();
   private ArrayList removeList = new ArrayList();
+  
+  
   
   public Survive()
   {
@@ -92,7 +95,8 @@ public class Survive
     panel.setPreferredSize(new Dimension(xRes, yRes));
     panel.setLayout(null);
     
-
+    
+    
     setBounds(0, 0, xRes, yRes);
     panel.add(this);
     
@@ -104,7 +108,7 @@ public class Survive
     container.setResizable(false);
     container.setVisible(true);
     
-
+    
     container.addWindowListener(new WindowAdapter()
     {
       public void windowClosing(WindowEvent e)
@@ -163,7 +167,41 @@ public class Survive
     }
     addFloor(playerX, playerY);
   }
-  
+  public void getCursorType (int type)
+  {
+      switch (type)
+      {
+          case 1:
+          setCursor(
+                new Cursor(Cursor.DEFAULT_CURSOR));
+              break;
+          case 2:
+          setCursor(
+                new Cursor(Cursor.MOVE_CURSOR));
+              break;
+      }
+      }
+  public void setUpCursorImage (int itemCode)
+  {
+      
+      String imageLoc = "";
+      
+      switch (itemCode)
+      {
+          case 1:
+              imageLoc = "sprites/log.png";
+              break;
+          case 2:
+              imageLoc = "sprites/stone.png";
+              break;
+          case 3:
+              imageLoc = "sprites/logWall.gif";
+              break;
+          
+      }
+     
+     
+  }
   private void checkMissingFloorTop()
   {
     int entityx = 0;
@@ -332,6 +370,17 @@ public class Survive
         }
         
       }
+      //Check if inventory is there
+      for (Inventory inventory : inventorys)
+      {
+          int xLimit = inventory.getX() + 20;
+          int yLimit = inventory.getY() + 20;
+          if (x >= inventory.getX() && y >= inventory.getY() && x <= xLimit && y <= yLimit)
+          {
+              type = String.valueOf(inventory.getItemCode());
+              
+          }
+      }
      return type;
   }
   public void removeMiddleLayer(MiddleLayer object)
@@ -381,7 +430,7 @@ public class Survive
       String type = middleLayer.getType();
       int modifiedX = middleLayer.getModifiedX();
       int modifiedY = middleLayer.getModifiedY();
-      if (middleLayer.collideWith(middleLayer.getX() + modifiedX, middleLayer.getY() + modifiedY, playerX, playerY) == true)
+      if (middleLayer.collideWith(middleLayer.getX() + modifiedX, middleLayer.getY() + modifiedY, playerX, playerY) == true && middleLayer.passable() == false)
       {
         if ("left".equals(direction)) {
           moveAll("right");
@@ -398,7 +447,49 @@ public class Survive
       }
     }
   }
+  public boolean checkForMoreItem(int itemCode)
+  {
+      boolean hasIt = false;
+      for (Inventory inventory : inventorys)
+      {
+      if (inventory.getItemCode() == itemCode)
+      {
+        if (inventory.getQuantity() > 0)
+        {
+            hasIt = true;
+        }
+        else
+        {
+            hasIt = false;
+        }
+     
+      }
+    } 
+      return hasIt;
+  }
+  public void setItemDown(int x, int y)
+  {
+      switch (itemSelection)
+      {
+          case 1:
+              Log = new LogEntity(this, "sprites/log.png", x, y, "log");
+              middleLayers.add(Log);
+              removeFromInventory(1,1);
+              break;
+          case 2:
+              Stone = new StoneEntity(this, "sprites/stone.png", x, y, "stone");
+              middleLayers.add(Stone);
+              removeFromInventory(2,1);
+              break;
+          case 3:
+              LogWall = new LogWallEntity(this, "sprites/logWall.gif", x, y, "logWall");
+              middleLayers.add(LogWall);
+              removeFromInventory(3,1);
+              break;
   
+      }
+     
+  }
   public void addFloor(int x, int y)
   {
     int grassChance = 2;
@@ -610,6 +701,8 @@ public class Survive
   public void gameLoop()
   {
     
+    
+    
     long lastLoopTime = System.currentTimeMillis();
     while (gameRunning)
     {
@@ -671,6 +764,20 @@ public class Survive
       
           
       }
+       if (holdingItem == true && checkForMoreItem(itemSelection) == false)
+      {
+          itemSelection = 0;
+          holdingItem = false;
+      }
+      if (holdingItem == true)
+      {
+          getCursorType(2);
+      }
+      if (holdingItem == false)
+      {
+          getCursorType(1);
+      }
+      
       if (waitingForKeyPress)
       {
         g.setColor(Color.white);
@@ -727,7 +834,27 @@ public class Survive
                     addToInventory(3, 1);
                     removeFromInventory(1, 4);
                     break;
+                 
               }
+          }
+          int whatNumber = 0;
+          try {
+          whatNumber = Integer.parseInt(what);
+          }
+          catch (NumberFormatException a)
+          {
+              System.err.println("Nothing there");
+          }
+          if (whatNumber > 0 && holdingItem == false)
+          {
+              itemSelection = whatNumber;
+              holdingItem = true;
+          }
+          if ("none".equals(what) && holdingItem == true)
+          {
+              int x = Math.round(e.getX()/20) * 20;
+              int y = Math.round(e.getY()/20) * 20;
+              setItemDown(x,y);
           }
           
       }

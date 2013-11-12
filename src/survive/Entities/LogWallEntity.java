@@ -32,6 +32,10 @@
      survive.removeMiddleLayer(this);
      survive.addToInventory(3, 1);
    }
+    public boolean passable()
+   {
+       return false;
+   }
  }
 
 

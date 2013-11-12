@@ -81,6 +81,7 @@ public abstract class MiddleLayer
     return modifiedY;
   }
   public abstract void interact();
+  public abstract boolean passable();
   
 }
 

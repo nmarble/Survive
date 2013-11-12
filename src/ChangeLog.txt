@@ -1,3 +1,4 @@
+20131113 - Added ability to drop things from inventory with mouse
 20131110 - Added crafting menu when C pressed
 20131110 - Player will now be drawn behind objects
 20131109 - Added inventory items
