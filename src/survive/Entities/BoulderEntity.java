@@ -1,5 +1,6 @@
  package survive.Entities;
  
+import survive.Global;
  import survive.MiddleLayer;
  import survive.Survive;
  

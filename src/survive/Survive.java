@@ -19,7 +19,6 @@ import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import survive.Entities.*;
@@ -37,6 +36,8 @@ public class Survive
   private MiddleLayer LogWall;
   private MiddleLayer Log;
   private MiddleLayer Stone;
+  
+  private EnemyLayer zombie;
   
   private Hud player;
   private Hud structureButton;
@@ -61,10 +62,6 @@ public class Survive
   private boolean iPressed = false;
   private boolean cPressed = false;
   
-  private int xRes = 800;
-  private int yRes = 600;
-  private int playerX = xRes / 2;
-  private int playerY = yRes / 2;
   private int treeLikely = 10;
   private int boulderLikely = 20;
   private int itemSelection = 0;
@@ -81,33 +78,27 @@ public class Survive
   private List<MiddleLayer> middleLayers = new ArrayList<MiddleLayer>();
   private List<Hud> huds = new ArrayList<Hud>();
   private List<Inventory> inventorys = new ArrayList<Inventory>();
+  private List<EnemyLayer> enemyLayers = new ArrayList<EnemyLayer>();
   private ArrayList removeList = new ArrayList();
   
   
   
   public Survive()
   {
-   
     JFrame container = new JFrame("Survive");
     
-
     JPanel panel = (JPanel)container.getContentPane();
-    panel.setPreferredSize(new Dimension(xRes, yRes));
+    panel.setPreferredSize(new Dimension(Global.xRes, Global.yRes));
     panel.setLayout(null);
     
-    
-    
-    setBounds(0, 0, xRes, yRes);
+    setBounds(0, 0, Global.xRes, Global.yRes);
     panel.add(this);
-    
 
     setIgnoreRepaint(true);
-    
 
     container.pack();
     container.setResizable(false);
     container.setVisible(true);
-    
     
     container.addWindowListener(new WindowAdapter()
     {
@@ -116,10 +107,9 @@ public class Survive
         System.exit(0);
       }
     });
+    
     addKeyListener(new KeyInputHandler());
     addMouseListener(new MouseInputHandler());
-    
-    
 
     requestFocus();
     
@@ -142,22 +132,26 @@ public class Survive
   
   private void initEntities()
   {
-    player = new PlayerEntity(this, "sprites/PlayerN.png", playerX, playerY, "player", 20);
+    //Add player entity
+    player = new PlayerEntity(this, "sprites/PlayerN.png", Global.playerX, Global.playerY, "player", 20);
     huds.add(player);
-    
-    structureButton = new ButtonEntity(this, "sprites/StructureButton.jpg", 0, (yRes - 100), "Structure", 100); 
+    //Add test zombie entity
+    zombie = new ZombieEntity(this, "sprites/ZombieN1.png", 100, 100, "zombie", "N");
+    enemyLayers.add(zombie);
+    //Add Crafting buttons
+    structureButton = new ButtonEntity(this, "sprites/StructureButton.jpg", 0, (Global.yRes - 100), "Structure", 100); 
     huds.add(structureButton);
     
-    toolButton = new ButtonEntity(this, "sprites/ToolButton.jpg", 110,(yRes - 100), "Tool",100); 
+    toolButton = new ButtonEntity(this, "sprites/ToolButton.jpg", 110,(Global.yRes - 100), "Tool",100); 
     huds.add(toolButton);
     
-    consumableButton = new ButtonEntity(this, "sprites/ConsumableButton.jpg", 220, (yRes - 100), "Consumable",100); 
+    consumableButton = new ButtonEntity(this, "sprites/ConsumableButton.jpg", 220, (Global.yRes - 100), "Consumable",100); 
     huds.add(consumableButton);
     
-    decorativeButton = new ButtonEntity(this, "sprites/DecorativeButton.jpg", 330,(yRes - 100), "Decorative",100); 
+    decorativeButton = new ButtonEntity(this, "sprites/DecorativeButton.jpg", 330,(Global.yRes - 100), "Decorative",100); 
     huds.add(decorativeButton);
     
-    
+    //Add starting grass
     for (int y = 0; y < 5; y++) {
       for (int x = 0; x < 5; x++)
       {
@@ -165,8 +159,10 @@ public class Survive
         lowerLayers.add(grass);
       }
     }
-    addFloor(playerX, playerY);
+    addFloor(Global.playerX, Global.playerY);
   }
+  
+  //Set cursor type
   public void getCursorType (int type)
   {
       switch (type)
@@ -180,12 +176,12 @@ public class Survive
                 new Cursor(Cursor.MOVE_CURSOR));
               break;
       }
-      }
+  }
+  
+  /* test code to set custom image for cursor. Doesnt work
   public void setUpCursorImage (int itemCode)
   {
-      
       String imageLoc = "";
-      
       switch (itemCode)
       {
           case 1:
@@ -198,28 +194,30 @@ public class Survive
               imageLoc = "sprites/logWall.gif";
               break;
           
-      }
-     
-     
+      } 
   }
+  */
   private void checkMissingFloorTop()
   {
     int entityx = 0;
-    int entityy = 0;
-    
+    int entityy = 0; 
     boolean match = true;
-    for (int x = 0; x < xRes / 20; x++)
+    
+    for (int x = 0; x < Global.xRes / 20; x++)
     {
       match = false; 
+      
       for (LowerLayer lowerLayer : lowerLayers)
       {
-       
         entityx = lowerLayer.getX();
         entityy = lowerLayer.getY();
-        if ((entityx == x * 20) && (entityy == 0)) {
+        
+        if ((entityx == x * 20) && (entityy == 0)) 
+        {
           match = true;
         }
       }
+      
       if (!match)
       {
         int y = 0;
@@ -232,22 +230,26 @@ public class Survive
   {
     int entityx = 0;
     int entityy = 0;
-    
     boolean match = true;
-    for (int x = 0; x < xRes / 20; x++)
+    
+    for (int x = 0; x < Global.xRes / 20; x++)
     {
       match = false;
+  
       for (LowerLayer lowerLayer : lowerLayers)
       {     
         entityx = lowerLayer.getX();
         entityy = lowerLayer.getY();
-        if ((entityx == x * 20) && (entityy == yRes)) {
+        
+        if ((entityx == x * 20) && (entityy == Global.yRes)) 
+        {
           match = true;
         }
       }
+      
       if (!match)
       {
-        int y = yRes;
+        int y = Global.yRes;
         addFloor(x * 20, y);
       }
     }
@@ -257,20 +259,23 @@ public class Survive
   {
     int entityx = 0;
     int entityy = 0;
-    
     boolean match = true;
-    for (int y = 0; y < yRes / 20; y++)
+    
+    for (int y = 0; y < Global.yRes / 20; y++)
     {
       match = false;
+      
       for (LowerLayer lowerLayer : lowerLayers)
       {
-        
         entityx = lowerLayer.getX();
         entityy = lowerLayer.getY();
-        if ((entityx == 0) && (entityy == y * 20)) {
+        
+        if ((entityx == 0) && (entityy == y * 20)) 
+        {
           match = true;
         }
       }
+      
       if (!match)
       {
         int x = 0;
@@ -285,20 +290,23 @@ public class Survive
     int entityy = 0;
     
     boolean match = true;
-    for (int y = 0; y < yRes / 20; y++)
+    for (int y = 0; y < Global.yRes / 20; y++)
     {
       match = false;
+      
       for (LowerLayer lowerLayer : lowerLayers)
       {      
         entityx = lowerLayer.getX();
         entityy = lowerLayer.getY();
-        if ((entityx == xRes) && (entityy == y * 20)) {
+        
+        if ((entityx == Global.xRes) && (entityy == y * 20)) 
+        {
           match = true;
         }
       }
       if (!match)
       {
-        int x = xRes;
+        int x = Global.xRes;
         addFloor(x, y * 20);
       }
     }
@@ -308,20 +316,23 @@ public class Survive
   {
     int entityx = 0;
     int entityy = 0;
-    
     boolean match = true;
-    for (int x = 0; x < xRes / 20; x++) {
-      for (int y = 0; y < yRes / 20; y++)
+    
+    for (int x = 0; x < Global.xRes / 20; x++) {
+      for (int y = 0; y < Global.yRes / 20; y++)
       {
         match = false;
+        
         for (LowerLayer lowerLayer : lowerLayers)
          {
           entityx = lowerLayer.getX();
           entityy = lowerLayer.getY();
-          if ((entityx == x * 20) && (entityy == y * 20)) {
+          if ((entityx == x * 20) && (entityy == y * 20)) 
+          {
             match = true;
           }
         }
+        
         if (!match) {
           addFloor(x * 20, y * 20);
         }
@@ -332,24 +343,24 @@ public class Survive
   public void interact()
   {
   
-   for (MiddleLayer middleLayer : middleLayers)
-        
-       {
+   for (MiddleLayer middleLayer : middleLayers) 
+   {
       //MiddleLayer object = (MiddleLayer)middleLayers.get(i);
-      if ((direction == "up") && (playerX == middleLayer.getX() + middleLayer.getModifiedX()) && (playerY == middleLayer.getY() + middleLayer.getModifiedY() + 20)) {
+      if (("up".equals(direction)) && (Global.playerX == middleLayer.getX() + middleLayer.getModifiedX()) && (Global.playerY == middleLayer.getY() + middleLayer.getModifiedY() + 20)) {
         middleLayer.interact();
       }
-      if ((direction == "down") && (playerX == middleLayer.getX() + middleLayer.getModifiedX()) && (playerY == middleLayer.getY() + middleLayer.getModifiedY() - 20)) {
+      if (("down".equals(direction)) && (Global.playerX == middleLayer.getX() + middleLayer.getModifiedX()) && (Global.playerY == middleLayer.getY() + middleLayer.getModifiedY() - 20)) {
         middleLayer.interact();
       }
-      if ((direction == "left") && (playerX == middleLayer.getX() + middleLayer.getModifiedX() + 20) && (playerY == middleLayer.getY() + middleLayer.getModifiedY())) {
+      if (("left".equals(direction)) && (Global.playerX == middleLayer.getX() + middleLayer.getModifiedX() + 20) && (Global.playerY == middleLayer.getY() + middleLayer.getModifiedY())) {
         middleLayer.interact();
       }
-      if ((direction == "right") && (playerX == middleLayer.getX() + middleLayer.getModifiedX() - 20) && (playerY == middleLayer.getY() + middleLayer.getModifiedY())) {
+      if (("right".equals(direction)) && (Global.playerX == middleLayer.getX() + middleLayer.getModifiedX() - 20) && (Global.playerY == middleLayer.getY() + middleLayer.getModifiedY())) {
         middleLayer.interact();
       }
     }
   }
+  
   public String mouseInteract(int x, int y)
   {
       String type = "none";
@@ -393,6 +404,7 @@ public class Survive
   }
   public void addToInventory(int itemCode, int quantity)
   {
+    //Add entities if none are available
     if (inventorys.isEmpty())
     {
       log = new Inventory("sprites/log.png", 1, 0);
@@ -414,23 +426,24 @@ public class Survive
   }
   public void removeFromInventory (int itemCode, int quantity)
   {
+    
     for (Inventory inventory : inventorys)
-      {
+    {
+      
       if (inventory.getItemCode() == itemCode)
       {
         inventory.removeQuantity(quantity);
-     
       }
     }  
   }
   public void checkCollisionObject(String direction)
   {
+    
     for (MiddleLayer middleLayer : middleLayers)
-      {
+    {
       String type = middleLayer.getType();
-      int modifiedX = middleLayer.getModifiedX();
-      int modifiedY = middleLayer.getModifiedY();
-      if (middleLayer.collideWith(middleLayer.getX() + modifiedX, middleLayer.getY() + modifiedY, playerX, playerY) == true && middleLayer.passable() == false)
+ 
+      if (middleLayer.collideWithPlayer() == true && middleLayer.passable() == false)
       {
         if ("left".equals(direction)) {
           moveAll("right");
@@ -462,7 +475,6 @@ public class Survive
         {
             hasIt = false;
         }
-     
       }
     } 
       return hasIt;
@@ -509,6 +521,7 @@ public class Survive
         }
       }
     }
+    
     int randomGrass = (int)(Math.random() * grassChance);
     int randomGravel = (int)(Math.random() * gravelChance);
     if (randomGrass > randomGravel)
@@ -540,6 +553,22 @@ public class Survive
   
   public void moveAll(String direction)
   {
+    for (EnemyLayer enemyLayer : enemyLayers)
+    {
+    
+      if ("left".equals(direction)) {
+        enemyLayer.moveLeft(movementSpeed);
+      }
+      if ("right".equals(direction)) {
+        enemyLayer.moveRight(movementSpeed);
+      }
+      if ("up".equals(direction)) {
+        enemyLayer.moveUp(movementSpeed);
+      }
+      if ("down".equals(direction)) {
+        enemyLayer.moveDown(movementSpeed);
+      }
+    }
     for (MiddleLayer object : middleLayers)
     {
       
@@ -649,29 +678,31 @@ public class Survive
       //Draw Inventory screen
       Graphics2D g = (Graphics2D)strategy.getDrawGraphics();
       g.setColor(Color.GRAY);
-      g.fill3DRect(xRes - (xRes / 5), 0, yRes, xRes, true);
+      g.fill3DRect(Global.xRes - (Global.xRes / 5), 0, Global.yRes, Global.xRes, true);
       g.setColor(Color.BLACK);
-      g.drawLine(xRes - (xRes / 5), (yRes / 2), xRes, (yRes / 2));
+      g.drawLine(Global.xRes - (Global.xRes / 5), (Global.yRes / 2), Global.xRes, (Global.yRes / 2));
       g.dispose();
       
       
      
   }
+  //Removes all craftable item buttons
   public void removeAllButtons()
   {
-
       for (int i = 5; i < huds.size(); i++)
       {
           Hud hud = huds.get(i);
           removeButton(hud);
       }
   }
+  
   public void findAvailReceipe()
   {
       int logQuantity = 0;
       int stoneQuantity = 0;
+      //Set location to put icons
       int x = 0;
-      int y = yRes - 30;
+      int y = Global.yRes - 30;
       for (Inventory inventory : inventorys)      
       {
         if (inventory.getQuantity() > 0)
@@ -687,6 +718,7 @@ public class Survive
             }
         }
       }
+      //Log wall receipe
       if (logQuantity >= 4)   
       {
           logWallReceipe = true;
@@ -698,45 +730,81 @@ public class Survive
       
   }
   
+  //Loop of main game
   public void gameLoop()
   {
-    
-    
-    
     long lastLoopTime = System.currentTimeMillis();
+    long loopTime = 0;
+    
     while (gameRunning)
     {
       long delta = System.currentTimeMillis() - lastLoopTime;
+      loopTime = loopTime + lastLoopTime;
       lastLoopTime = System.currentTimeMillis();
-      
+     
 
       
       Graphics2D g = (Graphics2D)strategy.getDrawGraphics();
       g.setColor(Color.black);
-      g.fillRect(0, 0, xRes, yRes);
+      g.fillRect(0, 0, Global.xRes, Global.yRes);
      
-      
+      //Move Enemy
+      for (EnemyLayer enemyLayer : enemyLayers)
+      {
+          if (enemyLayer.getSpeed() <  loopTime)
+          {
+          enemyLayer.moveToPlayer();
+          loopTime = 0;
+          }
+          if (enemyLayer.collideWithPlayer() == true)
+          {
+              System.exit(0);
+          }
+          //check for collision with object
+          for (MiddleLayer middleLayer : middleLayers)
+          {
+          int xM = middleLayer.getX() + middleLayer.getModifiedX();
+          int yM = middleLayer.getY() + middleLayer.getModifiedY();
+          
+          if (enemyLayer.collideWithObject(xM, yM) == true)
+          {
+              enemyLayer.moveBack();
+          }
+          }
+      }
+     
       checkButtonPushed();
+      //Draw all ground that is on screen
       for (LowerLayer lowerLayer : lowerLayers)
       {
         int entityX = lowerLayer.getX();
         int entityY = lowerLayer.getY();
-        if ((entityX >= 0) && (entityY >= 0) && (entityX <= xRes) && (entityY <= yRes)) {
+        if ((entityX >= 0) && (entityY >= 0) && (entityX <= Global.xRes) && (entityY <= Global.yRes)) {
           lowerLayer.draw(g);
         }
       }
+      //What is to be removed gets removed
       middleLayers.removeAll(removeList);
       huds.removeAll(removeList);
       
+      //Resets what is to be removed
       removeList.clear();
+      
+      //Draws Player
       huds.get(0).draw(g);
       
-      
+      //Draw all Enemys
+      for (EnemyLayer enemyLayer : enemyLayers)
+      {
+          enemyLayer.draw(g);
+      }
+      //Draw all Objects
       for (MiddleLayer middleLayer : middleLayers)
       {
         middleLayer.draw(g);
       }
       
+      //When Crafting is open
       if (craftingOpen == true)
       {    
       for (int i = 1; i <= 4; i++)
@@ -747,7 +815,7 @@ public class Survive
          
       }
       
-      
+      //When Crafting for structures is open
       if (craftingStructure == true)
       {
           int x = 0;
@@ -764,15 +832,19 @@ public class Survive
       
           
       }
-       if (holdingItem == true && checkForMoreItem(itemSelection) == false)
+      
+      //Change holding status if nothing is there
+      if (holdingItem == true && checkForMoreItem(itemSelection) == false)
       {
           itemSelection = 0;
           holdingItem = false;
       }
+      //Change cursor for holding item
       if (holdingItem == true)
       {
           getCursorType(2);
       }
+      //Change cursor for not holding item
       if (holdingItem == false)
       {
           getCursorType(1);
@@ -781,9 +853,11 @@ public class Survive
       if (waitingForKeyPress)
       {
         g.setColor(Color.white);
-        g.drawString(message, (xRes - g.getFontMetrics().stringWidth(message)) / 2, 250);
-        g.drawString("Press any key", (xRes - g.getFontMetrics().stringWidth("Press space to continue")) / 2, (yRes / 2));
+        g.drawString(message, (Global.xRes - g.getFontMetrics().stringWidth(message)) / 2, 250);
+        g.drawString("Press any key", (Global.xRes - g.getFontMetrics().stringWidth("Press space to continue")) / 2, (Global.yRes / 2));
       }
+      
+      //Draws inventory background and items
       if (inventoryOpen == true)
       {    
           drawInventory();
@@ -796,8 +870,8 @@ public class Survive
                 col = col + 25;
             
             
-            inventory.changeX(xRes - (xRes / 5) + (col));
-            inventory.changeY((yRes / 2) + (15 * row));
+            inventory.changeX(Global.xRes - (Global.xRes / 5) + (col));
+            inventory.changeY((Global.yRes / 2) + (15 * row));
             
             inventory.draw(g);
             String quantity = String.valueOf(inventory.getQuantity());
@@ -896,7 +970,6 @@ public class Survive
               iPressed = true;
               break;
       }
-     
     }
     
     public void keyReleased(KeyEvent e)

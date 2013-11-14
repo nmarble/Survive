@@ -10,14 +10,12 @@
  {
    private Survive survive;
    private Sprite[] frames = new Sprite[4];
-   private String direction = "North";
+  
    
    public PlayerEntity(Survive survive, String ref, int x, int y, String type, int imageSize)
    {
      super(ref, x, y, type, imageSize);
-     
- 
- 
+
      frames[0] = SpriteStore.get().getSprite("sprites/PlayerN.png");
      frames[1] = SpriteStore.get().getSprite("sprites/PlayerS.png");
      frames[2] = SpriteStore.get().getSprite("sprites/PlayerW.png");

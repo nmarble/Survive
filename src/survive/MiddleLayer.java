@@ -9,6 +9,8 @@ public abstract class MiddleLayer
   protected String type;
   protected double movementSpeed;
   protected Sprite sprite;
+  protected int modifiedX;
+  protected int modifiedY;
   
   public MiddleLayer(String ref, int x, int y, String type)
   {
@@ -16,15 +18,7 @@ public abstract class MiddleLayer
     this.x = x;
     this.y = y;
     this.type = type;
-  }
   
-  public boolean collideWith(int x, int y, int playerX, int playerY)
-  {
-    boolean collision = false;
-    if ((x == playerX) && (y == playerY)) {
-      collision = true;
-    }
-    return collision;
   }
   
   public void moveLeft(double movementSpeed)
@@ -69,20 +63,22 @@ public abstract class MiddleLayer
     return type;
   }
   
-  public int getModifiedX()
+  public boolean collideWithPlayer()
   {
-    int modifiedX = 0;
-    return modifiedX;
+    double xM = x + getModifiedX();
+    double yM = y + getModifiedY();
+    
+    boolean collision = false;
+    if ((xM == Global.playerX) && (yM == Global.playerY)) {
+      collision = true;
+    }
+    return collision;
   }
   
-  public int getModifiedY()
-  {
-    int modifiedY = 0;
-    return modifiedY;
-  }
   public abstract void interact();
   public abstract boolean passable();
-  
+  public abstract int getModifiedX();
+  public abstract int getModifiedY();
 }
 
 
