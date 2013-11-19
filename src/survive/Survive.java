@@ -65,7 +65,7 @@ public class Survive
   private int treeLikely = 10;
   private int boulderLikely = 20;
   private int itemSelection = 0;
-  
+  private int zombieChance = 100;
   private boolean gameRunning = true;
   private boolean inventoryOpen = false;
   private boolean craftingOpen = false;
@@ -135,9 +135,6 @@ public class Survive
     //Add player entity
     player = new PlayerEntity(this, "sprites/PlayerN.png", Global.playerX, Global.playerY, "player", 20);
     huds.add(player);
-    //Add test zombie entity
-    zombie = new ZombieEntity(this, "sprites/ZombieN1.png", 100, 100, "zombie", "N");
-    enemyLayers.add(zombie);
     //Add Crafting buttons
     structureButton = new ButtonEntity(this, "sprites/StructureButton.jpg", 0, (Global.yRes - 100), "Structure", 100); 
     huds.add(structureButton);
@@ -177,26 +174,7 @@ public class Survive
               break;
       }
   }
-  
-  /* test code to set custom image for cursor. Doesnt work
-  public void setUpCursorImage (int itemCode)
-  {
-      String imageLoc = "";
-      switch (itemCode)
-      {
-          case 1:
-              imageLoc = "sprites/log.png";
-              break;
-          case 2:
-              imageLoc = "sprites/stone.png";
-              break;
-          case 3:
-              imageLoc = "sprites/logWall.gif";
-              break;
-          
-      } 
-  }
-  */
+
   private void checkMissingFloorTop()
   {
     int entityx = 0;
@@ -345,7 +323,7 @@ public class Survive
   
    for (MiddleLayer middleLayer : middleLayers) 
    {
-      //MiddleLayer object = (MiddleLayer)middleLayers.get(i);
+      
       if (("up".equals(direction)) && (Global.playerX == middleLayer.getX() + middleLayer.getModifiedX()) && (Global.playerY == middleLayer.getY() + middleLayer.getModifiedY() + 20)) {
         middleLayer.interact();
       }
@@ -357,6 +335,22 @@ public class Survive
       }
       if (("right".equals(direction)) && (Global.playerX == middleLayer.getX() + middleLayer.getModifiedX() - 20) && (Global.playerY == middleLayer.getY() + middleLayer.getModifiedY())) {
         middleLayer.interact();
+      }
+    }
+   for (EnemyLayer enemyLayer : enemyLayers) 
+   {
+      
+      if (("up".equals(direction)) && (Global.playerX == enemyLayer.getX() + enemyLayer.getModifiedX()) && (Global.playerY == enemyLayer.getY() + enemyLayer.getModifiedY() + 20)) {
+        enemyLayer.interact();
+      }
+      if (("down".equals(direction)) && (Global.playerX == enemyLayer.getX() + enemyLayer.getModifiedX()) && (Global.playerY == enemyLayer.getY() + enemyLayer.getModifiedY() - 20)) {
+        enemyLayer.interact();
+      }
+      if (("left".equals(direction)) && (Global.playerX == enemyLayer.getX() + enemyLayer.getModifiedX() + 20) && (Global.playerY == enemyLayer.getY() + enemyLayer.getModifiedY())) {
+        enemyLayer.interact();
+      }
+      if (("right".equals(direction)) && (Global.playerX == enemyLayer.getX() + enemyLayer.getModifiedX() - 20) && (Global.playerY == enemyLayer.getY() + enemyLayer.getModifiedY())) {
+        enemyLayer.interact();
       }
     }
   }
@@ -395,6 +389,10 @@ public class Survive
      return type;
   }
   public void removeMiddleLayer(MiddleLayer object)
+  {
+    removeList.add(object);
+  }
+  public void removeEnemyLayer(EnemyLayer object)
   {
     removeList.add(object);
   }
@@ -733,9 +731,8 @@ public class Survive
   {
      for (EnemyLayer enemyLayer : enemyLayers)
       {
-          if (enemyLayer.getSpeed() <  loopTime)
+          if (10 ==  loopTime)
           {
-          loopTime = 0;
           //Get location of enemy
           int enemyXLoc = enemyLayer.getX();
           int enemyYLoc = enemyLayer.getY();
@@ -778,6 +775,13 @@ public class Survive
                       pasLocCoor[i] = middleLayer.passable();
                   }
               }
+              for (EnemyLayer tempEnemy : enemyLayers)
+              {
+                  if (xLocCoor[i] == tempEnemy.getX() && yLocCoor[i] == tempEnemy.getY())
+                  {
+                      pasLocCoor[i] = tempEnemy.passable();
+                  }
+              }   
           }
           // Checks for best location that is passable
           for (int i = 0; i <=8; i++)
@@ -834,8 +838,13 @@ public class Survive
           // Sets last Location and moves to new
           enemyLayer.setLast(enemyLayer.getX(), enemyLayer.getY());
           enemyLayer.setXY(nextX, nextY);
+          if (enemyLayer.getX() == Global.playerX && enemyLayer.getY() == Global.playerY)
+          {
+             System.exit(0);
+          }
           }                      
       }
+     
      return loopTime;
   }
   //Loop of main game
@@ -847,7 +856,7 @@ public class Survive
     while (gameRunning)
     {
       long delta = System.currentTimeMillis() - lastLoopTime;
-      loopTime = loopTime + lastLoopTime;
+      loopTime ++;
       lastLoopTime = System.currentTimeMillis();
      
 
@@ -855,9 +864,16 @@ public class Survive
       Graphics2D g = (Graphics2D)strategy.getDrawGraphics();
       g.setColor(Color.black);
       g.fillRect(0, 0, Global.xRes, Global.yRes);
-      
       // Moves applicable enemy within its speed compared to loop time
       loopTime = moveEnemy(loopTime);
+
+      //Chance to add zombie
+      int randomZombie = (int)(Math.random() * zombieChance);
+      if (randomZombie == 1)
+      {
+        zombie = new ZombieEntity(this, "sprites/ZombieN1.png", 0, Math.round((int) (Math.random() * Global.xRes)/20) * 20, "zombie", "N");
+        enemyLayers.add(zombie);   
+      }
       
       checkButtonPushed();
       //Draw all ground that is on screen
@@ -872,6 +888,7 @@ public class Survive
       //What is to be removed gets removed
       middleLayers.removeAll(removeList);
       huds.removeAll(removeList);
+      enemyLayers.removeAll(removeList);
       
       //Resets what is to be removed
       removeList.clear();
@@ -956,8 +973,12 @@ public class Survive
             }
          }
       }
-      strategy.show();
       
+      strategy.show();
+      if (loopTime > 10)
+      {
+          loopTime = 0;
+      }
       try
       {
         Thread.sleep(100L);

@@ -11,7 +11,6 @@
  {
    private Survive survive;
    private Sprite[] frames = new Sprite[8];
-   private long speed = 100000000;
    private int lastX = 0;
    private int lastY = 0;
    public ZombieEntity(Survive survive, String ref, int x, int y, String type, String direction)
@@ -35,7 +34,7 @@
    }
    public void interact()
    {
-     System.exit(0);
+     survive.removeEnemyLayer(this);
    }
     public boolean passable()
    {
@@ -93,7 +92,7 @@
   }
    public long getSpeed()
    {
-       return (speed*100000);
+       return (10);
    }
    public int getLastX()
    {

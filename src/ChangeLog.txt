@@ -1,3 +1,4 @@
+20131119 - Zombies now spawn randomly and can be removed be facing them and pressing space. Game will end if they touch you 
 20131114 - Added Zombies!
 20131113 - Added ability to drop things from inventory with mouse
 20131110 - Added crafting menu when C pressed
