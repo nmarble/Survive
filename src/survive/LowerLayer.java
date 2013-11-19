@@ -59,6 +59,7 @@
    {
      return type;
    }
+   public abstract boolean passable();
  }
 
 

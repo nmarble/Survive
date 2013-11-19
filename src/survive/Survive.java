@@ -727,9 +727,117 @@ public class Survive
           huds.add(structureButton);
           x = x + 25;
       }
-      
   }
   
+  public long moveEnemy(long loopTime)
+  {
+     for (EnemyLayer enemyLayer : enemyLayers)
+      {
+          if (enemyLayer.getSpeed() <  loopTime)
+          {
+          loopTime = 0;
+          //Get location of enemy
+          int enemyXLoc = enemyLayer.getX();
+          int enemyYLoc = enemyLayer.getY();
+          //Get location of Player
+          int endXLoc = Global.playerX;
+          int endYLoc = Global.playerY;
+          // Int a bunch of stuff
+          int xLocCoor[] = new int[9];  //the x location of a possible move
+          int yLocCoor[] = new int[9];  //the y lovation of a possible move
+          boolean pasLocCoor[] = new boolean[9]; //Stores if the location is passable
+          int xSector = -20; 
+          int ySector = -20;
+          int bT = 9999; //The least distance from a block
+          int nextX = 0; //What the next location will be
+          int nextY = 0; 
+          int secX = 0;  //The secondary location should x fail
+          int secY = 0;     
+          int dT, xD, yD, sT;
+          for (int i = 0; i <= 8; i++)
+          {
+              xLocCoor[i] = enemyXLoc + xSector;
+              yLocCoor[i] = enemyYLoc + ySector;
+              xSector = xSector + 20;
+              if (xSector > 20)
+              {
+                  xSector = -20;
+                  ySector = ySector + 20;
+              }
+              for (LowerLayer lowerLayer : lowerLayers)
+              {
+                  if (xLocCoor[i] == lowerLayer.getX() && yLocCoor[i] == lowerLayer.getY())
+                  {
+                      pasLocCoor[i] = lowerLayer.passable();
+                  }
+              }
+              for (MiddleLayer middleLayer : middleLayers)
+              {
+                  if (xLocCoor[i] == (middleLayer.getX() + middleLayer.getModifiedX()) && yLocCoor[i] == (middleLayer.getY() + middleLayer.getModifiedY()))
+                  {
+                      pasLocCoor[i] = middleLayer.passable();
+                  }
+              }
+          }
+          // Checks for best location that is passable
+          for (int i = 0; i <=8; i++)
+          {
+              if (pasLocCoor[i] == true && i != 4)
+              {
+              xD = Math.abs(xLocCoor[i] - Global.playerX); 
+              yD = Math.abs(yLocCoor[i] - Global.playerY); 
+              
+              dT = (xD + yD);
+              if (dT <= bT)
+              {
+                  sT = bT;
+                  secX = nextX;
+                  secY = nextY;
+                  bT = dT;
+                   
+                  nextX = xLocCoor[i];
+                  nextY = yLocCoor[i];
+              }
+              }
+             
+          }
+          // Change graphics of enemy
+          if (nextX > enemyLayer.getX())
+          {
+              enemyLayer.changeDirection("right");
+          }
+          if (nextX < enemyLayer.getX())
+          {
+              enemyLayer.changeDirection("left");
+          }
+          if (nextY > enemyLayer.getY())
+          {
+              enemyLayer.changeDirection("down");
+          }
+          if (nextY < enemyLayer.getY())
+          {
+              enemyLayer.changeDirection("up");
+          }
+          
+          // Sets next location to secondary if it was the last one
+          if (enemyLayer.getLastX() == nextX && enemyLayer.getLastY() == nextY)
+          {
+              nextX = secX;
+              nextY = secY;         
+          }
+          // Doesnt allow map jump
+          if (nextX == 0 && nextY == 0)
+          {
+              nextX = enemyLayer.getLastX();
+              nextY = enemyLayer.getLastY();
+          }
+          // Sets last Location and moves to new
+          enemyLayer.setLast(enemyLayer.getX(), enemyLayer.getY());
+          enemyLayer.setXY(nextX, nextY);
+          }                      
+      }
+     return loopTime;
+  }
   //Loop of main game
   public void gameLoop()
   {
@@ -747,32 +855,10 @@ public class Survive
       Graphics2D g = (Graphics2D)strategy.getDrawGraphics();
       g.setColor(Color.black);
       g.fillRect(0, 0, Global.xRes, Global.yRes);
-     
-      //Move Enemy
-      for (EnemyLayer enemyLayer : enemyLayers)
-      {
-          if (enemyLayer.getSpeed() <  loopTime)
-          {
-          enemyLayer.moveToPlayer();
-          loopTime = 0;
-          }
-          if (enemyLayer.collideWithPlayer() == true)
-          {
-              System.exit(0);
-          }
-          //check for collision with object
-          for (MiddleLayer middleLayer : middleLayers)
-          {
-          int xM = middleLayer.getX() + middleLayer.getModifiedX();
-          int yM = middleLayer.getY() + middleLayer.getModifiedY();
-          
-          if (enemyLayer.collideWithObject(xM, yM) == true)
-          {
-              enemyLayer.moveBack();
-          }
-          }
-      }
-     
+      
+      // Moves applicable enemy within its speed compared to loop time
+      loopTime = moveEnemy(loopTime);
+      
       checkButtonPushed();
       //Draw all ground that is on screen
       for (LowerLayer lowerLayer : lowerLayers)
@@ -803,7 +889,6 @@ public class Survive
       {
         middleLayer.draw(g);
       }
-      
       //When Crafting is open
       if (craftingOpen == true)
       {    
@@ -811,10 +896,8 @@ public class Survive
       {
         Hud hud = huds.get(i);
         hud.draw(g);
+      }     
       }
-         
-      }
-      
       //When Crafting for structures is open
       if (craftingStructure == true)
       {
@@ -829,10 +912,7 @@ public class Survive
                 x = x + 25;
                 }
             }
-      
-          
       }
-      
       //Change holding status if nothing is there
       if (holdingItem == true && checkForMoreItem(itemSelection) == false)
       {
@@ -856,7 +936,6 @@ public class Survive
         g.drawString(message, (Global.xRes - g.getFontMetrics().stringWidth(message)) / 2, 250);
         g.drawString("Press any key", (Global.xRes - g.getFontMetrics().stringWidth("Press space to continue")) / 2, (Global.yRes / 2));
       }
-      
       //Draws inventory background and items
       if (inventoryOpen == true)
       {    
@@ -868,14 +947,12 @@ public class Survive
             if (inventory.getQuantity() > 0)
             {
                 col = col + 25;
+                inventory.changeX(Global.xRes - (Global.xRes / 5) + (col));
+                inventory.changeY((Global.yRes / 2) + (15 * row));
             
-            
-            inventory.changeX(Global.xRes - (Global.xRes / 5) + (col));
-            inventory.changeY((Global.yRes / 2) + (15 * row));
-            
-            inventory.draw(g);
-            String quantity = String.valueOf(inventory.getQuantity());
-            g.drawString(quantity, inventory.getX(), inventory.getY());
+                inventory.draw(g);
+                String quantity = String.valueOf(inventory.getQuantity());
+                g.drawString(quantity, inventory.getX(), inventory.getY());
             }
          }
       }
@@ -929,8 +1006,7 @@ public class Survive
               int x = Math.round(e.getX()/20) * 20;
               int y = Math.round(e.getY()/20) * 20;
               setItemDown(x,y);
-          }
-          
+          }  
       }
   }
   

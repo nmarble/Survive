@@ -14,6 +14,10 @@
      
      this.survive = survive;
    }
+   public boolean passable()
+   {
+       return true;
+   }
  }
 
 

@@ -14,6 +14,10 @@ public class GrassEntity
     
     this.survive = survive;
   }
+  public boolean passable()
+   {
+       return true;
+   }
 }
 
 

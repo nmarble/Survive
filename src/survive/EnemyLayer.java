@@ -102,29 +102,19 @@ public abstract class EnemyLayer
     }
     return collision;
   }
-  public void moveBack()
+  public void setXY(int incX, int incY)
   {
-      switch (direction)
-      {
-          case "up":
-              y = y + 20;
-              break;
-          case "down":
-              y = y - 20;
-              break;
-          case "left":
-              x = x + 20;
-              break;
-          case "right":
-              x = x - 20;
-              break;
-      }
+      x = incX;
+      y = incY;
   }
-  
   public abstract void interact();
   public abstract boolean passable();
-  public abstract void moveToPlayer();
+  public abstract void changeDirection(String d);
   public abstract long getSpeed();
+  public abstract int getLastX();
+  public abstract int getLastY();
+  public abstract void setLast(int lX, int lY);
+  
 }
 
 

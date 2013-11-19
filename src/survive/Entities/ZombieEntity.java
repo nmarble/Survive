@@ -12,7 +12,8 @@
    private Survive survive;
    private Sprite[] frames = new Sprite[8];
    private long speed = 100000000;
-   
+   private int lastX = 0;
+   private int lastY = 0;
    public ZombieEntity(Survive survive, String ref, int x, int y, String type, String direction)
    {
      super(ref, x, y, type, direction);
@@ -40,64 +41,72 @@
    {
        return false;
    }
-   public void moveToPlayer()
+  public void changeDirection(String d)
   {
-      if (Global.playerX < x)
+      direction = d;
+      switch (direction)
       {
-          direction = "left";
-          x = x - 20;
-          if (sprite == frames[7])
-          {
-          changeFrame(6);    
-          }
-          else 
-          {        
-          changeFrame(7);
-          }
-      }
-      if (Global.playerX > x)
-      {
-          direction = "right";
-          x = x + 20;
-          if (sprite == frames[2])
-          {
-          changeFrame(3);    
-          }
-          else 
-          {        
-          changeFrame(2);
-          }
-      }
-      if (Global.playerY < y)
-      {
-          direction = "up";
-          y = y - 20;
-          if (sprite == frames[0])
-          {
-          changeFrame(1);    
-          }
-          else 
-          {        
-          changeFrame(0);
-          }
-      }
-      if (Global.playerY > y)
-      {
-          direction = "down";
-          y = y + 20;
-          if (sprite == frames[5])
-          {
-          changeFrame(4);    
-          }
-          else 
-          {        
-          changeFrame(5);
-          }
-      }
+        case "left":
+            if (sprite == frames[7])
+            {
+                changeFrame(6);    
+            }
+            else 
+            {        
+                changeFrame(7);
+            }
+              break;
+        case "right":
+            if (sprite == frames[2])
+            {
+            changeFrame(3);    
+            }
+            else 
+            {        
+            changeFrame(2);
+            }
+            break;
+        case "up":
+            if (sprite == frames[0])
+            {
+            changeFrame(1);    
+            }
+            else 
+            {        
+            changeFrame(0);
+            }
+            break;
+        case "down":
+            if (sprite == frames[5])
+            {
+            changeFrame(4);    
+            }
+            else 
+            {        
+            changeFrame(5);
+            }
+            break;
+          
+      } 
+      
+   
   }
    public long getSpeed()
    {
        return (speed*100000);
+   }
+   public int getLastX()
+   {
+       return lastX;
+   }
+   public int getLastY()
+   {
+       return lastY;
+   }
+   public void setLast(int lX, int lY)
+   {
+       lastX = lX;
+       lastY = lY;
    }
  }
 
