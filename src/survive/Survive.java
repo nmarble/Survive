@@ -28,8 +28,14 @@ public class Survive
 {
   private BufferStrategy strategy;
   
+  int totalRandom = 3;
+  int[] randomChance = new int[totalRandom];
+ 
+  
+  
   private LowerLayer grass;
   private LowerLayer gravel;
+  private LowerLayer water;
   
   private MiddleLayer tree;
   private MiddleLayer boulder;
@@ -64,6 +70,8 @@ public class Survive
   
   private int treeLikely = 10;
   private int boulderLikely = 20;
+
+  
   private int itemSelection = 0;
   private int zombieChance = 100;
   private boolean gameRunning = true;
@@ -502,8 +510,7 @@ public class Survive
   }
   public void addFloor(int x, int y)
   {
-    int grassChance = 2;
-    int gravelChance = 0;
+    
     for (LowerLayer lowerLayer : lowerLayers)
     {
       int entityx = lowerLayer.getX();
@@ -512,43 +519,81 @@ public class Survive
       {
         String type = lowerLayer.getType();
         if ("grass".equals(type)) {
-          grassChance++;
+          randomChance[0]++;
+          
         }
         if ("gravel".equals(type)) {
-          gravelChance++;
+          randomChance[1]++;
+          
+        }
+        if ("water".equals(type)) {
+          randomChance[2]++;
+          
         }
       }
     }
     
-    int randomGrass = (int)(Math.random() * grassChance);
-    int randomGravel = (int)(Math.random() * gravelChance);
-    if (randomGrass > randomGravel)
+    int chance = 0;
+    switch (getRandomGround())
     {
-      grass = new GrassEntity(this, "sprites/grass.gif", x, y, "grass");
-      lowerLayers.add(grass);
+        case 0:
+            grass = new GrassEntity(this, "sprites/grass.gif", x, y, "grass");
+            lowerLayers.add(grass);
       
-      int Chance = (int)(Math.random() * treeLikely);
-      if (Chance == 1)
-      {
-        tree = new TreeEntity(this, "sprites/tree.png", x, y - 20, "tree");
-        middleLayers.add(tree);
-      }
+            chance = getRandomNum(treeLikely);
+            if (chance == 1)
+            {
+                tree = new TreeEntity(this, "sprites/tree.png", x, y - 20, "tree");
+                middleLayers.add(tree);
+            }
+            break;
+        case 1:
+            gravel = new GravelEntity(this, "sprites/gravel.gif", x, y, "gravel");
+            lowerLayers.add(gravel);
+      
+            chance = getRandomNum(boulderLikely);
+            if (chance == 1)
+            {
+                boulder = new BoulderEntity(this, "sprites/boulder.png", x, y, "boulder");
+                middleLayers.add(boulder);
+            } 
+            break;
+        case 2:
+            water = new WaterEntity(this, "sprites/water.gif", x, y, "water");
+            lowerLayers.add(water);
+            break;
+            
+          
+    }
  
-    }
-    else
-    {
-      gravel = new GravelEntity(this, "sprites/gravel.gif", x, y, "gravel");
-      lowerLayers.add(gravel);
-      
-      int Chance = (int)(Math.random() * boulderLikely);
-      if (Chance == 1)
-      {
-        boulder = new BoulderEntity(this, "sprites/boulder.png", x, y, "boulder");
-        middleLayers.add(boulder);
-      }
-    }
   }
-  
+  public int getRandomGround()
+  {
+      randomChance[0] = 50;    //Grass
+      randomChance[1] = 25;    //Gravel
+      randomChance[2] = 10;    //Water
+     
+      int choice = 0;
+      int choiceNum = 0;
+      
+      for (int i = 0; i < totalRandom; i++ )
+      {
+          int chance = (int)(Math.random() * randomChance[i]);
+          
+          if (chance > choice)
+          {
+              choice = chance;
+              choiceNum = i;
+          }
+      }
+      
+      return choiceNum;
+  }
+  public int getRandomNum(int numRange)
+  {
+      int num = (int)(Math.random() * numRange);
+      return num;
+  }
   public void moveAll(String direction)
   {
     for (EnemyLayer enemyLayer : enemyLayers)
