@@ -6,6 +6,9 @@
 
 package survive;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author Marble
@@ -16,4 +19,5 @@ public class Global {
   public static final int yRes = 600;
   public static int playerX = xRes / 2;
   public static int playerY = yRes / 2;  
+ 
 }

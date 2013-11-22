@@ -30,7 +30,8 @@ public class Survive
   
   int totalRandom = 3;
   int[] randomChance = new int[totalRandom];
- 
+  int[] randomDefault = new int[totalRandom];
+  
   
   
   private LowerLayer grass;
@@ -126,6 +127,7 @@ public class Survive
     
     initEntities();
     checkMissingFloorAll();
+    randomChance[2] = 5;
   }
   
   private void startGame()
@@ -140,6 +142,13 @@ public class Survive
   
   private void initEntities()
   {
+    randomDefault[0] = 50;
+    randomDefault[1] = 25;
+    randomDefault[2] = 0;
+            
+    randomChance[0] = randomDefault[0];    //Grass
+    randomChance[1] = randomDefault[1];    //Gravel
+    randomChance[2] = randomDefault[2];    //Pond
     //Add player entity
     player = new PlayerEntity(this, "sprites/PlayerN.png", Global.playerX, Global.playerY, "player", 20);
     huds.add(player);
@@ -207,6 +216,7 @@ public class Survive
       if (!match)
       {
         int y = 0;
+
         addFloor(x * 20, y);
       }
     }
@@ -465,6 +475,26 @@ public class Survive
         }
       }
     }
+    for (LowerLayer lowerLayer : lowerLayers)
+    {
+      String type = lowerLayer.getType();
+ 
+      if (lowerLayer.collideWithPlayer() == true && lowerLayer.passable() == false)
+      {
+        if ("left".equals(direction)) {
+          moveAll("right");
+        }
+        if ("right".equals(direction)) {
+          moveAll("left");
+        }
+        if ("down".equals(direction)) {
+          moveAll("up");
+        }
+        if ("up".equals(direction)) {
+          moveAll("down");
+        }
+      }
+    }
   }
   public boolean checkForMoreItem(int itemCode)
   {
@@ -527,7 +557,7 @@ public class Survive
           
         }
         if ("water".equals(type)) {
-          randomChance[2]++;
+          //randomChance[2]++;
           
         }
       }
@@ -559,19 +589,26 @@ public class Survive
             } 
             break;
         case 2:
-            water = new WaterEntity(this, "sprites/water.gif", x, y, "water");
-            lowerLayers.add(water);
-            break;
+            int size = (int)(Math.random() * 10);
+            int[][] locs = PreSetGroups.pond(direction, x, y, size);
+            for (int a = 0; a < (size*4); a++)
+            {
+                x = locs[a][0];
+                 y = locs[a][1];
+     
+                water = new WaterEntity(this, "sprites/water.gif", x, y, "water");
+                lowerLayers.add(water);
+            }
+   
             
-          
+            break;
+     
     }
  
   }
   public int getRandomGround()
   {
-      randomChance[0] = 50;    //Grass
-      randomChance[1] = 25;    //Gravel
-      randomChance[2] = 10;    //Water
+      
      
       int choice = 0;
       int choiceNum = 0;
@@ -1018,7 +1055,13 @@ public class Survive
             }
          }
       }
-      
+      for (int i = 0; i < totalRandom; i++)
+      {
+          if (randomChance[i] > randomDefault[i] + 20)
+          {
+              randomChance[i] = randomDefault[i] + 10;
+          }
+      }
       strategy.show();
       if (loopTime > 10)
       {

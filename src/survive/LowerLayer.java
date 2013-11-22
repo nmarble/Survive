@@ -52,7 +52,17 @@
    {
      return (int)y;
    }
-   
+   public boolean collideWithPlayer()
+   {
+    double xM = x;
+    double yM = y;
+    
+    boolean collision = false;
+    if ((xM == Global.playerX) && (yM == Global.playerY)) {
+      collision = true;
+    }
+    return collision;
+   }
    public void changeFrame(int frameNumber) {}
    
    public String getType()
