@@ -37,7 +37,11 @@
    {
      y -= movementSpeed;
    }
-   
+   public void setXY(int x, int y)
+   {
+       this.x = x;
+       this.y = y;
+   }
    public void draw(Graphics g)
    {
      sprite.draw(g, (int)x, (int)y);

@@ -13,14 +13,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
 import java.awt.image.BufferStrategy;
-
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-
 import survive.Entities.*;
 
 public class Survive
@@ -31,8 +28,6 @@ public class Survive
   int totalRandom = 3;
   int[] randomChance = new int[totalRandom];
   int[] randomDefault = new int[totalRandom];
-  
-  
   
   private LowerLayer grass;
   private LowerLayer gravel;
@@ -52,6 +47,7 @@ public class Survive
   private Hud consumableButton;
   private Hud decorativeButton;
   
+  private Inventory inventoryMan;  
   private Inventory log;
   private Inventory stone;
   private Inventory logWall;
@@ -72,7 +68,6 @@ public class Survive
   private int treeLikely = 10;
   private int boulderLikely = 20;
 
-  
   private int itemSelection = 0;
   private int zombieChance = 100;
   private boolean gameRunning = true;
@@ -89,8 +84,6 @@ public class Survive
   private List<Inventory> inventorys = new ArrayList<Inventory>();
   private List<EnemyLayer> enemyLayers = new ArrayList<EnemyLayer>();
   private ArrayList removeList = new ArrayList();
-  
-  
   
   public Survive()
   {
@@ -142,6 +135,8 @@ public class Survive
   
   private void initEntities()
   {
+    Global.mapXLoc = 0;
+    Global.mapYLoc = 0;
     randomDefault[0] = 50;
     randomDefault[1] = 25;
     randomDefault[2] = 0;
@@ -165,6 +160,7 @@ public class Survive
     decorativeButton = new ButtonEntity(this, "sprites/DecorativeButton.jpg", 330,(Global.yRes - 100), "Decorative",100); 
     huds.add(decorativeButton);
     
+   
     //Add starting grass
     for (int y = 0; y < 5; y++) {
       for (int x = 0; x < 5; x++)
@@ -388,10 +384,8 @@ public class Survive
         
         if ((x >= hud.getX()) && (y >= hud.getY()) && (x <= xLimit) && (y <= yLimit))
         {
-            type = hud.getType();
-           
-        }
-        
+            type = hud.getType();        
+        }   
       }
       //Check if inventory is there
       for (Inventory inventory : inventorys)
@@ -401,7 +395,6 @@ public class Survive
           if (x >= inventory.getX() && y >= inventory.getY() && x <= xLimit && y <= yLimit)
           {
               type = String.valueOf(inventory.getItemCode());
-              
           }
       }
      return type;
@@ -429,6 +422,8 @@ public class Survive
       inventorys.add(stone);
       logWall = new Inventory("sprites/LogWall.gif", 3, 0);
       inventorys.add(logWall);
+      inventoryMan = new Inventory("sprites/inventoryMan.png", 9999,0); 
+      inventorys.add(inventoryMan); 
     }
     for (Inventory inventory : inventorys)
       {
@@ -589,30 +584,28 @@ public class Survive
             } 
             break;
         case 2:
-            int size = (int)(Math.random() * 10);
+            int size = (int)(Math.random() * 8);
             int[][] locs = PreSetGroups.pond(direction, x, y, size);
-            for (int a = 0; a < (size*4); a++)
+            for (int a = 0; a < (400); a++)
             {
                 x = locs[a][0];
-                 y = locs[a][1];
-     
+                y = locs[a][1];
+
                 water = new WaterEntity(this, "sprites/water.gif", x, y, "water");
                 lowerLayers.add(water);
+                if (a > 0 && x ==0 && y ==0)
+                {
+                    a = 400;
+                }
             }
-   
-            
             break;
-     
     }
- 
   }
   public int getRandomGround()
   {
-      
-     
       int choice = 0;
       int choiceNum = 0;
-      
+    
       for (int i = 0; i < totalRandom; i++ )
       {
           int chance = (int)(Math.random() * randomChance[i]);
@@ -1042,7 +1035,15 @@ public class Survive
           int col = -20;
           int row = 1;
           for (Inventory inventory : inventorys)
+          {
+            if (inventory.getItemCode() == 9999)
             {
+                inventory.changeX(Global.xRes - (Global.xRes / 5) + 20);
+                inventory.changeY(20);
+                inventory.draw(g);
+                
+            }
+                    
             if (inventory.getQuantity() > 0)
             {
                 col = col + 25;
@@ -1053,7 +1054,8 @@ public class Survive
                 String quantity = String.valueOf(inventory.getQuantity());
                 g.drawString(quantity, inventory.getX(), inventory.getY());
             }
-         }
+          }
+          
       }
       for (int i = 0; i < totalRandom; i++)
       {
@@ -1094,7 +1096,6 @@ public class Survive
                     addToInventory(3, 1);
                     removeFromInventory(1, 4);
                     break;
-                 
               }
           }
           int whatNumber = 0;
