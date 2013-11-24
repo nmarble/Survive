@@ -1,7 +1,8 @@
  package survive.Entities;
  
+import survive.Coords;
+import survive.Direction;
  import survive.EnemyLayer;
- import survive.Global;
  import survive.Sprite;
  import survive.SpriteStore;
  import survive.Survive;
@@ -13,9 +14,9 @@
    private Sprite[] frames = new Sprite[8];
    private int lastX = 0;
    private int lastY = 0;
-   public ZombieEntity(Survive survive, String ref, int x, int y, String type, String direction)
+   public ZombieEntity(Survive survive, String ref, final Coords coords, String type, final Direction direction)
    {
-     super(ref, x, y, type, direction);
+     super(ref, coords, type, direction);
      
      frames[0] = SpriteStore.get().getSprite("sprites/ZombieN1.png");
      frames[1] = SpriteStore.get().getSprite("sprites/ZombieN2.png");
@@ -30,7 +31,7 @@
    
    public void changeFrame(int frameNumber)
    {
-     sprite = frames[frameNumber];
+     setSprite(frames[frameNumber]);
    }
    public void interact()
    {
@@ -40,13 +41,13 @@
    {
        return false;
    }
-  public void changeDirection(String d)
+  public void changeDirection(final Direction d)
   {
       direction = d;
       switch (direction)
       {
-        case "left":
-            if (sprite == frames[7])
+        case LEFT:
+            if (getSprite() == frames[7])
             {
                 changeFrame(6);    
             }
@@ -55,8 +56,8 @@
                 changeFrame(7);
             }
               break;
-        case "right":
-            if (sprite == frames[2])
+        case RIGHT:
+            if (getSprite() == frames[2])
             {
             changeFrame(3);    
             }
@@ -65,8 +66,8 @@
             changeFrame(2);
             }
             break;
-        case "up":
-            if (sprite == frames[0])
+        case UP:
+            if (getSprite() == frames[0])
             {
             changeFrame(1);    
             }
@@ -75,8 +76,8 @@
             changeFrame(0);
             }
             break;
-        case "down":
-            if (sprite == frames[5])
+        case DOWN:
+            if (getSprite() == frames[5])
             {
             changeFrame(4);    
             }

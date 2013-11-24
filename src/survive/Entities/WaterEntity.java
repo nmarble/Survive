@@ -1,5 +1,6 @@
  package survive.Entities;
  
+import survive.Coords;
  import survive.LowerLayer;
  import survive.Survive;
  
@@ -8,9 +9,9 @@
  {
    private Survive survive;
    
-   public WaterEntity(Survive survive, String ref, int x, int y, String type)
+   public WaterEntity(Survive survive, String ref, final Coords coords, String type)
    {
-     super(ref, x, y, type);
+     super(ref, coords, type);
      
      this.survive = survive;
    }

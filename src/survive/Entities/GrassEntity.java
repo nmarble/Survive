@@ -1,5 +1,6 @@
 package survive.Entities;
 
+import survive.Coords;
 import survive.LowerLayer;
 import survive.Survive;
 
@@ -8,9 +9,9 @@ public class GrassEntity
 {
   private Survive survive;
   
-  public GrassEntity(Survive survive, String ref, int x, int y, String type)
+  public GrassEntity(Survive survive, String ref, final Coords coords, String type)
   {
-    super(ref, x, y, type);
+    super(ref, coords, type);
     
     this.survive = survive;
   }
