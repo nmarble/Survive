@@ -17,8 +17,6 @@ public class Global {
     
   public static final int xRes = 800;
   public static final int yRes = 600;
-  public static int playerX = xRes / 2;
-  public static int playerY = yRes / 2;
   public static int mapXLoc;
   public static int mapYLoc;
  

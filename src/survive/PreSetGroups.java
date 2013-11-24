@@ -12,7 +12,7 @@ public class PreSetGroups
    {
      
    }
-   public static int[][] pond(String side, int xLoc, int yLoc, int size)
+   public static int[][] pond(Direction side, int xLoc, int yLoc, int size)
    {
       
       int[][] locs = new int [500][2];
@@ -21,7 +21,7 @@ public class PreSetGroups
       int c = 0;
       switch(side)
       {          
-          case "down":
+          case DOWN:
           for (int i = 0; i<=size*2; i++)
           { 
               x = (int)Math.sqrt((size*size) - y*y);
@@ -47,7 +47,7 @@ public class PreSetGroups
           }
           break;
               
-          case "up":
+          case UP:
           for (int i = 0; i<=size*2; i++)
           {  
               x = (int)Math.sqrt((size*size) - y*y);
@@ -71,7 +71,7 @@ public class PreSetGroups
           }
           break;
               
-          case "right":
+          case RIGHT:
           for (int i = 0; i<=size*2; i++)
           {
               x = (int)Math.sqrt((size*size) - y*y);
@@ -95,7 +95,7 @@ public class PreSetGroups
           }
           break;
               
-          case "left":
+          case LEFT:
           for (int i = 0; i<=size*2; i++)
           {
               x = (int)Math.sqrt((size*size) - y*y);

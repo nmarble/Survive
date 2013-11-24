@@ -1,5 +1,6 @@
  package survive.Entities;
  
+import survive.Coords;
  import survive.Hud;
  import survive.Sprite;
  import survive.SpriteStore;
@@ -12,9 +13,9 @@
    private Sprite[] frames = new Sprite[4];
   
    
-   public PlayerEntity(Survive survive, String ref, int x, int y, String type, int imageSize)
+   public PlayerEntity(Survive survive, String ref, final Coords coords, String type, int imageSize)
    {
-     super(ref, x, y, type, imageSize);
+     super(ref, coords, type, imageSize);
 
      frames[0] = SpriteStore.get().getSprite("sprites/PlayerN.png");
      frames[1] = SpriteStore.get().getSprite("sprites/PlayerS.png");
@@ -26,7 +27,7 @@
    
    public void changeFrame(int frameNumber)
    {
-     sprite = frames[frameNumber];
+     setSprite(frames[frameNumber]);
    }
  }
 
