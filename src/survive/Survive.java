@@ -369,8 +369,9 @@ public class Survive
         for (int a = 0; a < (400); a++) {
           x = locs[a][0];
           y = locs[a][1];
-
           final Coords waterCoords = new Coords(x, y);
+          middleLayers.remove(waterCoords);
+          lowerLayers.remove(waterCoords);
           water = new WaterEntity(this, "sprites/water.gif", waterCoords, "water");
           lowerLayers.put(waterCoords, water);
           if (a > 0 && x == 0 && y == 0) {
@@ -560,9 +561,10 @@ public class Survive
       //Chance to add zombie
       int randomZombie = (int) (Math.random() * zombieChance);
       if (randomZombie == 1) {
-        final Coords location = new Coords(
-                player.getCoords().getX() - (Global.xRes / 2),
-                player.getCoords().getY() + new Random().nextInt(Global.yRes) - Global.yRes / 2
+        System.err.println("ZOMBIE");
+        final Coords location = new Coords(20,20
+                /*player.getCoords().getX() - (Global.xRes / 2),
+                player.getCoords().getY() + new Random().nextInt(Global.yRes) - Global.yRes / 2 */
         );
         zombie = new ZombieEntity(this, "sprites/ZombieN1.png", location, "zombie", Direction.UP);
         enemyLayers.put(location, zombie);
@@ -588,16 +590,15 @@ public class Survive
             addFloor(x, y);
           }
           lowerLayers.get(coords).draw(g, screenOffset);
-          //Draw all Enemys
-          if (enemyLayers.containsKey(coords)) {
-            enemyLayers.get(coords).draw(g, screenOffset);
-          }
-          //Draw all Objects
           if (middleLayers.containsKey(coords)) {
             middleLayers.get(coords).draw(g, screenOffset);
           }
+          if (enemyLayers.containsKey(coords)) {
+            enemyLayers.get(coords).draw(g, screenOffset);
+          }
         }
       }
+
       //What is to be removed gets removed
       for (final Object object : removeList) {
         middleLayers.remove(removeList);

@@ -8,7 +8,7 @@ import java.util.Objects;
  */
 public abstract class Drawable {
 
-  private Coords coords;
+  public Coords coords;
   private Sprite sprite;
 
   protected Drawable(final Coords coords, final Sprite sprite) {
