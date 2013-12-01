@@ -123,6 +123,79 @@ public class PreSetGroups
       
       return locs;
    }
+   public static int[][] houseFloor(Direction side,int xLoc, int yLoc, int size)
+   {
+
+       int[][] locs = new int [400][2];
+       int i = 0;
+       for (int x = 0; x <= (size * 20); x = x + 20)
+       {
+           for (int y = 0; y <= (size * 20); y = y + 20)
+           {
+               locs[i][0] = x + xLoc;
+               locs[i][1] = y + yLoc;
+               i++;
+           }
+       }
+       return locs;
+   }
+   public static int[][] houseWalls(Direction side,int xLoc, int yLoc, int size)
+   {
+
+       int[][] locs = new int [400][2];
+       int i = 0;
+       int x;
+       for (x = 0; x <= (size * 20); x = x + 20)
+       {
+               for (int y = 0; y <= (size * 20); y = y + (size*20))
+               {
+               locs[i][0] = x + xLoc;
+               locs[i][1] = y + yLoc;
+               i++;
+               }
+ 
+       }
+       x = size*20;
+       for (int y = 20; y <= (size * 20)-20; y = y + 20)
+       {
+            locs[i][0] = x + xLoc;
+            locs[i][1] = y + yLoc;
+            i++;   
+       }
+       x = 0;
+       for (int y = 20; y <= (size * 20) / 2 - 20; y = y + 20)
+       {
+            locs[i][0] = x + xLoc;
+            locs[i][1] = y + yLoc;
+            i++;  
+       }
+       for (int y = size * 20; y >= (size * 20) / 2 + 20; y = y - 20)
+       {
+            locs[i][0] = x + xLoc;
+            locs[i][1] = y + yLoc;
+            i++;  
+       }
+       return locs;
+   }
+    public static int[][] houseItems(int amount,int xLoc, int yLoc, int size)
+    {
+       int[][] locs = new int [amount][2];
+       int x;
+       int y;
+       for (int i = 0; i < amount; i++)
+       {
+           x = (int)(Math.random() * size) * 20;
+           y = (int)(Math.random() * size) * 20;
+           while (x == 0 || y == 0 || x == size *20 || y == size *20)
+           {
+               x = (int)(Math.random() * size) * 20;
+               y = (int)(Math.random() * size) * 20;
+           }
+           locs[i][0] = x + xLoc;
+           locs[i][1] = y + yLoc;              
+       }
+       return locs;
+    }  
 }
 
 

@@ -16,22 +16,10 @@ public class TreeEntity extends MiddleLayer
     this.survive = survive;
   }
 
-  public int getModifiedX()
+  public boolean interact()
   {
-    int modifiedX = 0;
-    return modifiedX;
-  }
-
-  public int getModifiedY()
-  {
-    int modifiedY = 40;
-    return modifiedY;
-  }
-
-  public void interact()
-  {
-    survive.removeMiddleLayer(this);
-    survive.addToInventory(1, 1);
+    survive.addToInventory(1, 2);
+    return true;
   }
 
   public boolean passable()

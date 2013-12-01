@@ -27,11 +27,8 @@ public abstract class MiddleLayer extends Drawable
     return type;
   }
 
-  public abstract void interact();
+  public abstract boolean interact();
 
   public abstract boolean passable();
 
-  public abstract int getModifiedX();
-
-  public abstract int getModifiedY();
 }

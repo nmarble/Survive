@@ -19,5 +19,5 @@ public class Global {
   public static final int yRes = 600;
   public static int mapXLoc;
   public static int mapYLoc;
- 
+  public static int totalItemRandom = 4;
 }

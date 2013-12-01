@@ -35,7 +35,7 @@ import survive.Direction;
    }
    public void interact()
    {
-     survive.removeEnemyLayer(this);
+  
    }
     public boolean passable()
    {

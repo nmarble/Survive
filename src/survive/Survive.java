@@ -27,19 +27,21 @@ public class Survive
 
   private BufferStrategy strategy;
 
-  int totalRandom = 3;
+  int totalRandom = 4;
   int[] randomChance = new int[totalRandom];
   int[] randomDefault = new int[totalRandom];
 
   private LowerLayer grass;
   private LowerLayer gravel;
   private LowerLayer water;
+  private LowerLayer woodFloor;
 
-  private MiddleLayer tree;
-  private MiddleLayer boulder;
+  private MiddleLayer Tree;
+  private MiddleLayer Boulder;
   private MiddleLayer LogWall;
   private MiddleLayer Log;
   private MiddleLayer Stone;
+  private MiddleLayer Barrel;
 
   private EnemyLayer zombie;
 
@@ -53,6 +55,7 @@ public class Survive
   private Inventory log;
   private Inventory stone;
   private Inventory logWall;
+  private Inventory barrel;
 
   private Direction direction = Direction.UP;
   private double movementSpeed = 20;
@@ -86,6 +89,7 @@ public class Survive
   private List<Inventory> inventorys = new ArrayList<Inventory>();
   private Map<Coords, EnemyLayer> enemyLayers = new HashMap<Coords, EnemyLayer>();
   private ArrayList removeList = new ArrayList();
+  private ArrayList<Hud> removeHudList = new ArrayList<Hud>();
 
   public Survive()
   {
@@ -121,7 +125,9 @@ public class Survive
     strategy = getBufferStrategy();
 
     initEntities();
-    randomChance[2] = 5;
+    randomChance[2] = 3;
+    randomChance[3] = 3;
+    
   }
 
   private void startGame()
@@ -141,10 +147,12 @@ public class Survive
     randomDefault[0] = 50;
     randomDefault[1] = 25;
     randomDefault[2] = 0;
+    randomDefault[3] = 0;
 
     randomChance[0] = randomDefault[0];    //Grass
     randomChance[1] = randomDefault[1];    //Gravel
     randomChance[2] = randomDefault[2];    //Pond
+    randomChance[3] = randomDefault[3];    //House
     //Add player entity
     player = new PlayerEntity(this, "sprites/PlayerN.png", new Coords(0, 0), "player", 20);
     huds.add(player);
@@ -194,7 +202,10 @@ public class Survive
     {
       final MiddleLayer middleLayer = middleLayers.get(interactCoords);
       if (middleLayer != null) {
-        middleLayer.interact();
+        if (middleLayer.interact() == true) {
+            middleLayers.remove(interactCoords);            
+        }
+        
       }
     }
 
@@ -241,12 +252,7 @@ public class Survive
   {
     removeList.add(object);
   }
-
-  public void removeButton(Hud object)
-  {
-    removeList.add(object);
-  }
-
+  
   public void addToInventory(int itemCode, int quantity)
   {
     //Add entities if none are available
@@ -257,6 +263,8 @@ public class Survive
       inventorys.add(stone);
       logWall = new Inventory("sprites/LogWall.gif", 3, 0);
       inventorys.add(logWall);
+      barrel = new Inventory("sprites/barrel.png", 4, 0);
+      inventorys.add(barrel);
       inventoryMan = new Inventory("sprites/inventoryMan.png", 9999, 0);
       inventorys.add(inventoryMan);
     }
@@ -340,32 +348,35 @@ public class Survive
   public void addFloor(int x, int y)
   {
     final Coords newLocation = new Coords(x, y);
-
+    int[][] locs;
     int chance = 0;
-    switch (getRandomGround()) {
+    int size = getRandomNum(8);
+    while (size < 5) {
+       size = getRandomNum(8); 
+    }
+    int startX = x;
+    int startY = y;
+    switch (getRandomGround(x, y)) {
       case 0:
         grass = new GrassEntity(this, "sprites/grass.gif", newLocation, "grass");
         lowerLayers.put(newLocation, grass);
-
         chance = getRandomNum(treeLikely);
         if (chance == 1) {
-          tree = new TreeEntity(this, "sprites/tree.png", newLocation, "tree");
-          middleLayers.put(newLocation, tree);
+          Tree = new TreeEntity(this, "sprites/tree.png", newLocation, "tree");
+          middleLayers.put(newLocation, Tree);
         }
         break;
       case 1:
         gravel = new GravelEntity(this, "sprites/gravel.gif", newLocation, "gravel");
         lowerLayers.put(newLocation, gravel);
-
         chance = getRandomNum(boulderLikely);
         if (chance == 1) {
-          boulder = new BoulderEntity(this, "sprites/boulder.png", newLocation, "boulder");
-          middleLayers.put(newLocation, boulder);
+          Boulder = new BoulderEntity(this, "sprites/boulder.png", newLocation, "boulder");
+          middleLayers.put(newLocation, Boulder);
         }
         break;
       case 2:
-        int size = (int) (Math.random() * 8);
-        int[][] locs = PreSetGroups.pond(direction, x, y, size);
+        locs = PreSetGroups.pond(direction, startX, startY, size);
         for (int a = 0; a < (400); a++) {
           x = locs[a][0];
           y = locs[a][1];
@@ -379,11 +390,49 @@ public class Survive
           }
         }
         break;
+        case 3:
+        locs = PreSetGroups.houseFloor(direction, startX, startY, size);
+        for (int a = 0; a < (400); a++) {
+          x = locs[a][0];
+          y = locs[a][1];
+          final Coords floorCoords = new Coords(x, y);
+          middleLayers.remove(floorCoords);
+          lowerLayers.remove(floorCoords);
+          woodFloor = new WoodFloorEntity(this, "sprites/woodFloor.gif", floorCoords, "woodfloor");
+          lowerLayers.put(floorCoords, woodFloor);
+          if (a > 0 && x == 0 && y == 0) {
+            a = 400;
+          }
+        }
+        locs = PreSetGroups.houseWalls(direction, startX, startY, size);
+        for (int a = 0; a < (400); a++) {
+          x = locs[a][0];
+          y = locs[a][1];
+          final Coords logWallCoords = new Coords(x, y);
+          LogWall = new LogWallEntity(this, "sprites/logWall.gif", logWallCoords, "logwall");
+          middleLayers.put(logWallCoords, LogWall);
+          if (a > 0 && x == 0 && y == 0) {
+            a = 400;
+          }
+        }
+        locs = PreSetGroups.houseItems(3, startX, startY, size);
+        for (int a = 0; a < (3); a++) {
+          x = locs[a][0];
+          y = locs[a][1];
+          final Coords itemsCoords = new Coords(x, y);
+          Barrel = new BarrelEntity(this, "sprites/barrel.png", itemsCoords, "barrel");
+          middleLayers.put(itemsCoords, Barrel);
+          if (a > 0 && x == 0 && y == 0) {
+            a = 400;
+          }
+        }
+        break;
     }
   }
 
-  public int getRandomGround()
+  public int getRandomGround(int x, int y)
   {
+    
     int choice = 0;
     int choiceNum = 0;
 
@@ -480,15 +529,8 @@ public class Survive
   }
 
   //Removes all craftable item buttons
-  public void removeAllButtons()
-  {
-    for (int i = 5; i < huds.size(); i++) {
-      Hud hud = huds.get(i);
-      removeButton(hud);
-    }
-  }
 
-  public void findAvailReceipe()
+  public void findAvailRec()
   {
     int logQuantity = 0;
     int stoneQuantity = 0;
@@ -562,9 +604,8 @@ public class Survive
       int randomZombie = (int) (Math.random() * zombieChance);
       if (randomZombie == 1) {
         System.err.println("ZOMBIE");
-        final Coords location = new Coords(20,20
-                /*player.getCoords().getX() - (Global.xRes / 2),
-                player.getCoords().getY() + new Random().nextInt(Global.yRes) - Global.yRes / 2 */
+        final Coords location = new Coords(player.getCoords().getX() - (Global.xRes / 2),
+                player.getCoords().getY() + (getRandomNum(Global.yRes / 20) * 20) - (getRandomNum(Global.yRes / 20) * 20) 
         );
         zombie = new ZombieEntity(this, "sprites/ZombieN1.png", location, "zombie", Direction.UP);
         enemyLayers.put(location, zombie);
@@ -605,7 +646,9 @@ public class Survive
         huds.remove(removeList);
         enemyLayers.remove(removeList);
       }
-
+      for (Hud hud : removeHudList){
+        huds.remove(hud);
+      }
       //Resets what is to be removed
       removeList.clear();
 
@@ -621,14 +664,11 @@ public class Survive
       }
       //When Crafting for structures is open
       if (craftingStructure == true) {
-        int x = 0;
-        removeAllButtons();
-        findAvailReceipe();
-        for (Hud hud : huds) {
-          if (hud.getType() == "LogWall" && logWallReceipe == true) {
-            hud.draw(g, new Coords(0, 0));
-            x = x + 25;
-          }
+        findAvailRec();
+        for (int i = 5; i < huds.size(); i++) {
+          Hud hud = huds.get(i);
+          hud.draw(g, new Coords(0, 0));
+          removeHudList.add(hud);
         }
       }
       //Change holding status if nothing is there

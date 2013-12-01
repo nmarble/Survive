@@ -17,26 +17,15 @@ public class BoulderEntity
     this.survive = survive;
   }
 
-  public int getModifiedX()
+  public boolean interact()
   {
-    int modifiedX = 0;
-    return modifiedX;
-  }
-
-  public int getModifiedY()
-  {
-    int modifiedY = 0;
-    return modifiedY;
-  }
-
-  public void interact()
-  {
-    survive.removeMiddleLayer(this);
     survive.addToInventory(2, 1);
+    return true;
   }
 
   public boolean passable()
   {
     return false;
   }
+ 
 }
