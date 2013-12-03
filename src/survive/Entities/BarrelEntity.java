@@ -50,7 +50,10 @@
    {
        return false;
    }
-
+   public boolean walkUnder()
+   {
+       return false;
+   }
  }
 
 

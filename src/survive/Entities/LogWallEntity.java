@@ -27,5 +27,8 @@ public class LogWallEntity
   {
     return false;
   }
-  
+  public boolean walkUnder()
+   {
+       return false;
+   }
 }

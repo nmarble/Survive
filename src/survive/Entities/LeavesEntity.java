@@ -4,13 +4,12 @@ import survive.Coords;
 import survive.MiddleLayer;
 import survive.Survive;
 
-public class BoulderEntity
-        extends MiddleLayer
+public class LeavesEntity extends MiddleLayer
 {
 
   private Survive survive;
 
-  public BoulderEntity(Survive survive, String ref, final Coords coords, String type)
+  public LeavesEntity(Survive survive, String ref, final Coords coords, String type)
   {
     super(ref, coords, type);
 
@@ -19,16 +18,16 @@ public class BoulderEntity
 
   public boolean interact()
   {
-    survive.addToInventory(2, 1);
+    survive.addToInventory(1, 2);
     return true;
   }
 
   public boolean passable()
   {
-    return false;
+    return true;
   }
   public boolean walkUnder()
    {
-       return false;
+       return true;
    }
 }

@@ -34,7 +34,7 @@ public abstract class EnemyLayer extends Drawable
     int modifiedY = 0;
     return modifiedY;
   }
-  public abstract void interact();
+  public abstract boolean interact();
   public abstract boolean passable();
   public abstract void changeDirection(Direction d);
   public abstract long getSpeed();

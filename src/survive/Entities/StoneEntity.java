@@ -27,5 +27,8 @@ public class StoneEntity
   {
     return true;
   }
- 
+  public boolean walkUnder()
+   {
+       return false;
+   }
 }

@@ -70,7 +70,7 @@ public class Survive
   private boolean iPressed = false;
   private boolean cPressed = false;
 
-  private int treeLikely = 10;
+  private int treeLikely = 60;
   private int boulderLikely = 20;
 
   private int itemSelection = 0;
@@ -212,10 +212,12 @@ public class Survive
     {
       final EnemyLayer enemyLayer = enemyLayers.get(interactCoords);
       if (enemyLayer != null) {
-        enemyLayer.interact();
+        if (enemyLayer.interact() == true) {
+            enemyLayers.remove(interactCoords);            
+        }
       }
     }
-  }
+  } 
 
   public String mouseInteract(int x, int y)
   {
@@ -287,12 +289,36 @@ public class Survive
       }
     }
   }
+  public void placeItemHeld(Direction direction)
+  {
+    final Coords coords = direction.getCoordsFrom(player.getCoords());  
+    switch (itemSelection) {
+      case 1:
+        Log = new LogEntity(this, "sprites/log.png", coords, "log");
+        Log.setCoords(coords);
+        middleLayers.put(coords, Log);
+        removeFromInventory(1, 1);
+        break;
+      case 2:
+        Stone = new StoneEntity(this, "sprites/stone.png", coords, "stone");
+        Stone.setCoords(coords);
+        middleLayers.put(coords, Stone);
+        removeFromInventory(2, 1);
+        break;
+      case 3:
+        LogWall = new LogWallEntity(this, "sprites/logwall.gif", coords, "logWall");
+        LogWall.setCoords(coords);
+        middleLayers.put(coords, LogWall);
+        removeFromInventory(3, 1);
+        break;
 
+    }
+  }
   public void checkCollisionObject(Direction direction)
   {
 
     final Direction opposite = direction.getOpposite();
-
+    
     final MiddleLayer middleLayer = middleLayers.get(player.getCoords());
     if (middleLayer != null && !middleLayer.passable()) {
       movePlayer(opposite);
@@ -335,7 +361,7 @@ public class Survive
         removeFromInventory(2, 1);
         break;
       case 3:
-        LogWall = new LogWallEntity(this, "sprites/logWall.gif", coords, "logWall");
+        LogWall = new LogWallEntity(this, "sprites/logwall.gif", coords, "logWall");
         LogWall.setCoords(coords);
         middleLayers.put(coords, LogWall);
         removeFromInventory(3, 1);
@@ -362,8 +388,31 @@ public class Survive
         lowerLayers.put(newLocation, grass);
         chance = getRandomNum(treeLikely);
         if (chance == 1) {
-          Tree = new TreeEntity(this, "sprites/tree.png", newLocation, "tree");
-          middleLayers.put(newLocation, Tree);
+          locs = PreSetGroups.tree(direction, startX, startY);
+          for (int a = 0; a < 13; a++) { 
+              x = locs[a][0];
+              y = locs[a][1];              
+              final Coords treeCoords = new Coords(x, y);
+              if (a == 4) {
+              Tree = new TreeEntity(this, "sprites/tree/trunk.png", treeCoords, "tree");    
+              }
+              if (a != 4 && a < 9) {
+              Tree = new LeavesEntity(this, "sprites/tree/leaves1_1.png", treeCoords, "leaves");
+              }
+              if (a == 9) {
+              Tree = new LeavesEntity(this, "sprites/tree/leaves1_D.png", treeCoords, "leaves");    
+              }
+              if (a == 10) {
+              Tree = new LeavesEntity(this, "sprites/tree/leaves1_U.png", treeCoords, "leaves");    
+              }
+              if (a == 11) {
+              Tree = new LeavesEntity(this, "sprites/tree/leaves1_R.png", treeCoords, "leaves");    
+              }
+              if (a == 12) {
+              Tree = new LeavesEntity(this, "sprites/tree/leaves1_L.png", treeCoords, "leaves");    
+              }
+              middleLayers.put(treeCoords, Tree);
+          } 
         }
         break;
       case 1:
@@ -398,7 +447,7 @@ public class Survive
           final Coords floorCoords = new Coords(x, y);
           middleLayers.remove(floorCoords);
           lowerLayers.remove(floorCoords);
-          woodFloor = new WoodFloorEntity(this, "sprites/woodFloor.gif", floorCoords, "woodfloor");
+          woodFloor = new WoodFloorEntity(this, "sprites/woodfloor.gif", floorCoords, "woodfloor");
           lowerLayers.put(floorCoords, woodFloor);
           if (a > 0 && x == 0 && y == 0) {
             a = 400;
@@ -409,13 +458,13 @@ public class Survive
           x = locs[a][0];
           y = locs[a][1];
           final Coords logWallCoords = new Coords(x, y);
-          LogWall = new LogWallEntity(this, "sprites/logWall.gif", logWallCoords, "logwall");
+          LogWall = new LogWallEntity(this, "sprites/logwall.gif", logWallCoords, "logwall");
           middleLayers.put(logWallCoords, LogWall);
           if (a > 0 && x == 0 && y == 0) {
             a = 400;
           }
         }
-        locs = PreSetGroups.houseItems(3, startX, startY, size);
+        locs = PreSetGroups.houseItems(direction, 3, startX, startY, size);
         for (int a = 0; a < (3); a++) {
           x = locs[a][0];
           y = locs[a][1];
@@ -511,8 +560,11 @@ public class Survive
       }
       checkCollisionObject(direction);
     }
-    if (spacePressed) {
+    if (spacePressed && !holdingItem) {
       interact();
+    }
+    if (spacePressed && holdingItem) {
+      placeItemHeld(direction);
     }
   }
 
@@ -654,7 +706,15 @@ public class Survive
 
       //Draws Player
       player.draw(g, screenOffset);
-
+      
+      //Draws what is being held
+      
+      
+      //Draws if Player can walk under;
+      final MiddleLayer middleLayer = middleLayers.get(player.getCoords());
+      if (middleLayer != null && middleLayer.walkUnder()) {
+          middleLayers.get(player.getCoords()).draw(g, screenOffset);
+      }
       //When Crafting is open
       if (craftingOpen == true) {
         for (int i = 1; i <= 4; i++) {

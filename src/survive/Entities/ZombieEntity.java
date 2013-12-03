@@ -33,9 +33,9 @@ import survive.Direction;
    {
      setSprite(frames[frameNumber]);
    }
-   public void interact()
+   public boolean interact()
    {
-  
+       return true;
    }
     public boolean passable()
    {

@@ -26,5 +26,8 @@ public class TreeEntity extends MiddleLayer
   {
     return false;
   }
-
+  public boolean walkUnder()
+   {
+       return false;
+   }
 }
