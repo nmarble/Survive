@@ -29,7 +29,10 @@ public enum Direction
   {
     return new Coords(reference.getX() + xOffset, reference.getY() + yOffset);
   }
-
+  public Coords getCoordsTo(final Coords reference)
+  {
+    return new Coords(reference.getX() - xOffset, reference.getY() - yOffset);
+  }
   public Direction getOpposite()
   {
     for (final Direction other : values()) {

@@ -50,12 +50,15 @@ public class Survive
   private Hud toolButton;
   private Hud consumableButton;
   private Hud decorativeButton;
+  private Hud selectionWindow;
 
   private Inventory inventoryMan;
   private Inventory log;
   private Inventory stone;
   private Inventory logWall;
   private Inventory barrel;
+  
+  
 
   private Direction direction = Direction.UP;
   private double movementSpeed = 20;
@@ -72,9 +75,11 @@ public class Survive
 
   private int treeLikely = 60;
   private int boulderLikely = 20;
+  private int zombieChance = 100;
 
   private int itemSelection = 0;
-  private int zombieChance = 100;
+  private int selectionX = 0;
+  private int selectionY = 0;
   private boolean gameRunning = true;
   private boolean inventoryOpen = false;
   private boolean craftingOpen = false;
@@ -142,8 +147,6 @@ public class Survive
 
   private void initEntities()
   {
-    Global.mapXLoc = 0;
-    Global.mapYLoc = 0;
     randomDefault[0] = 50;
     randomDefault[1] = 25;
     randomDefault[2] = 0;
@@ -153,6 +156,7 @@ public class Survive
     randomChance[1] = randomDefault[1];    //Gravel
     randomChance[2] = randomDefault[2];    //Pond
     randomChance[3] = randomDefault[3];    //House
+    
     //Add player entity
     player = new PlayerEntity(this, "sprites/PlayerN.png", new Coords(0, 0), "player", 20);
     huds.add(player);
@@ -168,16 +172,10 @@ public class Survive
 
     decorativeButton = new ButtonEntity(this, "sprites/DecorativeButton.jpg", new Coords(330, Global.yRes - 100), "Decorative", 100);
     huds.add(decorativeButton);
+    
+    selectionWindow = new ButtonEntity(this, "sprites/selection.png", new Coords(0,0), "selection", 20);
+    huds.add(selectionWindow);
 
-    //Add starting grass
-    for (int y = 0; y < 5; y++) {
-      for (int x = 0; x < 5; x++) {
-        final Coords coords = new Coords(x, y);
-        grass = new GrassEntity(this, "sprites/grass.gif", coords, "grass");
-        lowerLayers.put(coords, grass);
-      }
-    }
-    addFloor(player.getCoords().getX(), player.getCoords().getX());
   }
 
   //Set cursor type
@@ -218,7 +216,15 @@ public class Survive
       }
     }
   } 
-
+  public void selectionInteract(int x, int y)
+  {
+      for (Inventory inventory : inventorys) {
+          if (inventory.getX() == x && inventory.getY() == y) {
+              holdingItem = !holdingItem;
+              itemSelection = inventory.getItemCode();
+          }
+      }
+  }    
   public String mouseInteract(int x, int y)
   {
     String type = "none";
@@ -235,13 +241,13 @@ public class Survive
       }
     }
     //Check if inventory is there
-    for (Inventory inventory : inventorys) {
+    /*for (Inventory inventory : inventorys) {
       int xLimit = inventory.getX() + 20;
       int yLimit = inventory.getY() + 20;
       if (x >= inventory.getX() && y >= inventory.getY() && x <= xLimit && y <= yLimit) {
         type = String.valueOf(inventory.getItemCode());
       }
-    }
+    }*/
     return type;
   }
 
@@ -259,16 +265,17 @@ public class Survive
   {
     //Add entities if none are available
     if (inventorys.isEmpty()) {
-      log = new Inventory("sprites/log.png", 1, 0);
+      log = new Inventory("sprites/log.png", 1, 0, new Coords(0,0));
       inventorys.add(log);
-      stone = new Inventory("sprites/stone.png", 2, 0);
+      stone = new Inventory("sprites/stone.png", 2, 0, new Coords(0,0));
       inventorys.add(stone);
-      logWall = new Inventory("sprites/LogWall.gif", 3, 0);
+      logWall = new Inventory("sprites/LogWall.gif", 3, 0, new Coords(0,0));
       inventorys.add(logWall);
-      barrel = new Inventory("sprites/barrel.png", 4, 0);
+      barrel = new Inventory("sprites/barrel.png", 4, 0, new Coords(0,0));
       inventorys.add(barrel);
-      inventoryMan = new Inventory("sprites/inventoryMan.png", 9999, 0);
+      inventoryMan = new Inventory("sprites/inventoryMan.png", 9999, 0, new Coords(0,0));
       inventorys.add(inventoryMan);
+      
     }
     for (Inventory inventory : inventorys) {
       if (inventory.getItemCode() == itemCode) {
@@ -429,14 +436,12 @@ public class Survive
         for (int a = 0; a < (400); a++) {
           x = locs[a][0];
           y = locs[a][1];
+          if (a > 0 && x == 0 && y == 0) break;
           final Coords waterCoords = new Coords(x, y);
           middleLayers.remove(waterCoords);
           lowerLayers.remove(waterCoords);
           water = new WaterEntity(this, "sprites/water.gif", waterCoords, "water");
           lowerLayers.put(waterCoords, water);
-          if (a > 0 && x == 0 && y == 0) {
-            a = 400;
-          }
         }
         break;
         case 3:
@@ -444,36 +449,30 @@ public class Survive
         for (int a = 0; a < (400); a++) {
           x = locs[a][0];
           y = locs[a][1];
+          if (a > 0 && x == 0 && y == 0) break;
           final Coords floorCoords = new Coords(x, y);
           middleLayers.remove(floorCoords);
           lowerLayers.remove(floorCoords);
           woodFloor = new WoodFloorEntity(this, "sprites/woodfloor.gif", floorCoords, "woodfloor");
           lowerLayers.put(floorCoords, woodFloor);
-          if (a > 0 && x == 0 && y == 0) {
-            a = 400;
-          }
         }
         locs = PreSetGroups.houseWalls(direction, startX, startY, size);
-        for (int a = 0; a < (400); a++) {
+        for (int a = 0; a < (400); a++) { 
           x = locs[a][0];
           y = locs[a][1];
+          if (a > 0 && x == 0 && y == 0) break;
           final Coords logWallCoords = new Coords(x, y);
           LogWall = new LogWallEntity(this, "sprites/logwall.gif", logWallCoords, "logwall");
           middleLayers.put(logWallCoords, LogWall);
-          if (a > 0 && x == 0 && y == 0) {
-            a = 400;
-          }
         }
         locs = PreSetGroups.houseItems(direction, 3, startX, startY, size);
-        for (int a = 0; a < (3); a++) {
+        for (int a = 0; a < (3); a++) { 
           x = locs[a][0];
           y = locs[a][1];
+          if (a > 0 && x == 0 && y == 0) break;
           final Coords itemsCoords = new Coords(x, y);
           Barrel = new BarrelEntity(this, "sprites/barrel.png", itemsCoords, "barrel");
           middleLayers.put(itemsCoords, Barrel);
-          if (a > 0 && x == 0 && y == 0) {
-            a = 400;
-          }
         }
         break;
     }
@@ -517,54 +516,78 @@ public class Survive
       }
     }
     if (iPressed) {
+      if (!inventoryOpen) {
+          holdingItem = false;
+      }
       inventoryOpen = !inventoryOpen;
+      selectionX = -(Global.xRes - (Global.xRes / 5) + 5);
+      selectionY = -(Global.yRes - (Global.yRes / 2) + 15);
+       
     }
-    if (leftPressed) {
+    if (leftPressed && !inventoryOpen) {
+      if (direction == Direction.LEFT) {
+      movePlayer(direction);          
+      }
       direction = Direction.LEFT;
-
-      movePlayer(direction);
-
       for (int i = 0; i < 1; i++) {
         Hud hud = huds.get(i);
         hud.changeFrame(2);
       }
       checkCollisionObject(direction);
     }
-    if (rightPressed) {
+    if (leftPressed && inventoryOpen) {
+        selectionX = selectionX + 25;      
+    }
+    if (rightPressed && !inventoryOpen) {
+      if (direction == Direction.RIGHT) {
+      movePlayer(direction);          
+      }
       direction = Direction.RIGHT;
-
-      movePlayer(direction);
       for (int i = 0; i < 1; i++) {
         Hud hud = huds.get(i);
         hud.changeFrame(3);
       }
       checkCollisionObject(direction);
     }
-    if (upPressed) {
+    if (rightPressed && inventoryOpen) {
+        selectionX = selectionX - 25;      
+    }
+    if (upPressed && !inventoryOpen) {
+      if (direction == Direction.UP) {
+      movePlayer(direction);          
+      }
       direction = Direction.UP;
-
-      movePlayer(direction);
       for (int i = 0; i < 1; i++) {
         Hud hud = huds.get(i);
         hud.changeFrame(0);
       }
       checkCollisionObject(direction);
     }
-    if (downPressed) {
+    if (upPressed && inventoryOpen) {
+        selectionY = selectionY + 25;      
+    }
+    if (downPressed && !inventoryOpen) {
+      if (direction == Direction.DOWN) {
+      movePlayer(direction);          
+      }
       direction = Direction.DOWN;
-
-      movePlayer(direction);
       for (int i = 0; i < 1; i++) {
         Hud hud = huds.get(i);
         hud.changeFrame(1);
       }
       checkCollisionObject(direction);
     }
+    if (downPressed && inventoryOpen) {
+        selectionY = selectionY - 25;      
+    }
     if (spacePressed && !holdingItem) {
       interact();
     }
-    if (spacePressed && holdingItem) {
+    if (spacePressed && holdingItem && !inventoryOpen) {
       placeItemHeld(direction);
+    }
+    if (spacePressed && inventoryOpen) {
+        selectionInteract(selectionX, selectionY);
     }
   }
 
@@ -708,7 +731,15 @@ public class Survive
       player.draw(g, screenOffset);
       
       //Draws what is being held
-      
+      if (holdingItem == true) {
+          for(Inventory inventory : inventorys) {
+              if (inventory.getItemCode() == itemSelection) {
+                  Coords center = new Coords(-Global.xRes / 2, -Global.yRes / 2);
+                  Coords drawCoords = direction.getCoordsTo(center);
+                  inventory.draw(g, drawCoords);
+              }
+          }        
+      }
       
       //Draws if Player can walk under;
       final MiddleLayer middleLayer = middleLayers.get(player.getCoords());
@@ -728,7 +759,9 @@ public class Survive
         for (int i = 5; i < huds.size(); i++) {
           Hud hud = huds.get(i);
           hud.draw(g, new Coords(0, 0));
-          removeHudList.add(hud);
+          if (hud.getType() != "selection") {
+              removeHudList.add(hud);
+          }
         }
       }
       //Change holding status if nothing is there
@@ -751,29 +784,48 @@ public class Survive
         g.drawString("Press any key", (Global.xRes - g.getFontMetrics().stringWidth("Press space to continue")) / 2, (Global.yRes / 2));
       }
       //Draws inventory background and items
+      
       if (inventoryOpen == true) {
+        if (selectionX > -(Global.xRes - (Global.xRes / 5) + 5)) {
+           selectionX = -(Global.xRes - (Global.xRes / 5) + 5);
+        }
+        if (selectionY > -(Global.yRes - (Global.yRes / 2) + 15)) {
+            selectionY = -(Global.yRes - (Global.yRes / 2) + 15);
+        }
+        if (selectionX < -(Global.xRes - 30)) {
+           selectionX = -(Global.xRes - 30);
+        }
+        if (selectionY < -(Global.yRes - 30)) {
+            selectionY = -(Global.yRes - 30);
+        }
         drawInventory();
         int col = -20;
-        int row = 1;
+        int row = -1;
+        
         for (Inventory inventory : inventorys) {
+          int drawX = 0;
+          int drawY = 0;
           if (inventory.getItemCode() == 9999) {
-            inventory.changeX(Global.xRes - (Global.xRes / 5) + 20);
-            inventory.changeY(20);
-            inventory.draw(g);
-
+            drawX = -(Global.xRes - (Global.xRes / 5) + 20);
+            drawY = -20;
+            inventory.draw(g, new Coords(drawX, drawY));
           }
-
           if (inventory.getQuantity() > 0) {
             col = col + 25;
-            inventory.changeX(Global.xRes - (Global.xRes / 5) + (col));
-            inventory.changeY((Global.yRes / 2) + (15 * row));
+            drawX = -(Global.xRes - (Global.xRes / 5) + (col));
+            drawY = -(Global.yRes / 2) + (15 * row);
 
-            inventory.draw(g);
+            inventory.draw(g, new Coords(drawX, drawY));
             String quantity = String.valueOf(inventory.getQuantity());
-            g.drawString(quantity, inventory.getX(), inventory.getY());
+            g.drawString(quantity, -drawX, -drawY);
+            inventory.setXY(drawX, drawY);
           }
         }
-
+        for (Hud hud : huds) {
+            if ("selection" == hud.getType()) {
+            hud.draw(g, new Coords(selectionX, selectionY));
+            }
+        }
       }
       for (int i = 0; i < totalRandom; i++) {
         if (randomChance[i] > randomDefault[i] + 20) {

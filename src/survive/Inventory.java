@@ -1,22 +1,16 @@
  package survive;
- 
-import java.awt.Graphics;
 
- public class Inventory
+ public class Inventory extends Drawable
  {
    protected int itemCode;
    protected int quantity;
-   protected int x;
-   protected int y;
-   protected Sprite sprite;
-   
-   public Inventory(String ref, int itemCode, int quantity)
+   protected int x, y;
+   public Inventory(String ref, int itemCode, int quantity, Coords coords)
    {
-     sprite = SpriteStore.get().getSprite(ref);
+     super(coords, SpriteStore.get().getSprite(ref));
      this.itemCode = itemCode;
      this.quantity = quantity;
-     x = 0;
-     y = 0;
+
    }
    
    public int getItemCode()
@@ -28,14 +22,7 @@ import java.awt.Graphics;
    {
      return quantity;
    }
-   public int getX()
-   {
-       return x;
-   }
-   public int getY()
-   {
-       return y;
-   }
+   
    public void addQuantity(int quantity)
    {
      this.quantity += quantity;
@@ -44,18 +31,19 @@ import java.awt.Graphics;
    {
      this.quantity -= quantity;
    }
-   public void changeX(int x)
+   public void setXY(int incX, int incY)
    {
-     this.x = x; 
+       x = incX;
+       y = incY;
    }
-   public void changeY(int y)
+   public int getX()
    {
-     this.y = y; 
+       return x;
    }
-   public void draw(Graphics g)
-  {
-    sprite.draw(g, (int)x, (int)y);
-  }
+   public int getY()
+   {
+       return y;
+   }
  }
 
 

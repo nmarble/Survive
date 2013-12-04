@@ -3,7 +3,6 @@ package survive;
 public abstract class Hud extends Drawable {
   protected int imageSize;
   protected String type;
-  protected double movementSpeed;
 
   public Hud(String ref, final Coords coords, String type, int imageSize) {
     super(coords, SpriteStore.get().getSprite(ref));
