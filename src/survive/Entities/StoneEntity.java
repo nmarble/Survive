@@ -31,4 +31,8 @@ public class StoneEntity
    {
        return false;
    }
+  public boolean seePassed()
+   {
+       return true;
+   }
 }

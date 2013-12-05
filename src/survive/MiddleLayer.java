@@ -32,5 +32,7 @@ public abstract class MiddleLayer extends Drawable
   public abstract boolean passable();
   
   public abstract boolean walkUnder();
+  
+  public abstract boolean seePassed();
 
 }

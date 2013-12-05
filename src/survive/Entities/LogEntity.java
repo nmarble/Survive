@@ -31,4 +31,8 @@ public class LogEntity
    {
        return false;
    }
+  public boolean seePassed()
+   {
+       return true;
+   }
 }

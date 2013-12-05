@@ -30,4 +30,8 @@ public class LeavesEntity extends MiddleLayer
    {
        return true;
    }
+  public boolean seePassed()
+   {
+       return true;
+   }
 }

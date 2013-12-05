@@ -31,4 +31,8 @@ public class LogWallEntity
    {
        return false;
    }
+  public boolean seePassed()
+   {
+       return false;
+   }
 }

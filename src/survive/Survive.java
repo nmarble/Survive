@@ -12,6 +12,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
+import static java.lang.Math.abs;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +44,8 @@ public class Survive
   private MiddleLayer Stone;
   private MiddleLayer Barrel;
 
+  private UpperLayer black;
+  
   private EnemyLayer zombie;
 
   private Hud player;
@@ -90,6 +93,7 @@ public class Survive
 
   private Map<Coords, LowerLayer> lowerLayers = new HashMap<Coords, LowerLayer>();
   private Map<Coords, MiddleLayer> middleLayers = new HashMap<Coords, MiddleLayer>();
+  private Map<Coords, UpperLayer> upperLayers = new HashMap<Coords, UpperLayer>();
   private List<Hud> huds = new ArrayList<Hud>();
   private List<Inventory> inventorys = new ArrayList<Inventory>();
   private Map<Coords, EnemyLayer> enemyLayers = new HashMap<Coords, EnemyLayer>();
@@ -147,6 +151,7 @@ public class Survive
 
   private void initEntities()
   {
+   
     randomDefault[0] = 50;
     randomDefault[1] = 25;
     randomDefault[2] = 0;
@@ -657,7 +662,182 @@ public class Survive
     }
     return loopTime;
   }
+  public void checkLoS() {
+      Coords startCoord = new Coords(player.getCoords().getX(),player.getCoords().getY());
+      //topleft to bottom left
+      for (int endY = player.getCoords().getY() - Global.yRes; endY < startCoord.getY() + Global.yRes; endY = endY +20){
+      boolean unseen = false;
+      Coords endCoord = new Coords(player.getCoords().getX() - Global.xRes, endY);
 
+      int deltaX = startCoord.getX() - endCoord.getX();
+      int deltaY = 0;
+      if (startCoord.getY() <= endCoord.getY()) {
+      deltaY = startCoord.getY() - endCoord.getY();
+      }
+      if (startCoord.getY() > endCoord.getY()) {
+      deltaY = endCoord.getY() - startCoord.getY();
+      }
+      
+      double error = 0;
+      double deltaError = abs((double)deltaY / (double)deltaX); 
+      int y = startCoord.getY();
+      for (int x = startCoord.getX(); x >= endCoord.getX(); x = x - 20) {
+          Coords location = new Coords(x,y);
+          if (unseen) {
+            black = new BlackEntity(this, "sprites/black.png", location, "black");
+            upperLayers.put(location, black);  
+          }
+
+          if (middleLayers.containsKey(location)) {
+            MiddleLayer middleLayer = middleLayers.get(location); 
+            if (!middleLayer.seePassed()) {
+                unseen = true;
+            }
+            }
+          
+          error = error + deltaError;
+          while (error >= .5) {
+              if (startCoord.getY() <= endCoord.getY()) {
+              y = y - 20;
+              }
+              if (startCoord.getY() > endCoord.getY()) {
+              y = y + 20;
+              }
+              error = error - 1;
+          }
+      }
+      }
+      //topright to bottom right
+      for (int endY = player.getCoords().getY() - Global.yRes; endY < startCoord.getY() + Global.yRes; endY = endY +20){
+      boolean unseen = false;
+      Coords endCoord = new Coords(player.getCoords().getX() + Global.xRes, endY);
+
+      int deltaX = startCoord.getX() - endCoord.getX();
+      int deltaY = 0;
+      if (startCoord.getY() <= endCoord.getY()) {
+      deltaY = startCoord.getY() - endCoord.getY();
+      }
+      if (startCoord.getY() > endCoord.getY()) {
+      deltaY = endCoord.getY() - startCoord.getY();
+      }
+      
+      double error = 0;
+      double deltaError = abs((double)deltaY / (double)deltaX); 
+      int y = startCoord.getY();
+      for (int x = startCoord.getX(); x <= endCoord.getX(); x = x + 20) {
+          Coords location = new Coords(x,y);
+          if (unseen) {
+            black = new BlackEntity(this, "sprites/black.png", location, "black");
+            upperLayers.put(location, black);  
+          }
+
+          if (middleLayers.containsKey(location)) {
+            MiddleLayer middleLayer = middleLayers.get(location); 
+            if (!middleLayer.seePassed()) {
+                unseen = true;
+            }
+            }
+          
+          error = error + deltaError;
+          while (error >= .5) {
+              if (startCoord.getY() <= endCoord.getY()) {
+              y = y - 20;
+              }
+              if (startCoord.getY() > endCoord.getY()) {
+              y = y + 20;
+              }
+              error = error - 1;
+          }
+      }
+      }
+      //topleft to topright
+      for (int endX = player.getCoords().getX() - Global.xRes; endX < startCoord.getX() + Global.xRes; endX = endX +20){
+      boolean unseen = false;
+      Coords endCoord = new Coords(endX, player.getCoords().getY() - Global.yRes);
+      
+      int deltaX = 0;
+      if (startCoord.getX() <= endCoord.getX()) {
+        deltaX = startCoord.getX() - endCoord.getX();
+      }
+      if (startCoord.getX() > endCoord.getX()) {
+        deltaX = endCoord.getX() - startCoord.getX();
+      }    
+      int deltaY = startCoord.getY() - endCoord.getY();
+      
+      double error = 0;
+      double deltaError = abs((double)deltaX / (double)deltaY); 
+      int x = startCoord.getX();
+      for (int y = startCoord.getY(); y >= endCoord.getY(); y = y - 20) {
+          Coords location = new Coords(x,y);
+          if (unseen) {
+            black = new BlackEntity(this, "sprites/black.png", location, "black");
+            upperLayers.put(location, black);  
+          }
+
+          if (middleLayers.containsKey(location)) {
+            MiddleLayer middleLayer = middleLayers.get(location); 
+            if (!middleLayer.seePassed()) {
+                unseen = true;
+            }
+            }
+          
+          error = error + deltaError;
+          while (error >= .5) {
+              if (startCoord.getX() <= endCoord.getX()) { 
+              x = x - 20;
+              }
+              if (startCoord.getX() > endCoord.getX()) { 
+              x = x + 20;
+              }
+              error = error - 1;
+          }
+      }
+      }
+      //bottomleft to bottomright
+      for (int endX = player.getCoords().getX() - Global.xRes; endX < startCoord.getX() + Global.xRes; endX = endX +20){
+      boolean unseen = false;
+      Coords endCoord = new Coords(endX, player.getCoords().getY() + Global.yRes);
+      
+      int deltaX = 0;
+      if (startCoord.getX() <= endCoord.getX()) {
+        deltaX = startCoord.getX() - endCoord.getX();
+      }
+      if (startCoord.getX() > endCoord.getX()) {
+        deltaX = endCoord.getX() - startCoord.getX();
+      }    
+      int deltaY = startCoord.getY() - endCoord.getY();
+      
+      double error = 0;
+      double deltaError = abs((double)deltaX / (double)deltaY); 
+      int x = startCoord.getX();
+      for (int y = startCoord.getY(); y <= endCoord.getY(); y = y + 20) {
+          Coords location = new Coords(x,y);
+          if (unseen) {
+            black = new BlackEntity(this, "sprites/black.png", location, "black");
+            upperLayers.put(location, black);  
+          }
+
+          if (middleLayers.containsKey(location)) {
+            MiddleLayer middleLayer = middleLayers.get(location); 
+            if (!middleLayer.seePassed()) {
+                unseen = true;
+            }
+            }
+          
+          error = error + deltaError;
+          while (error >= .5) {
+              if (startCoord.getX() <= endCoord.getX()) { 
+              x = x - 20;
+              }
+              if (startCoord.getX() > endCoord.getX()) { 
+              x = x + 20;
+              }
+              error = error - 1;
+          }
+      }
+      }
+      
+  }
   //Loop of main game
   public void gameLoop()
   {
@@ -685,7 +865,7 @@ public class Survive
         zombie = new ZombieEntity(this, "sprites/ZombieN1.png", location, "zombie", Direction.UP);
         enemyLayers.put(location, zombie);
       }
-
+      checkLoS(); 
       checkButtonPushed();
       //Draw all ground that is on screen
       // The upper right coordinates of the screen in game world coordinates.
@@ -712,6 +892,11 @@ public class Survive
           if (enemyLayers.containsKey(coords)) {
             enemyLayers.get(coords).draw(g, screenOffset);
           }
+          if (upperLayers.containsKey(coords)) {
+            upperLayers.get(coords).draw(g, screenOffset);
+            upperLayers.remove(coords);
+          }
+          
         }
       }
 

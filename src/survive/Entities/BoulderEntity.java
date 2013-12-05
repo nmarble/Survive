@@ -31,4 +31,8 @@ public class BoulderEntity
    {
        return false;
    }
+  public boolean seePassed()
+   {
+       return true;
+   }
 }

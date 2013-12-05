@@ -30,4 +30,8 @@ public class TreeEntity extends MiddleLayer
    {
        return false;
    }
+  public boolean seePassed()
+   {
+       return false;
+   }
 }
