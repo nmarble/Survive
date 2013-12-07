@@ -79,7 +79,7 @@ public class Survive
   private int treeLikely = 60;
   private int boulderLikely = 20;
   private int zombieChance = 100;
-
+  private int pRotate = 0;
   private int itemSelection = 0;
   private int selectionX = 0;
   private int selectionY = 0;
@@ -152,8 +152,8 @@ public class Survive
   private void initEntities()
   {
    
-    randomDefault[0] = 50;
-    randomDefault[1] = 25;
+    randomDefault[0] = 150;
+    randomDefault[1] = 10;
     randomDefault[2] = 0;
     randomDefault[3] = 0;
 
@@ -514,6 +514,7 @@ public class Survive
 
   public void checkButtonPushed()
   {
+
     if (cPressed) {
       craftingOpen = !craftingOpen;
       if (craftingStructure = true) {
@@ -534,11 +535,10 @@ public class Survive
       movePlayer(direction);          
       }
       direction = Direction.LEFT;
-      for (int i = 0; i < 1; i++) {
-        Hud hud = huds.get(i);
-        hud.changeFrame(2);
-      }
+      Hud hud = huds.get(0);
+      hud.changeDirection(direction);
       checkCollisionObject(direction);
+      pRotate ++;
     }
     if (leftPressed && inventoryOpen) {
         selectionX = selectionX + 25;      
@@ -548,11 +548,10 @@ public class Survive
       movePlayer(direction);          
       }
       direction = Direction.RIGHT;
-      for (int i = 0; i < 1; i++) {
-        Hud hud = huds.get(i);
-        hud.changeFrame(3);
-      }
+      Hud hud = huds.get(0);
+      hud.changeDirection(direction);
       checkCollisionObject(direction);
+      pRotate ++;
     }
     if (rightPressed && inventoryOpen) {
         selectionX = selectionX - 25;      
@@ -562,11 +561,10 @@ public class Survive
       movePlayer(direction);          
       }
       direction = Direction.UP;
-      for (int i = 0; i < 1; i++) {
-        Hud hud = huds.get(i);
-        hud.changeFrame(0);
-      }
+      Hud hud = huds.get(0);
+      hud.changeDirection(direction);
       checkCollisionObject(direction);
+      pRotate ++;
     }
     if (upPressed && inventoryOpen) {
         selectionY = selectionY + 25;      
@@ -576,11 +574,10 @@ public class Survive
       movePlayer(direction);          
       }
       direction = Direction.DOWN;
-      for (int i = 0; i < 1; i++) {
-        Hud hud = huds.get(i);
-        hud.changeFrame(1);
-      }
+      Hud hud = huds.get(0);
+      hud.changeDirection(direction);
       checkCollisionObject(direction);
+      pRotate ++;
     }
     if (downPressed && inventoryOpen) {
         selectionY = selectionY - 25;      
@@ -593,6 +590,9 @@ public class Survive
     }
     if (spacePressed && inventoryOpen) {
         selectionInteract(selectionX, selectionY);
+    }
+    if (pRotate > 1) {
+        pRotate = 0;
     }
   }
 
@@ -687,6 +687,14 @@ public class Survive
             black = new BlackEntity(this, "sprites/black.png", location, "black");
             upperLayers.put(location, black);  
           }
+
+          if (middleLayers.containsKey(location)) {
+            MiddleLayer middleLayer = middleLayers.get(location); 
+            if (!middleLayer.seePassed()) {
+                unseen = true;
+            }
+            }
+          
           error = error + deltaError;
           while (error >= .5) {
               if (startCoord.getY() <= endCoord.getY()) {
@@ -696,18 +704,7 @@ public class Survive
               y = y + 20;
               }
               error = error - 1;
-              location = new Coords(x,y);
-              if (unseen) {
-                 black = new BlackEntity(this, "sprites/black.png", location, "black");
-                 upperLayers.put(location, black);  
-              }
           }
-          if (middleLayers.containsKey(location)) {
-            MiddleLayer middleLayer = middleLayers.get(location); 
-            if (!middleLayer.seePassed()) {
-                unseen = true;
-            }
-            }
       }
       }
       //topright to bottom right
@@ -734,6 +731,13 @@ public class Survive
             upperLayers.put(location, black);  
           }
 
+          if (middleLayers.containsKey(location)) {
+            MiddleLayer middleLayer = middleLayers.get(location); 
+            if (!middleLayer.seePassed()) {
+                unseen = true;
+            }
+            }
+          
           error = error + deltaError;
           while (error >= .5) {
               if (startCoord.getY() <= endCoord.getY()) {
@@ -743,18 +747,7 @@ public class Survive
               y = y + 20;
               }
               error = error - 1;
-              location = new Coords(x,y);
-              if (unseen) {
-                 black = new BlackEntity(this, "sprites/black.png", location, "black");
-                 upperLayers.put(location, black);  
-              }
           }
-          if (middleLayers.containsKey(location)) {
-            MiddleLayer middleLayer = middleLayers.get(location); 
-            if (!middleLayer.seePassed()) {
-                unseen = true;
-            }
-            }
       }
       }
       //topleft to topright
@@ -780,6 +773,14 @@ public class Survive
             black = new BlackEntity(this, "sprites/black.png", location, "black");
             upperLayers.put(location, black);  
           }
+
+          if (middleLayers.containsKey(location)) {
+            MiddleLayer middleLayer = middleLayers.get(location); 
+            if (!middleLayer.seePassed()) {
+                unseen = true;
+            }
+            }
+          
           error = error + deltaError;
           while (error >= .5) {
               if (startCoord.getX() <= endCoord.getX()) { 
@@ -789,18 +790,7 @@ public class Survive
               x = x + 20;
               }
               error = error - 1;
-              location = new Coords(x,y);
-              if (unseen) {
-                 black = new BlackEntity(this, "sprites/black.png", location, "black");
-                 upperLayers.put(location, black);  
-              }
           }
-          if (middleLayers.containsKey(location)) {
-            MiddleLayer middleLayer = middleLayers.get(location); 
-            if (!middleLayer.seePassed()) {
-                unseen = true;
-            }
-            }
       }
       }
       //bottomleft to bottomright
@@ -826,7 +816,14 @@ public class Survive
             black = new BlackEntity(this, "sprites/black.png", location, "black");
             upperLayers.put(location, black);  
           }
-         
+
+          if (middleLayers.containsKey(location)) {
+            MiddleLayer middleLayer = middleLayers.get(location); 
+            if (!middleLayer.seePassed()) {
+                unseen = true;
+            }
+            }
+          
           error = error + deltaError;
           while (error >= .5) {
               if (startCoord.getX() <= endCoord.getX()) { 
@@ -836,18 +833,7 @@ public class Survive
               x = x + 20;
               }
               error = error - 1;
-              location = new Coords(x,y);
-              if (unseen) {
-                 black = new BlackEntity(this, "sprites/black.png", location, "black");
-                 upperLayers.put(location, black);  
-              }
           }
-          if (middleLayers.containsKey(location)) {
-            MiddleLayer middleLayer = middleLayers.get(location); 
-            if (!middleLayer.seePassed()) {
-                unseen = true;
-            }
-            }
       }
       }
       
@@ -906,12 +892,10 @@ public class Survive
           if (enemyLayers.containsKey(coords)) {
             enemyLayers.get(coords).draw(g, screenOffset);
           }
-          // remove for LOS
           if (upperLayers.containsKey(coords)) {
             upperLayers.get(coords).draw(g, screenOffset);
             upperLayers.remove(coords);
           }
-    
         }
       }
 

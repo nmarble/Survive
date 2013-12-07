@@ -20,4 +20,6 @@ public abstract class Hud extends Drawable {
   public String getType() {
     return type;
   }
+   public void changeDirection(Direction d) {
+   }
 }
