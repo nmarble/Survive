@@ -165,10 +165,13 @@ public class Survive
     //Add player entity
     player = new PlayerEntity(this, "sprites/PlayerN.png", new Coords(0, 0), "player", 20);
     huds.add(player);
+    
+    zombie = new ZombieEntity(this, "sprites/ZombieN1.png", new Coords(100,100), "zombie", Direction.UP);
+    enemyLayers.put(new Coords(100,100), zombie);
     //Add Crafting buttons
     structureButton = new ButtonEntity(this, "sprites/StructureButton.jpg", new Coords(0, Global.yRes - 100), "Structure", 100);
     huds.add(structureButton);
-
+    
     toolButton = new ButtonEntity(this, "sprites/ToolButton.jpg", new Coords(110, Global.yRes - 100), "Tool", 100);
     huds.add(toolButton);
 
@@ -562,7 +565,7 @@ public class Survive
       }
       direction = Direction.UP;
       Hud hud = huds.get(0);
-      hud.changeDirection(direction);
+      hud.changeDirection(direction); 
       checkCollisionObject(direction);
       pRotate ++;
     }
@@ -640,26 +643,30 @@ public class Survive
   public long moveEnemy(long loopTime)
   {
     for (EnemyLayer enemyLayer : enemyLayers.values()) {
+      Coords finalMove = enemyLayer.getCoords();
       if (10 == loopTime) {
-
-        // Too complicated for me to fix now. Simple, random walk here instead.
-        final Direction enemyDirection = Direction.getRandom();
-        enemyLayer.changeDirection(enemyDirection);
-        final Coords attemptedMove = enemyDirection.getCoordsFrom(enemyLayer.getCoords());
-
-        // Allow the enemy to move to the attempted location if everything there is passable.
-        final LowerLayer lower = lowerLayers.get(attemptedMove);
-        final MiddleLayer middle = middleLayers.get(attemptedMove);
-        final EnemyLayer otherEnemy = enemyLayers.get(attemptedMove);
-        if ((lower == null || lower.passable())
-                && (middle == null || middle.passable())
-                && otherEnemy == null) {
-
-          enemyLayer.setCoords(attemptedMove);
-        }
-
+          int fD = 99999;
+          
+          for (int x = enemyLayer.getCoords().getX() - 20; x <= enemyLayer.getCoords().getX() + 20; x  = x + 20) {
+              for (int y = enemyLayer.getCoords().getY() - 20; y <= enemyLayer.getCoords().getY() + 20; y  = y + 20) {
+                  int dx = abs(x - player.getCoords().getX());
+                  int dy = abs(y - player.getCoords().getY());              
+                  int tD = dx + dy;
+                  Coords coords = new Coords(x,y);
+                  LowerLayer lowerLayer = lowerLayers.get(coords);
+                  if (lowerLayer != null) {
+                  if (tD < fD && lowerLayer.passable()) {
+                      fD = tD;
+                      finalMove = new Coords(x,y);
+                  }
+                  }
+              }
+          }
+          enemyLayer.setCoords(finalMove);
+          loopTime = 0;
       }
     }
+    
     return loopTime;
   }
   public void checkLoS() {
@@ -855,7 +862,7 @@ public class Survive
       // Moves applicable enemy within its speed compared to loop time
       loopTime = moveEnemy(loopTime);
 
-      //Chance to add zombie
+      /*/Chance to add zombie
       int randomZombie = (int) (Math.random() * zombieChance);
       if (randomZombie == 1) {
         System.err.println("ZOMBIE");
@@ -865,6 +872,7 @@ public class Survive
         zombie = new ZombieEntity(this, "sprites/ZombieN1.png", location, "zombie", Direction.UP);
         enemyLayers.put(location, zombie);
       }
+      */
       checkLoS(); 
       checkButtonPushed();
       //Draw all ground that is on screen
@@ -903,7 +911,7 @@ public class Survive
       for (final Object object : removeList) {
         middleLayers.remove(removeList);
         huds.remove(removeList);
-        enemyLayers.remove(removeList);
+
       }
       for (Hud hud : removeHudList){
         huds.remove(hud);

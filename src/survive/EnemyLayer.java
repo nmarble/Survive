@@ -22,7 +22,7 @@ public abstract class EnemyLayer extends Drawable
   {
     return type;
   }
-  
+
   public int getModifiedX()
   {
     int modifiedX = 0;

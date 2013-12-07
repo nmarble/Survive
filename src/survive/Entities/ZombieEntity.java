@@ -41,6 +41,7 @@ import survive.Direction;
    {
        return false;
    }
+
   public void changeDirection(final Direction d)
   {
       direction = d;
