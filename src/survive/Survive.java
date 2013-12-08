@@ -43,8 +43,11 @@ public class Survive
   private MiddleLayer Log;
   private MiddleLayer Stone;
   private MiddleLayer Barrel;
+  private MiddleLayer Axe;
 
   private UpperLayer black;
+  private UpperLayer use;
+  
   
   private EnemyLayer zombie;
 
@@ -54,13 +57,14 @@ public class Survive
   private Hud consumableButton;
   private Hud decorativeButton;
   private Hud selectionWindow;
+  private Hud equipOverlay;
 
   private Inventory inventoryMan;
   private Inventory log;
   private Inventory stone;
   private Inventory logWall;
   private Inventory barrel;
-  
+  private Inventory axe;
   
 
   private Direction direction = Direction.UP;
@@ -73,9 +77,14 @@ public class Survive
   private boolean upPressed = false;
   private boolean downPressed = false;
   private boolean spacePressed = false;
+  private boolean enterPressed = false;
   private boolean iPressed = false;
   private boolean cPressed = false;
-
+  
+  int[] equipped = new int [4];
+  int equippedSelection = 0;
+  
+  
   private int treeLikely = 60;
   private int boulderLikely = 20;
   private int zombieChance = 100;
@@ -136,7 +145,9 @@ public class Survive
     initEntities();
     randomChance[2] = 3;
     randomChance[3] = 3;
-    
+    for (int i = 0; i < 4; i++) {
+        equipped[i] = 0;
+    }
   }
 
   private void startGame()
@@ -151,7 +162,7 @@ public class Survive
 
   private void initEntities()
   {
-   
+    
     randomDefault[0] = 150;
     randomDefault[1] = 10;
     randomDefault[2] = 0;
@@ -169,6 +180,9 @@ public class Survive
     zombie = new ZombieEntity(this, "sprites/ZombieN1.png", new Coords(100,100), "zombie", Direction.UP);
     enemyLayers.put(new Coords(100,100), zombie);
     //Add Crafting buttons
+    Axe = new AxeEntity(this, "sprites/axe.png", new Coords(-100, -100), "axe");
+    middleLayers.put(new Coords(-100, -100), Axe);
+    
     structureButton = new ButtonEntity(this, "sprites/StructureButton.jpg", new Coords(0, Global.yRes - 100), "Structure", 100);
     huds.add(structureButton);
     
@@ -183,6 +197,10 @@ public class Survive
     
     selectionWindow = new ButtonEntity(this, "sprites/selection.png", new Coords(0,0), "selection", 20);
     huds.add(selectionWindow);
+    
+    equipOverlay = new ButtonEntity(this, "sprites/Equipoverlay.png", new Coords(400,0), "equipOverlay", 150);
+    huds.add(equipOverlay);
+    
 
   }
 
@@ -200,11 +218,41 @@ public class Survive
         break;
     }
   }
-
+  public void drawEquipped(Coords coords) 
+  {
+      switch (equipped[0]) {
+          case 5:
+              String pic = "";
+              int a = getRandomNum(2) ; 
+              switch (direction) {
+                  case UP:
+                      pic = "sprites/AxeSwingN1.png";
+                      if (a == 1) {pic = "sprites/AxeSwingN2.png";}
+                      break;
+                  case DOWN:
+                      pic = "sprites/AxeSwingS1.png";
+                      if (a == 1) {pic = "sprites/AxeSwingS2.png";}
+                      break;
+                  case LEFT:
+                      pic = "sprites/AxeSwingW1.png";
+                      if (a == 1) {pic = "sprites/AxeSwingW2.png";}
+                      break;
+                  case RIGHT:
+                      pic = "sprites/AxeSwingE1.png";
+                      if (a == 1) {pic = "sprites/AxeSwingE2.png";}
+                      break;
+              }
+              use = new UseEntity(this, pic, coords, "use");
+              upperLayers.put(coords, use);
+              break;   
+      } 
+  }
   public void interact()
   {
     final Coords interactCoords = direction.getCoordsFrom(player.getCoords());
-
+    if (equipped[0] == 5) {
+    drawEquipped(interactCoords);
+    }
     {
       final MiddleLayer middleLayer = middleLayers.get(interactCoords);
       if (middleLayer != null) {
@@ -276,8 +324,8 @@ public class Survive
       inventorys.add(logWall);
       barrel = new Inventory("sprites/barrel.png", 4, 0, new Coords(0,0));
       inventorys.add(barrel);
-      inventoryMan = new Inventory("sprites/inventoryMan.png", 9999, 0, new Coords(0,0));
-      inventorys.add(inventoryMan);
+      axe = new Inventory("sprites/axe.png", 5, 0, new Coords(0,0));
+      inventorys.add(axe);
       
     }
     for (Inventory inventory : inventorys) {
@@ -305,21 +353,28 @@ public class Survive
     switch (itemSelection) {
       case 1:
         Log = new LogEntity(this, "sprites/log.png", coords, "log");
-        Log.setCoords(coords);
         middleLayers.put(coords, Log);
         removeFromInventory(1, 1);
         break;
       case 2:
         Stone = new StoneEntity(this, "sprites/stone.png", coords, "stone");
-        Stone.setCoords(coords);
         middleLayers.put(coords, Stone);
         removeFromInventory(2, 1);
         break;
       case 3:
         LogWall = new LogWallEntity(this, "sprites/logwall.gif", coords, "logWall");
-        LogWall.setCoords(coords);
         middleLayers.put(coords, LogWall);
         removeFromInventory(3, 1);
+        break;
+      case 4:
+        Barrel = new LogWallEntity(this, "sprites/logwall.gif", coords, "logWall");
+        middleLayers.put(coords, Barrel);
+        removeFromInventory(4, 1);
+        break;
+      case 5:
+        Axe = new AxeEntity(this, "sprites/axe.png", coords, "axe");
+        middleLayers.put(coords, Axe);
+        removeFromInventory(5, 1);
         break;
 
     }
@@ -539,6 +594,10 @@ public class Survive
       pRotate ++;
     }
     if (leftPressed && inventoryOpen) {
+        if (selectionY > -(Global.yRes - (Global.yRes / 2) + 15)) {
+            equippedSelection --;
+            if (equippedSelection < 0) {equippedSelection = 3;}
+        }
         selectionX = selectionX + 25;      
     }
     if (rightPressed && !inventoryOpen) {
@@ -552,6 +611,10 @@ public class Survive
       pRotate ++;
     }
     if (rightPressed && inventoryOpen) {
+        if (selectionY > -(Global.yRes - (Global.yRes / 2) + 15)) {
+            equippedSelection ++;
+            if (equippedSelection > 3) {equippedSelection = 0;}
+        }
         selectionX = selectionX - 25;      
     }
     if (upPressed && !inventoryOpen) {
@@ -565,6 +628,10 @@ public class Survive
       pRotate ++;
     }
     if (upPressed && inventoryOpen) {
+        if (selectionY > -(Global.yRes - (Global.yRes / 2) + 15)) {
+            equippedSelection ++;
+            if (equippedSelection > 3) {equippedSelection = 0;}
+        }
         selectionY = selectionY + 25;      
     }
     if (downPressed && !inventoryOpen) {
@@ -578,6 +645,10 @@ public class Survive
       pRotate ++;
     }
     if (downPressed && inventoryOpen) {
+        if (selectionY > -(Global.yRes - (Global.yRes / 2) + 15)) {
+            if (equippedSelection == 0) {selectionX = -(Global.xRes - (Global.xRes / 5) + 5); selectionY = -(Global.yRes - (Global.yRes / 2) - 10); equippedSelection = 0;}
+            equippedSelection --;
+        }
         selectionY = selectionY - 25;      
     }
     if (spacePressed && !holdingItem) {
@@ -586,8 +657,16 @@ public class Survive
     if (spacePressed && holdingItem && !inventoryOpen) {
       placeItemHeld(direction);
     }
-    if (spacePressed && inventoryOpen) {
+    if (spacePressed && inventoryOpen && !holdingItem) {
         selectionInteract(selectionX, selectionY);
+    }
+    if (spacePressed && holdingItem && inventoryOpen && selectionY >= -(Global.yRes - (Global.yRes / 2) - 10)) {
+        for (Inventory inventory : inventorys) {
+            if (inventory.getItemCode() == itemSelection && inventory.equipable()) {
+                equipped[equippedSelection] = inventory.getItemCode();
+                inventory.removeQuantity(1);
+            }
+      }
     }
     if (pRotate > 1) {
         pRotate = 0;
@@ -599,7 +678,7 @@ public class Survive
     //Draw Inventory screen
     Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
     g.setColor(Color.GRAY);
-    g.fill3DRect(Global.xRes - (Global.xRes / 5), 0, Global.yRes, Global.xRes, true);
+    g.fill3DRect(Global.xRes - (Global.xRes / 5), Global.yRes / 2, Global.yRes, Global.xRes, true);
     g.setColor(Color.BLACK);
     g.drawLine(Global.xRes - (Global.xRes / 5), (Global.yRes / 2), Global.xRes, (Global.yRes / 2));
     g.dispose();
@@ -650,7 +729,9 @@ public class Survive
                   int tD = dx + dy;
                   Coords coords = new Coords(x,y);
                   LowerLayer lowerLayer = lowerLayers.get(coords);
+                  MiddleLayer middleLayer = middleLayers.get(coords);
                   if (lowerLayer != null) {
+                  if (middleLayer == null || middleLayer.passable()) {
                   if (tD < fD && lowerLayer.passable()) {
                       fD = tD;
                       finalMove = new Coords(x,y);
@@ -666,6 +747,7 @@ public class Survive
                       if (finalMove.getY() > enemyLayer.getCoords().getY()) {
                           newdirection = Direction.DOWN;
                       }
+                  }
                   }
                   }
               }
@@ -982,19 +1064,7 @@ public class Survive
       }
       //Draws inventory background and items
       
-      if (inventoryOpen == true) {
-        if (selectionX > -(Global.xRes - (Global.xRes / 5) + 5)) {
-           selectionX = -(Global.xRes - (Global.xRes / 5) + 5);
-        }
-        if (selectionY > -(Global.yRes - (Global.yRes / 2) + 15)) {
-            selectionY = -(Global.yRes - (Global.yRes / 2) + 15);
-        }
-        if (selectionX < -(Global.xRes - 30)) {
-           selectionX = -(Global.xRes - 30);
-        }
-        if (selectionY < -(Global.yRes - 30)) {
-            selectionY = -(Global.yRes - 30);
-        }
+      if (inventoryOpen == true) {       
         drawInventory();
         int col = -20;
         int row = -1;
@@ -1019,10 +1089,16 @@ public class Survive
           }
         }
         for (Hud hud : huds) {
+            if ("equipOverlay" == hud.getType()) {
+            hud.draw(g, new Coords(-(Global.xRes/2 -150),0));
+            }
+        }
+        for (Hud hud : huds) {
             if ("selection" == hud.getType()) {
             hud.draw(g, new Coords(selectionX, selectionY));
             }
         }
+        findSelectionCoords();
       }
       for (int i = 0; i < totalRandom; i++) {
         if (randomChance[i] > randomDefault[i] + 20) {
@@ -1039,7 +1115,39 @@ public class Survive
       }
     }
   }
-
+  public void findSelectionCoords()
+  {
+      if (selectionX >= -(Global.xRes - (Global.xRes / 5) + 5)) {
+           selectionX = -(Global.xRes - (Global.xRes / 5) + 5);
+        }
+        if (selectionY >= -(Global.yRes - (Global.yRes / 2) - 10)) {
+            switch (equippedSelection) {
+                case 0:
+                    selectionX = -(Global.xRes - 78);
+                    selectionY = -120;                  
+                    break;
+                case 1:
+                    selectionX = -(Global.xRes - 24);
+                    selectionY = -75;
+                    break;
+                case 2:
+                    selectionX = -(Global.xRes - 55);
+                    selectionY = -5;
+                    break;
+                case 3:
+                    selectionX = -(Global.xRes - 145);
+                    selectionY = -39;
+                    break;
+            }
+        }
+        if (selectionX <= -(Global.xRes - 30) && equippedSelection != 1) {
+           selectionX = -(Global.xRes - 30);
+        }
+        if (selectionY <= -(Global.yRes - 30)) {
+            selectionY = -(Global.yRes - 30);
+        }
+              
+  }
   private class MouseInputHandler
           extends MouseAdapter
   {
@@ -1095,7 +1203,7 @@ public class Survive
         return;
       }
       switch (e.getKeyCode()) {
-
+        
         case 32:
           spacePressed = true;
           break;
@@ -1126,7 +1234,9 @@ public class Survive
         return;
       }
       switch (e.getKeyCode()) {
-
+        case 13:
+          enterPressed = false;
+          break;
         case 32:
           spacePressed = false;
           break;

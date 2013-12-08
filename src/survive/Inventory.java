@@ -36,6 +36,14 @@
        x = incX;
        y = incY;
    }
+   public boolean equipable()
+   {
+       boolean equip = false;
+       if (itemCode == 5) {
+           equip = true;
+       }
+       return equip;
+   }
    public int getX()
    {
        return x;
@@ -45,7 +53,12 @@
        return y;
    }
  }
-
+//Item Codes
+//Log 1
+//Stone 2
+//Log Wall 3
+//Barrel 4
+//Axe 5
 
 
 
