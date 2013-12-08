@@ -58,6 +58,8 @@ public class Survive
   private Hud decorativeButton;
   private Hud selectionWindow;
   private Hud equipOverlay;
+  private Hud bagOverlay;
+  
 
   private Inventory inventoryMan;
   private Inventory log;
@@ -198,9 +200,11 @@ public class Survive
     selectionWindow = new ButtonEntity(this, "sprites/selection.png", new Coords(0,0), "selection", 20);
     huds.add(selectionWindow);
     
-    equipOverlay = new ButtonEntity(this, "sprites/Equipoverlay.png", new Coords(400,0), "equipOverlay", 150);
+    equipOverlay = new ButtonEntity(this, "sprites/Equipoverlay.png", new Coords(0,0), "equipOverlay", 150);
     huds.add(equipOverlay);
     
+    bagOverlay = new ButtonEntity(this, "sprites/bag.png", new Coords(0,0), "bagOverlay", 150);
+    huds.add(bagOverlay);
 
   }
 
@@ -220,7 +224,7 @@ public class Survive
   }
   public void drawEquipped(Coords coords) 
   {
-      switch (equipped[0]) {
+      switch (equipped[3]) {
           case 5:
               String pic = "";
               int a = getRandomNum(2) ; 
@@ -250,7 +254,7 @@ public class Survive
   public void interact()
   {
     final Coords interactCoords = direction.getCoordsFrom(player.getCoords());
-    if (equipped[0] == 5) {
+    if (equipped[3] == 5) {
     drawEquipped(interactCoords);
     }
     {
@@ -320,7 +324,7 @@ public class Survive
       inventorys.add(log);
       stone = new Inventory("sprites/stone.png", 2, 0, new Coords(0,0));
       inventorys.add(stone);
-      logWall = new Inventory("sprites/LogWall.gif", 3, 0, new Coords(0,0));
+      logWall = new Inventory("sprites/logwall.gif", 3, 0, new Coords(0,0));
       inventorys.add(logWall);
       barrel = new Inventory("sprites/barrel.png", 4, 0, new Coords(0,0));
       inventorys.add(barrel);
@@ -579,7 +583,7 @@ public class Survive
           holdingItem = false;
       }
       inventoryOpen = !inventoryOpen;
-      selectionX = -(Global.xRes - (Global.xRes / 5) + 5);
+      selectionX = -(Global.xRes -170);
       selectionY = -(Global.yRes - (Global.yRes / 2) + 15);
        
     }
@@ -664,6 +668,7 @@ public class Survive
         for (Inventory inventory : inventorys) {
             if (inventory.getItemCode() == itemSelection && inventory.equipable()) {
                 equipped[equippedSelection] = inventory.getItemCode();
+                inventory.slotEquipped[equippedSelection] = true;
                 inventory.removeQuantity(1);
             }
       }
@@ -672,20 +677,6 @@ public class Survive
         pRotate = 0;
     }
   }
-
-  public void drawInventory()
-  {
-    //Draw Inventory screen
-    Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
-    g.setColor(Color.GRAY);
-    g.fill3DRect(Global.xRes - (Global.xRes / 5), Global.yRes / 2, Global.yRes, Global.xRes, true);
-    g.setColor(Color.BLACK);
-    g.drawLine(Global.xRes - (Global.xRes / 5), (Global.yRes / 2), Global.xRes, (Global.yRes / 2));
-    g.dispose();
-
-  }
-
-  //Removes all craftable item buttons
 
   public void findAvailRec()
   {
@@ -709,7 +700,7 @@ public class Survive
 
       //Set location to put icons
       final Coords coords = new Coords(0, Global.yRes - 30);
-      structureButton = new ButtonEntity(this, "sprites/logWall.gif", coords, "LogWall", 20);
+      structureButton = new ButtonEntity(this, "sprites/logwall.gif", coords, "LogWall", 20);
       huds.add(structureButton);
     }
   }
@@ -1065,21 +1056,24 @@ public class Survive
       //Draws inventory background and items
       
       if (inventoryOpen == true) {       
-        drawInventory();
         int col = -20;
         int row = -1;
+        
+        for (Hud hud : huds) {
+            if ("equipOverlay" == hud.getType()) {
+            hud.draw(g, new Coords(-(Global.xRes -150),0));
+            }
+            if ("bagOverlay" == hud.getType()) {
+            hud.draw(g, new Coords(-(Global.xRes -175), -(Global.yRes / 2)));
+            }           
+        }
         
         for (Inventory inventory : inventorys) {
           int drawX = 0;
           int drawY = 0;
-          if (inventory.getItemCode() == 9999) {
-            drawX = -(Global.xRes - (Global.xRes / 5) + 20);
-            drawY = -20;
-            inventory.draw(g, new Coords(drawX, drawY));
-          }
           if (inventory.getQuantity() > 0) {
             col = col + 25;
-            drawX = -(Global.xRes - (Global.xRes / 5) + (col));
+            drawX = -((Global.xRes -175) + (col));
             drawY = -(Global.yRes / 2) + (15 * row);
 
             inventory.draw(g, new Coords(drawX, drawY));
@@ -1087,12 +1081,30 @@ public class Survive
             g.drawString(quantity, -drawX, -drawY);
             inventory.setXY(drawX, drawY);
           }
+          if (inventory.isEquipped()) {
+              if (inventory.slotEquipped[0]) {
+                  int x = -(Global.xRes - 78);
+                  int y = -120;
+                  inventory.draw(g, new Coords(x, y));
+              }
+              if (inventory.slotEquipped[1]) {
+                  int x = -(Global.xRes - 24);
+                  int y = -75;
+                  inventory.draw(g, new Coords(x, y));
+              }
+              if (inventory.slotEquipped[2]) {
+                  int x = -(Global.xRes - 55);
+                  int y = -5;
+                  inventory.draw(g, new Coords(x, y));
+              }
+              if (inventory.slotEquipped[3]) {
+                  int x = -(Global.xRes - 145);
+                  int y = -39;
+                  inventory.draw(g, new Coords(x, y));
+              }
+          }
         }
-        for (Hud hud : huds) {
-            if ("equipOverlay" == hud.getType()) {
-            hud.draw(g, new Coords(-(Global.xRes/2 -150),0));
-            }
-        }
+        
         for (Hud hud : huds) {
             if ("selection" == hud.getType()) {
             hud.draw(g, new Coords(selectionX, selectionY));
@@ -1117,8 +1129,8 @@ public class Survive
   }
   public void findSelectionCoords()
   {
-      if (selectionX >= -(Global.xRes - (Global.xRes / 5) + 5)) {
-           selectionX = -(Global.xRes - (Global.xRes / 5) + 5);
+      if (selectionX >= -(Global.xRes -170)) {
+           selectionX = -(Global.xRes -170);
         }
         if (selectionY >= -(Global.yRes - (Global.yRes / 2) - 10)) {
             switch (equippedSelection) {
