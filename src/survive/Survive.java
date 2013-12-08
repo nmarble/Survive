@@ -263,11 +263,6 @@ public class Survive
   {
     removeList.add(object);
   }
-
-  public void removeEnemyLayer(EnemyLayer object)
-  {
-    removeList.add(object);
-  }
   
   public void addToInventory(int itemCode, int quantity)
   {
@@ -643,7 +638,8 @@ public class Survive
   public long moveEnemy(long loopTime)
   {
     for (EnemyLayer enemyLayer : enemyLayers.values()) {
-      Coords finalMove = enemyLayer.getCoords();
+      Coords finalMove = new Coords(0,0);
+      Direction newdirection = Direction.UP;
       if (10 == loopTime) {
           int fD = 99999;
           
@@ -658,11 +654,28 @@ public class Survive
                   if (tD < fD && lowerLayer.passable()) {
                       fD = tD;
                       finalMove = new Coords(x,y);
+                      if (finalMove.getX() < enemyLayer.getCoords().getX()) {
+                          newdirection = Direction.LEFT;
+                      }
+                      if (finalMove.getX() > enemyLayer.getCoords().getX()) {
+                          newdirection = Direction.RIGHT;
+                      }
+                      if (finalMove.getY() < enemyLayer.getCoords().getY()) {
+                          newdirection = Direction.UP;
+                      }
+                      if (finalMove.getY() > enemyLayer.getCoords().getY()) {
+                          newdirection = Direction.DOWN;
+                      }
                   }
                   }
               }
           }
-          enemyLayer.setCoords(finalMove);
+          enemyLayers.remove(enemyLayer.coords);
+          zombie = new ZombieEntity(this, "sprites/ZombieN1.png", finalMove, "zombie", newdirection);
+          zombie.changeDirection(newdirection);
+          int i = getRandomNum(2);
+          if (i == 1) {zombie.changeDirection(newdirection);}
+          enemyLayers.put(finalMove, zombie);
           loopTime = 0;
       }
     }
@@ -691,7 +704,7 @@ public class Survive
       for (int x = startCoord.getX(); x >= endCoord.getX(); x = x - 20) {
           Coords location = new Coords(x,y);
           if (unseen) {
-            black = new BlackEntity(this, "sprites/black.png", location, "black");
+            black = new BlackEntity(this, "sprites/black.gif", location, "black");
             upperLayers.put(location, black);  
           }
 
@@ -734,7 +747,7 @@ public class Survive
       for (int x = startCoord.getX(); x <= endCoord.getX(); x = x + 20) {
           Coords location = new Coords(x,y);
           if (unseen) {
-            black = new BlackEntity(this, "sprites/black.png", location, "black");
+            black = new BlackEntity(this, "sprites/black.gif", location, "black");
             upperLayers.put(location, black);  
           }
 
@@ -777,7 +790,7 @@ public class Survive
       for (int y = startCoord.getY(); y >= endCoord.getY(); y = y - 20) {
           Coords location = new Coords(x,y);
           if (unseen) {
-            black = new BlackEntity(this, "sprites/black.png", location, "black");
+            black = new BlackEntity(this, "sprites/black.gif", location, "black");
             upperLayers.put(location, black);  
           }
 
@@ -820,7 +833,7 @@ public class Survive
       for (int y = startCoord.getY(); y <= endCoord.getY(); y = y + 20) {
           Coords location = new Coords(x,y);
           if (unseen) {
-            black = new BlackEntity(this, "sprites/black.png", location, "black");
+            black = new BlackEntity(this, "sprites/black.gif", location, "black");
             upperLayers.put(location, black);  
           }
 
@@ -886,10 +899,9 @@ public class Survive
       final int yStart = screenOffset.getY();
       final int yStop = screenOffset.getY() + Global.yRes;
       final int yStep = 20;
-      for (int x = xStart; x < xStop; x += xStep) {
-        for (int y = yStart; y < yStop; y += yStep) {
+      for (int x = xStart; x <= xStop; x += xStep) {
+        for (int y = yStart; y <= yStop; y += yStep) {
           final Coords coords = new Coords(x, y);
-
           if (!lowerLayers.containsKey(coords)) {
             addFloor(x, y);
           }
@@ -897,7 +909,7 @@ public class Survive
           if (middleLayers.containsKey(coords)) {
             middleLayers.get(coords).draw(g, screenOffset);
           }
-          if (enemyLayers.containsKey(coords)) {
+          if (enemyLayers.containsKey(coords) && !upperLayers.containsKey(coords)) {
             enemyLayers.get(coords).draw(g, screenOffset);
           }
           if (upperLayers.containsKey(coords)) {
@@ -921,6 +933,7 @@ public class Survive
 
       //Draws Player
       player.draw(g, screenOffset);
+
       
       //Draws what is being held
       if (holdingItem == true) {
