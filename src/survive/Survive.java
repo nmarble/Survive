@@ -60,6 +60,8 @@ public class Survive
   private Hud equipOverlay;
   private Hud bagOverlay;
   
+  private int bagOverlayX = -Global.xRes + 175;
+  private int bagOverlayY = -Global.yRes + 175;
 
   private Inventory inventoryMan;
   private Inventory log;
@@ -203,7 +205,7 @@ public class Survive
     equipOverlay = new ButtonEntity(this, "sprites/Equipoverlay.png", new Coords(0,0), "equipOverlay", 150);
     huds.add(equipOverlay);
     
-    bagOverlay = new ButtonEntity(this, "sprites/bag.png", new Coords(0,0), "bagOverlay", 150);
+    bagOverlay = new ButtonEntity(this, "sprites/bagOverlay.png", new Coords(0,0), "bagOverlay", 150);
     huds.add(bagOverlay);
 
   }
@@ -568,7 +570,56 @@ public class Survive
   {
     player.setCoords(direction.getCoordsFrom(player.getCoords()));
   }
-
+  public void spacePushedInv() 
+  {
+      if (!holdingItem) {
+          selectionInteract(selectionX, selectionY);
+      }
+      if (holdingItem && selectionY > bagOverlayY)
+        for (Inventory inventory : inventorys) {
+            if (inventory.getItemCode() == itemSelection && inventory.equipable()) {
+                equipped[equippedSelection] = inventory.getItemCode();
+                inventory.slotEquipped[equippedSelection] = true;
+                inventory.removeQuantity(1);
+            }
+        }
+  }
+  public void invDirectionPushed()
+  {
+      if (leftPressed) {
+        if (selectionY > bagOverlayY) {
+            equippedSelection --;
+            if (equippedSelection < 0) {equippedSelection = 3;}
+            
+        }
+        selectionX = selectionX + 25; 
+      }
+      if (rightPressed) {
+        if (selectionY > bagOverlayY) {
+            equippedSelection ++;
+            if (equippedSelection > 3) {equippedSelection = 0;}
+        }
+        selectionX = selectionX - 25; 
+      }
+      if (upPressed) {
+        if (selectionY > bagOverlayY) {
+            equippedSelection ++;
+            if (equippedSelection > 3) {equippedSelection = 0;}
+        }
+        selectionY = selectionY + 25;    
+      }
+      if (downPressed) {
+        selectionY = selectionY - 25; 
+        if (selectionY > bagOverlayY) {
+            equippedSelection --;
+            if (equippedSelection == -1) {
+                selectionX = bagOverlayX - 5; 
+                selectionY = bagOverlayY - 15;
+                equippedSelection = 0;
+            }      
+        }   
+      }
+  }
   public void checkButtonPushed()
   {
 
@@ -583,8 +634,8 @@ public class Survive
           holdingItem = false;
       }
       inventoryOpen = !inventoryOpen;
-      selectionX = -(Global.xRes -170);
-      selectionY = -(Global.yRes - (Global.yRes / 2) + 15);
+      selectionX = bagOverlayX - 20;
+      selectionY = bagOverlayY - 20;
        
     }
     if (leftPressed && !inventoryOpen) {
@@ -597,13 +648,7 @@ public class Survive
       checkCollisionObject(direction);
       pRotate ++;
     }
-    if (leftPressed && inventoryOpen) {
-        if (selectionY > -(Global.yRes - (Global.yRes / 2) + 15)) {
-            equippedSelection --;
-            if (equippedSelection < 0) {equippedSelection = 3;}
-        }
-        selectionX = selectionX + 25;      
-    }
+    
     if (rightPressed && !inventoryOpen) {
       if (direction == Direction.RIGHT) {
       movePlayer(direction);          
@@ -613,13 +658,6 @@ public class Survive
       hud.changeDirection(direction);
       checkCollisionObject(direction);
       pRotate ++;
-    }
-    if (rightPressed && inventoryOpen) {
-        if (selectionY > -(Global.yRes - (Global.yRes / 2) + 15)) {
-            equippedSelection ++;
-            if (equippedSelection > 3) {equippedSelection = 0;}
-        }
-        selectionX = selectionX - 25;      
     }
     if (upPressed && !inventoryOpen) {
       if (direction == Direction.UP) {
@@ -631,13 +669,6 @@ public class Survive
       checkCollisionObject(direction);
       pRotate ++;
     }
-    if (upPressed && inventoryOpen) {
-        if (selectionY > -(Global.yRes - (Global.yRes / 2) + 15)) {
-            equippedSelection ++;
-            if (equippedSelection > 3) {equippedSelection = 0;}
-        }
-        selectionY = selectionY + 25;      
-    }
     if (downPressed && !inventoryOpen) {
       if (direction == Direction.DOWN) {
       movePlayer(direction);          
@@ -648,12 +679,8 @@ public class Survive
       checkCollisionObject(direction);
       pRotate ++;
     }
-    if (downPressed && inventoryOpen) {
-        if (selectionY > -(Global.yRes - (Global.yRes / 2) + 15)) {
-            if (equippedSelection == 0) {selectionX = -(Global.xRes - (Global.xRes / 5) + 5); selectionY = -(Global.yRes - (Global.yRes / 2) - 10); equippedSelection = 0;}
-            equippedSelection --;
-        }
-        selectionY = selectionY - 25;      
+    if (leftPressed || rightPressed || upPressed || downPressed && inventoryOpen) {
+      invDirectionPushed();
     }
     if (spacePressed && !holdingItem) {
       interact();
@@ -661,18 +688,10 @@ public class Survive
     if (spacePressed && holdingItem && !inventoryOpen) {
       placeItemHeld(direction);
     }
-    if (spacePressed && inventoryOpen && !holdingItem) {
-        selectionInteract(selectionX, selectionY);
+    if (spacePressed && inventoryOpen) {
+      spacePushedInv();
     }
-    if (spacePressed && holdingItem && inventoryOpen && selectionY >= -(Global.yRes - (Global.yRes / 2) - 10)) {
-        for (Inventory inventory : inventorys) {
-            if (inventory.getItemCode() == itemSelection && inventory.equipable()) {
-                equipped[equippedSelection] = inventory.getItemCode();
-                inventory.slotEquipped[equippedSelection] = true;
-                inventory.removeQuantity(1);
-            }
-      }
-    }
+
     if (pRotate > 1) {
         pRotate = 0;
     }
@@ -1057,14 +1076,14 @@ public class Survive
       
       if (inventoryOpen == true) {       
         int col = -20;
-        int row = -1;
+        int row = 1;
         
         for (Hud hud : huds) {
-            if ("equipOverlay" == hud.getType()) {
+            if ("equipOverlay" == hud.getType()) { 
             hud.draw(g, new Coords(-(Global.xRes -150),0));
             }
             if ("bagOverlay" == hud.getType()) {
-            hud.draw(g, new Coords(-(Global.xRes -175), -(Global.yRes / 2)));
+            hud.draw(g, new Coords(bagOverlayX, bagOverlayY));
             }           
         }
         
@@ -1073,8 +1092,8 @@ public class Survive
           int drawY = 0;
           if (inventory.getQuantity() > 0) {
             col = col + 25;
-            drawX = -((Global.xRes -175) + (col));
-            drawY = -(Global.yRes / 2) + (15 * row);
+            drawX = (bagOverlayX - (col));
+            drawY = (bagOverlayY) - (15 * row);
 
             inventory.draw(g, new Coords(drawX, drawY));
             String quantity = String.valueOf(inventory.getQuantity());
@@ -1104,19 +1123,21 @@ public class Survive
               }
           }
         }
-        
+        findSelectionCoords();
         for (Hud hud : huds) {
             if ("selection" == hud.getType()) {
             hud.draw(g, new Coords(selectionX, selectionY));
             }
         }
-        findSelectionCoords();
+        
       }
       for (int i = 0; i < totalRandom; i++) {
         if (randomChance[i] > randomDefault[i] + 20) {
           randomChance[i] = randomDefault[i] + 10;
         }
       }
+      System.err.println(selectionY);
+      System.err.println(bagOverlayY);
       strategy.show();
       if (loopTime > 10) {
         loopTime = 0;
@@ -1129,10 +1150,10 @@ public class Survive
   }
   public void findSelectionCoords()
   {
-      if (selectionX >= -(Global.xRes -170)) {
-           selectionX = -(Global.xRes -170);
+      if (selectionX > bagOverlayX) {
+           selectionX = bagOverlayX;
         }
-        if (selectionY >= -(Global.yRes - (Global.yRes / 2) - 10)) {
+        if (selectionY > bagOverlayY) {
             switch (equippedSelection) {
                 case 0:
                     selectionX = -(Global.xRes - 78);
@@ -1152,10 +1173,10 @@ public class Survive
                     break;
             }
         }
-        if (selectionX <= -(Global.xRes - 30) && equippedSelection != 1) {
+        if (selectionX < -(Global.xRes - 30) && equippedSelection != 1) {
            selectionX = -(Global.xRes - 30);
         }
-        if (selectionY <= -(Global.yRes - 30)) {
+        if (selectionY < -(Global.yRes - 30)) {
             selectionY = -(Global.yRes - 30);
         }
               
