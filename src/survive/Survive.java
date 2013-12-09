@@ -59,9 +59,10 @@ public class Survive
   private Hud selectionWindow;
   private Hud equipOverlay;
   private Hud bagOverlay;
+  private Hud healthOverlay;
   
-  private int bagOverlayX = -Global.xRes + 175;
-  private int bagOverlayY = -Global.yRes + 175;
+  private int bagOverlayX = -Global.xRes + 200;
+  private int bagOverlayY = -Global.yRes + 200;
 
   private Inventory inventoryMan;
   private Inventory log;
@@ -205,9 +206,12 @@ public class Survive
     equipOverlay = new ButtonEntity(this, "sprites/Equipoverlay.png", new Coords(0,0), "equipOverlay", 150);
     huds.add(equipOverlay);
     
-    bagOverlay = new ButtonEntity(this, "sprites/bagOverlay.png", new Coords(0,0), "bagOverlay", 150);
+    bagOverlay = new ButtonEntity(this, "sprites/bagOvr.png", new Coords(0,0), "bagOverlay", 150);
     huds.add(bagOverlay);
-
+    
+    healthOverlay = new ButtonEntity(this, "sprites/Healthoverlay.png", new Coords(0,0), "healthOverlay", 150);
+    huds.add(healthOverlay);
+    
   }
 
   //Set cursor type
@@ -613,8 +617,8 @@ public class Survive
         if (selectionY > bagOverlayY) {
             equippedSelection --;
             if (equippedSelection == -1) {
-                selectionX = bagOverlayX - 5; 
-                selectionY = bagOverlayY - 15;
+                selectionX = bagOverlayX - 30; 
+                selectionY = bagOverlayY - 35;
                 equippedSelection = 0;
             }      
         }   
@@ -634,8 +638,8 @@ public class Survive
           holdingItem = false;
       }
       inventoryOpen = !inventoryOpen;
-      selectionX = bagOverlayX - 20;
-      selectionY = bagOverlayY - 20;
+      selectionX = bagOverlayX - 30;
+      selectionY = bagOverlayY - 35;
        
     }
     if (leftPressed && !inventoryOpen) {
@@ -1026,7 +1030,11 @@ public class Survive
       //Draws Player
       player.draw(g, screenOffset);
 
-      
+      for(Hud hud : huds) {
+          if ("healthOverlay" == hud.getType()) {
+            hud.draw(g, new Coords(0, 0));
+          } 
+      }
       //Draws what is being held
       if (holdingItem == true) {
           for(Inventory inventory : inventorys) {
@@ -1075,7 +1083,7 @@ public class Survive
       //Draws inventory background and items
       
       if (inventoryOpen == true) {       
-        int col = -20;
+        int col = 5;
         int row = 1;
         
         for (Hud hud : huds) {
@@ -1084,7 +1092,8 @@ public class Survive
             }
             if ("bagOverlay" == hud.getType()) {
             hud.draw(g, new Coords(bagOverlayX, bagOverlayY));
-            }           
+            }
+            
         }
         
         for (Inventory inventory : inventorys) {
@@ -1093,7 +1102,7 @@ public class Survive
           if (inventory.getQuantity() > 0) {
             col = col + 25;
             drawX = (bagOverlayX - (col));
-            drawY = (bagOverlayY) - (15 * row);
+            drawY = (bagOverlayY - 20) - (15 * row);
 
             inventory.draw(g, new Coords(drawX, drawY));
             String quantity = String.valueOf(inventory.getQuantity());
@@ -1136,8 +1145,7 @@ public class Survive
           randomChance[i] = randomDefault[i] + 10;
         }
       }
-      System.err.println(selectionY);
-      System.err.println(bagOverlayY);
+
       strategy.show();
       if (loopTime > 10) {
         loopTime = 0;
@@ -1150,10 +1158,10 @@ public class Survive
   }
   public void findSelectionCoords()
   {
-      if (selectionX > bagOverlayX) {
-           selectionX = bagOverlayX;
+      if (selectionX > bagOverlayX - 30) {
+           selectionX = bagOverlayX - 30;
         }
-        if (selectionY > bagOverlayY) {
+        if (selectionY > bagOverlayY - 35) {
             switch (equippedSelection) {
                 case 0:
                     selectionX = -(Global.xRes - 78);
@@ -1173,13 +1181,13 @@ public class Survive
                     break;
             }
         }
-        if (selectionX < -(Global.xRes - 30) && equippedSelection != 1) {
-           selectionX = -(Global.xRes - 30);
+        if (selectionX < -(Global.xRes - 70) && equippedSelection == 0) {
+           selectionX = -(Global.xRes - 70);
         }
-        if (selectionY < -(Global.yRes - 30)) {
-            selectionY = -(Global.yRes - 30);
+        if (selectionY < -(Global.yRes - 90)) {
+            selectionY = -(Global.yRes - 90);
         }
-              
+
   }
   private class MouseInputHandler
           extends MouseAdapter
