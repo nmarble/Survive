@@ -23,17 +23,6 @@ public abstract class EnemyLayer extends Drawable
     return type;
   }
 
-  public int getModifiedX()
-  {
-    int modifiedX = 0;
-    return modifiedX;
-  }
-  
-  public int getModifiedY()
-  {
-    int modifiedY = 0;
-    return modifiedY;
-  }
   public abstract boolean interact();
   public abstract boolean passable();
   public abstract void changeDirection(Direction d);
@@ -41,7 +30,9 @@ public abstract class EnemyLayer extends Drawable
   public abstract int getLastX();
   public abstract int getLastY();
   public abstract void setLast(int lX, int lY);
-  
+  public abstract int getLife();
+  public abstract void setLife(int newLife);
+  public abstract int getSTR();
 }
 
 

@@ -14,6 +14,9 @@ import survive.Direction;
    private Sprite[] frames = new Sprite[8];
    private int lastX = 0;
    private int lastY = 0;
+   
+   private int life = 50;
+   private int STR = 20;
    public ZombieEntity(Survive survive, String ref, final Coords coords, String type, final Direction direction)
    {
      super(ref, coords, type, direction);
@@ -28,7 +31,18 @@ import survive.Direction;
      frames[7] = SpriteStore.get().getSprite("sprites/ZombieW2.png");
      this.survive = survive;
    }
-   
+   public void setLife(int newLife)
+   {
+       life = newLife;
+   }
+   public int getLife()
+   {
+       return life;
+   }
+   public int getSTR()
+   {
+       return STR;
+   }
    public void changeFrame(int frameNumber)
    {
      setSprite(frames[frameNumber]);

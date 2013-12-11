@@ -6,17 +6,19 @@ import survive.Coords;
  import survive.SpriteStore;
  import survive.Survive;
  import survive.Direction;
+import survive.Drawable;
  
  public class PlayerEntity
-   extends Hud
+ extends Drawable
  {
    private Survive survive;
    private Sprite[] frames = new Sprite[8];
-  
+   private int life = 100;
+   private int STR = 25;
    
-   public PlayerEntity(Survive survive, String ref, final Coords coords, String type, int imageSize)
+   public PlayerEntity(Survive survive, String ref, final Coords coords, String type)
    {
-     super(ref, coords, type, imageSize);
+     super(coords, SpriteStore.get().getSprite(ref));
 
      frames[0] = SpriteStore.get().getSprite("sprites/PlayerN.png");
      frames[1] = SpriteStore.get().getSprite("sprites/PlayerS.png");
@@ -28,6 +30,18 @@ import survive.Coords;
      frames[7] = SpriteStore.get().getSprite("sprites/PlayerE2.png");
      
      this.survive = survive;
+   }
+   public void setLife(int newLife)
+   {
+       life = newLife;
+   }
+   public int getLife()
+   {
+       return life;
+   }
+   public int getSTR()
+   {
+       return STR;
    }
    public void changeFrame(int frameNumber)
    {

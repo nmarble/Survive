@@ -22,4 +22,5 @@ public abstract class Hud extends Drawable {
   }
    public void changeDirection(Direction d) {
    }
+
 }

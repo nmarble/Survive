@@ -14,6 +14,7 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import static java.lang.Math.abs;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +52,8 @@ public class Survive
   
   private EnemyLayer zombie;
 
-  private Hud player;
+  private PlayerEntity player;
+  
   private Hud structureButton;
   private Hud toolButton;
   private Hud consumableButton;
@@ -111,6 +113,7 @@ public class Survive
   private List<Hud> huds = new ArrayList<Hud>();
   private List<Inventory> inventorys = new ArrayList<Inventory>();
   private Map<Coords, EnemyLayer> enemyLayers = new HashMap<Coords, EnemyLayer>();
+  private List<EnemyLayer> enemyMovable = new ArrayList<EnemyLayer>();
   private ArrayList removeList = new ArrayList();
   private ArrayList<Hud> removeHudList = new ArrayList<Hud>();
 
@@ -178,26 +181,22 @@ public class Survive
     randomChance[2] = randomDefault[2];    //Pond
     randomChance[3] = randomDefault[3];    //House
     
+    //Add Test entities
+    testEntities();
     //Add player entity
-    player = new PlayerEntity(this, "sprites/PlayerN.png", new Coords(0, 0), "player", 20);
-    huds.add(player);
+    player = new PlayerEntity(this, "sprites/PlayerN.png", new Coords(0, 0), "player");
     
-    zombie = new ZombieEntity(this, "sprites/ZombieN1.png", new Coords(100,100), "zombie", Direction.UP);
-    enemyLayers.put(new Coords(100,100), zombie);
     //Add Crafting buttons
-    Axe = new AxeEntity(this, "sprites/axe.png", new Coords(-100, -100), "axe");
-    middleLayers.put(new Coords(-100, -100), Axe);
-    
-    structureButton = new ButtonEntity(this, "sprites/StructureButton.jpg", new Coords(0, Global.yRes - 100), "Structure", 100);
+    structureButton = new ButtonEntity(this, "sprites/StructureButton.jpg", new Coords(0, Global.yRes - 100), "crafting", 100);
     huds.add(structureButton);
     
-    toolButton = new ButtonEntity(this, "sprites/ToolButton.jpg", new Coords(110, Global.yRes - 100), "Tool", 100);
+    toolButton = new ButtonEntity(this, "sprites/ToolButton.jpg", new Coords(110, Global.yRes - 100), "crafting", 100);
     huds.add(toolButton);
 
-    consumableButton = new ButtonEntity(this, "sprites/ConsumableButton.jpg", new Coords(220, Global.yRes - 100), "Consumable", 100);
+    consumableButton = new ButtonEntity(this, "sprites/ConsumableButton.jpg", new Coords(220, Global.yRes - 100), "crafting", 100);
     huds.add(consumableButton);
 
-    decorativeButton = new ButtonEntity(this, "sprites/DecorativeButton.jpg", new Coords(330, Global.yRes - 100), "Decorative", 100);
+    decorativeButton = new ButtonEntity(this, "sprites/DecorativeButton.jpg", new Coords(330, Global.yRes - 100), "crafting", 100);
     huds.add(decorativeButton);
     
     selectionWindow = new ButtonEntity(this, "sprites/selection.png", new Coords(0,0), "selection", 20);
@@ -209,24 +208,18 @@ public class Survive
     bagOverlay = new ButtonEntity(this, "sprites/bagOvr.png", new Coords(0,0), "bagOverlay", 150);
     huds.add(bagOverlay);
     
-    healthOverlay = new ButtonEntity(this, "sprites/Healthoverlay.png", new Coords(0,0), "healthOverlay", 150);
+    healthOverlay = new ButtonEntity(this, "sprites/Healthoverlay1.png", new Coords(0,0), "healthOverlay", 150);
     huds.add(healthOverlay);
     
   }
-
-  //Set cursor type
-  public void getCursorType(int type)
+  public void testEntities () 
   {
-    switch (type) {
-      case 1:
-        setCursor(
-                new Cursor(Cursor.DEFAULT_CURSOR));
-        break;
-      case 2:
-        setCursor(
-                new Cursor(Cursor.MOVE_CURSOR));
-        break;
-    }
+    // Test Zombie
+    zombie = new ZombieEntity(this, "sprites/ZombieN1.png", new Coords(100,100), "zombie", Direction.UP);
+    enemyLayers.put(new Coords(100,100), zombie);
+    // Test Axe
+    Axe = new AxeEntity(this, "sprites/axe.png", new Coords(-100, -100), "axe");
+    middleLayers.put(new Coords(-100, -100), Axe);   
   }
   public void drawEquipped(Coords coords) 
   {
@@ -277,7 +270,10 @@ public class Survive
       final EnemyLayer enemyLayer = enemyLayers.get(interactCoords);
       if (enemyLayer != null) {
         if (enemyLayer.interact() == true) {
-            enemyLayers.remove(interactCoords);            
+            enemyLayer.setLife(enemyLayer.getLife() - player.getSTR());
+            if (enemyLayer.getLife() == 0) {
+            enemyLayers.remove(interactCoords);
+            }
         }
       }
     }
@@ -291,31 +287,6 @@ public class Survive
           }
       }
   }    
-  public String mouseInteract(int x, int y)
-  {
-    String type = "none";
-    //Check if button is there
-    for (Hud hud : huds) {
-      if (hud instanceof PlayerEntity) {
-        continue;
-      }
-      int xLimit = (hud.getCoords().getX() + hud.getImageSize());
-      int yLimit = (hud.getCoords().getY() + hud.getImageSize());
-
-      if ((x >= hud.getCoords().getX()) && (y >= hud.getCoords().getY()) && (x <= xLimit) && (y <= yLimit)) {
-        type = hud.getType();
-      }
-    }
-    //Check if inventory is there
-    /*for (Inventory inventory : inventorys) {
-      int xLimit = inventory.getX() + 20;
-      int yLimit = inventory.getY() + 20;
-      if (x >= inventory.getX() && y >= inventory.getY() && x <= xLimit && y <= yLimit) {
-        type = String.valueOf(inventory.getItemCode());
-      }
-    }*/
-    return type;
-  }
 
   public void removeMiddleLayer(MiddleLayer object)
   {
@@ -647,8 +618,7 @@ public class Survive
       movePlayer(direction);          
       }
       direction = Direction.LEFT;
-      Hud hud = huds.get(0);
-      hud.changeDirection(direction);
+      player.changeDirection(direction);
       checkCollisionObject(direction);
       pRotate ++;
     }
@@ -658,8 +628,7 @@ public class Survive
       movePlayer(direction);          
       }
       direction = Direction.RIGHT;
-      Hud hud = huds.get(0);
-      hud.changeDirection(direction);
+      player.changeDirection(direction);
       checkCollisionObject(direction);
       pRotate ++;
     }
@@ -668,8 +637,7 @@ public class Survive
       movePlayer(direction);          
       }
       direction = Direction.UP;
-      Hud hud = huds.get(0);
-      hud.changeDirection(direction); 
+      player.changeDirection(direction); 
       checkCollisionObject(direction);
       pRotate ++;
     }
@@ -678,8 +646,7 @@ public class Survive
       movePlayer(direction);          
       }
       direction = Direction.DOWN;
-      Hud hud = huds.get(0);
-      hud.changeDirection(direction);
+      player.changeDirection(direction);
       checkCollisionObject(direction);
       pRotate ++;
     }
@@ -728,12 +695,13 @@ public class Survive
     }
   }
 
-  public long moveEnemy(long loopTime)
+  public void moveEnemy()
   {
-    for (EnemyLayer enemyLayer : enemyLayers.values()) {
+    enemyMovable.addAll(enemyLayers.values());
+    for (EnemyLayer enemyLayer : enemyMovable) {
       Coords finalMove = new Coords(0,0);
       Direction newdirection = Direction.UP;
-      if (10 == loopTime) {
+      
           int fD = 99999;
           
           for (int x = enemyLayer.getCoords().getX() - 20; x <= enemyLayer.getCoords().getX() + 20; x  = x + 20) {
@@ -744,8 +712,10 @@ public class Survive
                   Coords coords = new Coords(x,y);
                   LowerLayer lowerLayer = lowerLayers.get(coords);
                   MiddleLayer middleLayer = middleLayers.get(coords);
+                  EnemyLayer otherEnemy = enemyLayers.get(coords);
                   if (lowerLayer != null) {
                   if (middleLayer == null || middleLayer.passable()) {
+                  if (otherEnemy == null || otherEnemy.passable()) {
                   if (tD < fD && lowerLayer.passable()) {
                       fD = tD;
                       finalMove = new Coords(x,y);
@@ -764,20 +734,28 @@ public class Survive
                   }
                   }
                   }
+                  }
               }
           }
+          // Move to this location if not players
+          if (finalMove.getX() != player.getCoords().getX() || finalMove.getY() != player.getCoords().getY()) {
           enemyLayers.remove(enemyLayer.coords);
           zombie = new ZombieEntity(this, "sprites/ZombieN1.png", finalMove, "zombie", newdirection);
           zombie.changeDirection(newdirection);
           int i = getRandomNum(2);
           if (i == 1) {zombie.changeDirection(newdirection);}
           enemyLayers.put(finalMove, zombie);
-          loopTime = 0;
-      }
+          }
+          // If the final move is players location do this
+          else {
+              player.setLife(player.getLife() - enemyLayer.getSTR());
+              System.err.println(player.getLife());
+          }
+          
     }
-    
-    return loopTime;
+    enemyMovable.clear();
   }
+
   public void checkLoS() {
       Coords startCoord = new Coords(player.getCoords().getX(),player.getCoords().getY());
       //topleft to bottom left
@@ -968,10 +946,13 @@ public class Survive
       Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
       g.setColor(Color.black);
       g.fillRect(0, 0, Global.xRes, Global.yRes);
+      
       // Moves applicable enemy within its speed compared to loop time
-      loopTime = moveEnemy(loopTime);
-
-      /*/Chance to add zombie
+      if (loopTime == 10) {
+        moveEnemy();
+        loopTime = 0;
+      }
+ 
       int randomZombie = (int) (Math.random() * zombieChance);
       if (randomZombie == 1) {
         System.err.println("ZOMBIE");
@@ -981,7 +962,7 @@ public class Survive
         zombie = new ZombieEntity(this, "sprites/ZombieN1.png", location, "zombie", Direction.UP);
         enemyLayers.put(location, zombie);
       }
-      */
+      
       checkLoS(); 
       checkButtonPushed();
       //Draw all ground that is on screen
@@ -1029,10 +1010,20 @@ public class Survive
 
       //Draws Player
       player.draw(g, screenOffset);
-
+      
+      //Draw Health Bar
       for(Hud hud : huds) {
-          if ("healthOverlay" == hud.getType()) {
+          if ("healthOverlay".equals(hud.getType())) {
+            String life = String.valueOf(player.getLife());
+            g.setColor(Color.red);
+            for (int x = 67; x <= (player.getLife()*2)+67; x = x +2) {
+            g.drawLine(x, 0, x, 25);
+            g.drawLine(x+1, 0, x+1, 25);
+            }
             hud.draw(g, new Coords(0, 0));
+            g.setColor(Color.white);
+            g.drawString(life, hud.getCoords().getX() + 155, hud.getCoords().getY()+17);
+            
           } 
       }
       //Draws what is being held
@@ -1053,9 +1044,10 @@ public class Survive
       }
       //When Crafting is open
       if (craftingOpen == true) {
-        for (int i = 1; i <= 4; i++) {
-          Hud hud = huds.get(i);
-          hud.draw(g, new Coords(0, 0));
+        for (Hud hud : huds) {
+            if ("crafting".equals(hud.getType())) {
+                hud.draw(g, new Coords(0, 0));
+            }
         }
       }
       //When Crafting for structures is open
@@ -1145,7 +1137,11 @@ public class Survive
           randomChance[i] = randomDefault[i] + 10;
         }
       }
-
+      // Check for death
+      if (player.getLife() <= 0) {
+          System.err.println("DEAD");
+          System.exit(0);
+      }
       strategy.show();
       if (loopTime > 10) {
         loopTime = 0;
@@ -1195,36 +1191,7 @@ public class Survive
 
     public void mouseClicked(MouseEvent e)
     {
-      //Get what is clicked
-      String what = mouseInteract(e.getX(), e.getY());
-
-      if (craftingOpen == true && !"none".equals(what)) {
-        craftingOpen = false;
-        craftingStructure = true;
-      }
-      if (craftingStructure = true) {
-        switch (what) {
-          case "LogWall":
-            addToInventory(3, 1);
-            removeFromInventory(1, 4);
-            break;
-        }
-      }
-      int whatNumber = 0;
-      try {
-        whatNumber = Integer.parseInt(what);
-      } catch (NumberFormatException a) {
-        System.err.println("Nothing there");
-      }
-      if (whatNumber > 0 && holdingItem == false) {
-        itemSelection = whatNumber;
-        holdingItem = true;
-      }
-      if ("none".equals(what) && holdingItem == true) {
-        int x = Math.round(e.getX() / 20) * 20;
-        int y = Math.round(e.getY() / 20) * 20;
-        setItemDown(new Coords(x, y));
-      }
+     
     }
   }
 
