@@ -5,13 +5,17 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.MouseInfo;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
 import static java.lang.Math.abs;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,6 +52,7 @@ public class Survive
 
   private UpperLayer black;
   private UpperLayer use;
+  private UpperLayer hurt;
   
   
   private EnemyLayer zombie;
@@ -210,7 +215,7 @@ public class Survive
     
     healthOverlay = new ButtonEntity(this, "sprites/Healthoverlay1.png", new Coords(0,0), "healthOverlay", 150);
     huds.add(healthOverlay);
-    
+  
   }
   public void testEntities () 
   {
@@ -614,46 +619,38 @@ public class Survive
        
     }
     if (leftPressed && !inventoryOpen) {
-      if (direction == Direction.LEFT) {
-      movePlayer(direction);          
-      }
       direction = Direction.LEFT;
-      player.changeDirection(direction);
+      player.changeFrame(pRotate);
+      movePlayer(direction);           
       checkCollisionObject(direction);
       pRotate ++;
     }
     
     if (rightPressed && !inventoryOpen) {
-      if (direction == Direction.RIGHT) {
-      movePlayer(direction);          
-      }
       direction = Direction.RIGHT;
-      player.changeDirection(direction);
+      player.changeFrame(pRotate);
+      movePlayer(direction);          
       checkCollisionObject(direction);
       pRotate ++;
     }
     if (upPressed && !inventoryOpen) {
-      if (direction == Direction.UP) {
-      movePlayer(direction);          
-      }
       direction = Direction.UP;
-      player.changeDirection(direction); 
+      player.changeFrame(pRotate);
+      movePlayer(direction);           
       checkCollisionObject(direction);
       pRotate ++;
     }
     if (downPressed && !inventoryOpen) {
-      if (direction == Direction.DOWN) {
-      movePlayer(direction);          
-      }
       direction = Direction.DOWN;
-      player.changeDirection(direction);
+      player.changeFrame(pRotate);
+      movePlayer(direction);          
       checkCollisionObject(direction);
       pRotate ++;
     }
     if (leftPressed || rightPressed || upPressed || downPressed && inventoryOpen) {
       invDirectionPushed();
     }
-    if (spacePressed && !holdingItem) {
+    if (spacePressed && !holdingItem && !inventoryOpen) {
       interact();
     }
     if (spacePressed && holdingItem && !inventoryOpen) {
@@ -695,7 +692,7 @@ public class Survive
     }
   }
 
-  public void moveEnemy()
+  public void moveEnemy(Graphics2D g)
   {
     enemyMovable.addAll(enemyLayers.values());
     for (EnemyLayer enemyLayer : enemyMovable) {
@@ -748,10 +745,9 @@ public class Survive
           }
           // If the final move is players location do this
           else {
+              zombie.changeDirection(newdirection);
               player.setLife(player.getLife() - enemyLayer.getSTR());
-              System.err.println(player.getLife());
-          }
-          
+          }    
     }
     enemyMovable.clear();
   }
@@ -932,12 +928,40 @@ public class Survive
       }
       
   }
+  public double getPlayerDirection()
+  {
+      double mouseX = MouseInfo.getPointerInfo().getLocation().x - (Global.xRes /2);
+      double mouseY = MouseInfo.getPointerInfo().getLocation().y - (Global.yRes /2);
+      double xD = abs(10 - mouseX);
+      double yD = abs(30 - mouseY);
+      double playerRot = Math.toDegrees(Math.atan(xD/yD));
+      
+      if (mouseX - 10 > 0 && mouseY - 30> 0) {
+          playerRot = abs(playerRot - 180);
+      }
+      if (mouseX - 10  < 0 && mouseY - 30  > 0) {
+          playerRot = playerRot + 180;
+      }
+      if (mouseX - 10< 0 && mouseY  - 30 < 0) {
+          playerRot = abs(playerRot - 360);
+      }
+      direction = Direction.UP;
+      if (playerRot > 22.5 && playerRot <= 67.5) {direction = Direction.UPRIGHT;}
+      if (playerRot > 67.5 && playerRot <= 112.5) {direction = Direction.RIGHT;}
+      if (playerRot > 112.5 && playerRot <= 157.5) {direction = Direction.DOWNRIGHT;}
+      if (playerRot > 157.5 && playerRot <= 202.5) {direction = Direction.DOWN;}
+      if (playerRot > 202.5 && playerRot <= 247.5) {direction = Direction.DOWNLEFT;}
+      if (playerRot > 247.5 && playerRot <= 292.5) {direction = Direction.LEFT;}
+      if (playerRot > 292.5 && playerRot <= 337.5) {direction = Direction.UPLEFT;}
+      return playerRot;
+  }
   //Loop of main game
   public void gameLoop()
   {
     long lastLoopTime = System.currentTimeMillis();
     long loopTime = 0;
-
+    
+    
     while (gameRunning) {
       long delta = System.currentTimeMillis() - lastLoopTime;
       loopTime++;
@@ -947,9 +971,15 @@ public class Survive
       g.setColor(Color.black);
       g.fillRect(0, 0, Global.xRes, Global.yRes);
       
+      
+      
+  
+      
+      
+
       // Moves applicable enemy within its speed compared to loop time
       if (loopTime == 10) {
-        moveEnemy();
+        moveEnemy(g);
         loopTime = 0;
       }
  
@@ -1007,9 +1037,6 @@ public class Survive
       }
       //Resets what is to be removed
       removeList.clear();
-
-      //Draws Player
-      player.draw(g, screenOffset);
       
       //Draw Health Bar
       for(Hud hud : huds) {
@@ -1137,11 +1164,15 @@ public class Survive
           randomChance[i] = randomDefault[i] + 10;
         }
       }
+      
+      //Draws Player
+      player.rotDraw(g, screenOffset, (int)getPlayerDirection());   
       // Check for death
       if (player.getLife() <= 0) {
           System.err.println("DEAD");
           System.exit(0);
       }
+ 
       strategy.show();
       if (loopTime > 10) {
         loopTime = 0;
@@ -1189,9 +1220,14 @@ public class Survive
           extends MouseAdapter
   {
 
-    public void mouseClicked(MouseEvent e)
+    public void mousePressed(MouseEvent e)
     {
-     
+     if (!holdingItem && !inventoryOpen) {
+      interact();
+     }
+     if (holdingItem && !inventoryOpen) {
+      placeItemHeld(direction);
+     }
     }
   }
 
@@ -1233,6 +1269,19 @@ public class Survive
         case 73:
           iPressed = true;
           break;
+        case 87:
+          upPressed = true;
+          break;
+        case 83:
+          downPressed = true;
+          break;
+        case 65:
+          leftPressed = true;
+          break;
+        case 68:
+          rightPressed = true;
+          break;
+            
       }
     }
 
@@ -1265,6 +1314,18 @@ public class Survive
           break;
         case 73:
           iPressed = false;
+          break;
+        case 87:
+          upPressed = false;
+          break;
+        case 83:
+          downPressed = false;
+          break;
+        case 65:
+          leftPressed = false;
+          break;
+        case 68:
+          rightPressed = false;
           break;
       }
     }

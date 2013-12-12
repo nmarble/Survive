@@ -1,6 +1,7 @@
 package survive;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.util.Objects;
 
 /**
@@ -18,6 +19,9 @@ public abstract class Drawable {
 
   public void draw(final Graphics g, final Coords offset) {
     sprite.draw(g, coords.getX() - offset.getX(), coords.getY() - offset.getY());
+  }
+  public void rotDraw(final Graphics2D g, final Coords offset, int degree) {
+    sprite.rotDraw(g, coords.getX() - offset.getX(), coords.getY() - offset.getY(), degree);
   }
 
   public Coords getCoords() {

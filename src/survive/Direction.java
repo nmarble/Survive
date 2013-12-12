@@ -8,7 +8,7 @@ import java.util.Random;
 public enum Direction
 {
 
-  UP(0, -20), DOWN(0, 20), LEFT(-20, 0), RIGHT(20, 0);
+  UP(0, -20), DOWN(0, 20), LEFT(-20, 0), RIGHT(20, 0), UPRIGHT(20, -20), DOWNRIGHT(20, 20), UPLEFT(-20, -20), DOWNLEFT(-20, 20);
 
   private final int xOffset;
   private final int yOffset;
