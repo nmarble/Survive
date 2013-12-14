@@ -15,7 +15,8 @@ import java.util.List;
  */
 public class Global {
     
-  public static final int xRes = 800;
-  public static final int yRes = 600;
+  public static int xRes = 800;
+  public static int yRes = 600;
   public static int totalItemRandom = 4;
+
 }

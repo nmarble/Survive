@@ -33,10 +33,19 @@ import java.awt.geom.AffineTransform;
    }
    public void rotDraw(Graphics2D g, int x, int y, int degree)
    {
+      AffineTransform old = g.getTransform();
       g.translate(x, y);
       g.rotate(Math.toRadians(degree),10,10);
       g.drawImage(image, 0, 0, null);
-
+      g.setTransform(old);
+   }
+   public void scaleDraw(Graphics2D g, int x, int y, double xScale, double yScale)
+   {
+      AffineTransform old = g.getTransform();
+      AffineTransform newG = new AffineTransform();
+      newG.scale(xScale, yScale);
+      g.drawImage(image, newG, null);
+      g.setTransform(old);
    }
  }
 

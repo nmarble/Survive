@@ -6,6 +6,14 @@
             <file>file:/C:/Users/robert/Documents/GitHub/Survive/src/sprites/boulder.gif</file>
             <file>file:/C:/Users/robert/Documents/GitHub/Survive/src/sprites/boulder.png</file>
         </group>
-        <group/>
+        <group>
+            <file>file:/C:/Users/Marble/Documents/GitHub/Survive/src/survive/Entities/PlayerEntity.java</file>
+            <file>file:/C:/Users/Marble/Documents/GitHub/Survive/src/survive/SpriteStore.java</file>
+            <file>file:/C:/Users/Marble/Documents/GitHub/Survive/src/survive/Survive.java</file>
+            <file>file:/C:/Users/Marble/Documents/GitHub/Survive/src/survive/Entities/UseEntity.java</file>
+            <file>file:/C:/Users/Marble/Documents/GitHub/Survive/src/survive/Sprite.java</file>
+            <file>file:/C:/Users/Marble/Documents/GitHub/Survive/src/survive/Direction.java</file>
+            <file>file:/C:/Users/Marble/Documents/GitHub/Survive/src/survive/Drawable.java</file>
+        </group>
     </open-files>
 </project-private>

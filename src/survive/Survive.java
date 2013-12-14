@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.MouseInfo;
+import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -52,7 +53,6 @@ public class Survive
 
   private UpperLayer black;
   private UpperLayer use;
-  private UpperLayer hurt;
   
   
   private EnemyLayer zombie;
@@ -67,6 +67,7 @@ public class Survive
   private Hud equipOverlay;
   private Hud bagOverlay;
   private Hud healthOverlay;
+  private Hud hurt;
   
   private int bagOverlayX = -Global.xRes + 200;
   private int bagOverlayY = -Global.yRes + 200;
@@ -92,6 +93,7 @@ public class Survive
   private boolean enterPressed = false;
   private boolean iPressed = false;
   private boolean cPressed = false;
+  private boolean hurtFlash = false;
   
   int[] equipped = new int [4];
   int equippedSelection = 0;
@@ -121,11 +123,18 @@ public class Survive
   private List<EnemyLayer> enemyMovable = new ArrayList<EnemyLayer>();
   private ArrayList removeList = new ArrayList();
   private ArrayList<Hud> removeHudList = new ArrayList<Hud>();
-
+  
+  Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+  
+  
   public Survive()
   {
     JFrame container = new JFrame("Survive");
-
+    
+    Global.xRes = ((int)screenSize.getWidth() /20) * 20;
+    Global.yRes = ((int)screenSize.getHeight() /20) * 20;
+    bagOverlayX = -Global.xRes + 200;
+    bagOverlayY = -Global.yRes + 200;
     JPanel panel = (JPanel) container.getContentPane();
     panel.setPreferredSize(new Dimension(Global.xRes, Global.yRes));
     panel.setLayout(null);
@@ -134,7 +143,8 @@ public class Survive
     panel.add(this);
 
     setIgnoreRepaint(true);
-
+    
+    container.setUndecorated(true);
     container.pack();
     container.setResizable(false);
     container.setVisible(true);
@@ -215,6 +225,9 @@ public class Survive
     
     healthOverlay = new ButtonEntity(this, "sprites/Healthoverlay1.png", new Coords(0,0), "healthOverlay", 150);
     huds.add(healthOverlay);
+    
+    hurt = new ButtonEntity(this, "sprites/hurtSmall.png", new Coords(0,0), "hurtOverlay", 1000);
+    huds.add(hurt);
   
   }
   public void testEntities () 
@@ -747,6 +760,7 @@ public class Survive
           else {
               zombie.changeDirection(newdirection);
               player.setLife(player.getLife() - enemyLayer.getSTR());
+              hurtFlash = true;
           }    
     }
     enemyMovable.clear();
@@ -982,7 +996,10 @@ public class Survive
         moveEnemy(g);
         loopTime = 0;
       }
- 
+      if (loopTime == 1) {
+          hurtFlash = false;
+      }
+      
       int randomZombie = (int) (Math.random() * zombieChance);
       if (randomZombie == 1) {
         System.err.println("ZOMBIE");
@@ -1025,7 +1042,9 @@ public class Survive
           }
         }
       }
-
+      //Draws Player
+      player.rotDraw(g, screenOffset, (int)getPlayerDirection());
+      
       //What is to be removed gets removed
       for (final Object object : removeList) {
         middleLayers.remove(removeList);
@@ -1164,9 +1183,20 @@ public class Survive
           randomChance[i] = randomDefault[i] + 10;
         }
       }
+      //Draw hurt screen
       
-      //Draws Player
-      player.rotDraw(g, screenOffset, (int)getPlayerDirection());   
+      if (hurtFlash == true) {
+          for (Hud hud : huds) {
+          if ("hurtOverlay" == hud.getType()) {
+                double x = 0;
+                double y = 0;
+                x = ((double)Global.xRes) / (double)hud.getImageSize();
+                y = ((double)Global.yRes) / (double)hud.getImageSize();
+                hud.scaleDraw(g, new Coords(0, 0), x, y);    
+          }
+          }
+      }
+         
       // Check for death
       if (player.getLife() <= 0) {
           System.err.println("DEAD");
