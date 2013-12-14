@@ -52,9 +52,8 @@ public class Survive
   private MiddleLayer Axe;
 
   private UpperLayer black;
-  private UpperLayer use;
   
-  
+
   private EnemyLayer zombie;
 
   private PlayerEntity player;
@@ -68,6 +67,7 @@ public class Survive
   private Hud bagOverlay;
   private Hud healthOverlay;
   private Hud hurt;
+  private Hud use;
   
   private int bagOverlayX = -Global.xRes + 200;
   private int bagOverlayY = -Global.yRes + 200;
@@ -92,11 +92,12 @@ public class Survive
   private boolean spacePressed = false;
   private boolean enterPressed = false;
   private boolean iPressed = false;
+  private boolean ePressed = false;
   private boolean cPressed = false;
   private boolean hurtFlash = false;
   
   int[] equipped = new int [4];
-  int equippedSelection = 0;
+  
   
   
   private int treeLikely = 60;
@@ -199,78 +200,71 @@ public class Survive
     //Add Test entities
     testEntities();
     //Add player entity
-    player = new PlayerEntity(this, "sprites/PlayerN.png", new Coords(0, 0), "player");
+    player = new PlayerEntity(this, "sprites/playern.png", new Coords(0, 0), "player");
     
     //Add Crafting buttons
-    structureButton = new ButtonEntity(this, "sprites/StructureButton.jpg", new Coords(0, Global.yRes - 100), "crafting", 100);
+    structureButton = new ButtonEntity(this, "sprites/structurebutton.jpg", new Coords(0, Global.yRes - 100), "crafting", 100);
     huds.add(structureButton);
     
-    toolButton = new ButtonEntity(this, "sprites/ToolButton.jpg", new Coords(110, Global.yRes - 100), "crafting", 100);
+    toolButton = new ButtonEntity(this, "sprites/toolbutton.jpg", new Coords(110, Global.yRes - 100), "crafting", 100);
     huds.add(toolButton);
 
-    consumableButton = new ButtonEntity(this, "sprites/ConsumableButton.jpg", new Coords(220, Global.yRes - 100), "crafting", 100);
+    consumableButton = new ButtonEntity(this, "sprites/consumablebutton.jpg", new Coords(220, Global.yRes - 100), "crafting", 100);
     huds.add(consumableButton);
 
-    decorativeButton = new ButtonEntity(this, "sprites/DecorativeButton.jpg", new Coords(330, Global.yRes - 100), "crafting", 100);
+    decorativeButton = new ButtonEntity(this, "sprites/decorativebutton.jpg", new Coords(330, Global.yRes - 100), "crafting", 100);
     huds.add(decorativeButton);
     
-    selectionWindow = new ButtonEntity(this, "sprites/selection.png", new Coords(0,0), "selection", 20);
-    huds.add(selectionWindow);
-    
-    equipOverlay = new ButtonEntity(this, "sprites/Equipoverlay.png", new Coords(0,0), "equipOverlay", 150);
+    equipOverlay = new ButtonEntity(this, "sprites/equipoverlay.png", new Coords(0,0), "equipOverlay", 150);
     huds.add(equipOverlay);
     
-    bagOverlay = new ButtonEntity(this, "sprites/bagOvr.png", new Coords(0,0), "bagOverlay", 150);
+    bagOverlay = new ButtonEntity(this, "sprites/bagoverlay.png", new Coords(0,0), "bagOverlay", 150);
     huds.add(bagOverlay);
     
-    healthOverlay = new ButtonEntity(this, "sprites/Healthoverlay1.png", new Coords(0,0), "healthOverlay", 150);
+    healthOverlay = new ButtonEntity(this, "sprites/healthoverlay.png", new Coords(0,0), "healthOverlay", 150);
     huds.add(healthOverlay);
     
-    hurt = new ButtonEntity(this, "sprites/hurtSmall.png", new Coords(0,0), "hurtOverlay", 1000);
+    hurt = new ButtonEntity(this, "sprites/hurt.png", new Coords(0,0), "hurtOverlay", 1000);
     huds.add(hurt);
   
   }
   public void testEntities () 
   {
-    // Test Zombie
-    zombie = new ZombieEntity(this, "sprites/ZombieN1.png", new Coords(100,100), "zombie", Direction.UP);
-    enemyLayers.put(new Coords(100,100), zombie);
     // Test Axe
     Axe = new AxeEntity(this, "sprites/axe.png", new Coords(-100, -100), "axe");
     middleLayers.put(new Coords(-100, -100), Axe);   
   }
   public void drawEquipped(Coords coords) 
   {
+      String pic = "";
+      int a = getRandomNum(2) ; 
       switch (equipped[3]) {
           case 5:
-              String pic = "";
-              int a = getRandomNum(2) ; 
-              switch (direction) {
-                  case UP:
-                      pic = "sprites/AxeSwingN1.png";
-                      if (a == 1) {pic = "sprites/AxeSwingN2.png";}
-                      break;
-                  case DOWN:
-                      pic = "sprites/AxeSwingS1.png";
-                      if (a == 1) {pic = "sprites/AxeSwingS2.png";}
-                      break;
-                  case LEFT:
-                      pic = "sprites/AxeSwingW1.png";
-                      if (a == 1) {pic = "sprites/AxeSwingW2.png";}
-                      break;
-                  case RIGHT:
-                      pic = "sprites/AxeSwingE1.png";
-                      if (a == 1) {pic = "sprites/AxeSwingE2.png";}
-                      break;
-              }
-              use = new UseEntity(this, pic, coords, "use");
-              upperLayers.put(coords, use);
+              pic = "sprites/axeswingn1.png";
+              if (a == 1) {pic = "sprites/axeswingn2.png";}
+              use = new UseEntity(this, pic, coords, "use", 20);
+              huds.add(use);
               break;   
       } 
   }
+  
+  public void mouseInteract()
+  {
+     int mouseX = MouseInfo.getPointerInfo().getLocation().x;
+     int mouseY = MouseInfo.getPointerInfo().getLocation().y;
+     if (!holdingItem && !inventoryOpen) {
+      interact();
+     }
+     if (holdingItem && !inventoryOpen) {
+      placeItemHeld(direction);
+     }
+     if (inventoryOpen) {
+         inventoryInteract(-mouseX, -mouseY);
+     }
+  }
   public void interact()
   {
-    final Coords interactCoords = direction.getCoordsFrom(player.getCoords());
+    final Coords interactCoords = direction.getCoordsFrom(player.getCoords());    
     if (equipped[3] == 5) {
     drawEquipped(interactCoords);
     }
@@ -299,7 +293,7 @@ public class Survive
   public void selectionInteract(int x, int y)
   {
       for (Inventory inventory : inventorys) {
-          if (inventory.getX() == x && inventory.getY() == y) {
+          if (inventory.getX() >= x && inventory.getY() >= y && inventory.getX() - 20 <= x && inventory.getY() - 20 <= y ) {
               holdingItem = !holdingItem;
               itemSelection = inventory.getItemCode();
           }
@@ -348,7 +342,8 @@ public class Survive
   }
   public void placeItemHeld(Direction direction)
   {
-    final Coords coords = direction.getCoordsFrom(player.getCoords());  
+    final Coords coords = direction.getCoordsFrom(player.getCoords());
+    if (!middleLayers.containsKey(coords)) {
     switch (itemSelection) {
       case 1:
         Log = new LogEntity(this, "sprites/log.png", coords, "log");
@@ -376,6 +371,7 @@ public class Survive
         removeFromInventory(5, 1);
         break;
 
+    }
     }
   }
   public void checkCollisionObject(Direction direction)
@@ -409,32 +405,6 @@ public class Survive
     return hasIt;
   }
 
-  public void setItemDown(final Coords coords)
-  {
-    switch (itemSelection) {
-      case 1:
-        Log = new LogEntity(this, "sprites/log.png", coords, "log");
-        Log.setCoords(coords);
-        middleLayers.put(coords, Log);
-        removeFromInventory(1, 1);
-        break;
-      case 2:
-        Stone = new StoneEntity(this, "sprites/stone.png", coords, "stone");
-        Stone.setCoords(coords);
-        middleLayers.put(coords, Stone);
-        removeFromInventory(2, 1);
-        break;
-      case 3:
-        LogWall = new LogWallEntity(this, "sprites/logwall.gif", coords, "logWall");
-        LogWall.setCoords(coords);
-        middleLayers.put(coords, LogWall);
-        removeFromInventory(3, 1);
-        break;
-
-    }
-
-  }
-
   public void addFloor(int x, int y)
   {
     final Coords newLocation = new Coords(x, y);
@@ -464,16 +434,16 @@ public class Survive
               Tree = new LeavesEntity(this, "sprites/tree/leaves1_1.png", treeCoords, "leaves");
               }
               if (a == 9) {
-              Tree = new LeavesEntity(this, "sprites/tree/leaves1_D.png", treeCoords, "leaves");    
+              Tree = new LeavesEntity(this, "sprites/tree/leaves1_d.png", treeCoords, "leaves");    
               }
               if (a == 10) {
-              Tree = new LeavesEntity(this, "sprites/tree/leaves1_U.png", treeCoords, "leaves");    
+              Tree = new LeavesEntity(this, "sprites/tree/leaves1_u.png", treeCoords, "leaves");    
               }
               if (a == 11) {
-              Tree = new LeavesEntity(this, "sprites/tree/leaves1_R.png", treeCoords, "leaves");    
+              Tree = new LeavesEntity(this, "sprites/tree/leaves1_r.png", treeCoords, "leaves");    
               }
               if (a == 12) {
-              Tree = new LeavesEntity(this, "sprites/tree/leaves1_L.png", treeCoords, "leaves");    
+              Tree = new LeavesEntity(this, "sprites/tree/leaves1_l.png", treeCoords, "leaves");    
               }
               middleLayers.put(treeCoords, Tree);
           } 
@@ -563,12 +533,27 @@ public class Survive
   {
     player.setCoords(direction.getCoordsFrom(player.getCoords()));
   }
-  public void spacePushedInv() 
+  public void inventoryInteract(int x, int y) 
   {
-      if (!holdingItem) {
-          selectionInteract(selectionX, selectionY);
+      boolean inEquip = false;
+      int equippedSelection = 0;
+      if (x <= -(Global.xRes - 78) && y <= -120 && x >= -(Global.xRes - 78)-20 && y >= -140) {
+        equippedSelection = 0;
+        inEquip = true;
       }
-      if (holdingItem && selectionY > bagOverlayY)
+      if (x <= -(Global.xRes - 24) && y <= -75 && x >= -(Global.xRes - 24)-20 && y >= -95) {
+        equippedSelection = 1;
+        inEquip = true;
+      }
+      if (x <= -(Global.xRes - 55) && y <= -5 && x >= -(Global.xRes - 55)-20 && y >= -25) {
+        equippedSelection = 2;
+        inEquip = true;
+      }
+      if (x <= -(Global.xRes - 145) && y <= -39 && x >= -(Global.xRes - 78)-20 && y >= -59) {
+        equippedSelection = 3;
+        inEquip = true;
+      }
+      if (holdingItem && inEquip)
         for (Inventory inventory : inventorys) {
             if (inventory.getItemCode() == itemSelection && inventory.equipable()) {
                 equipped[equippedSelection] = inventory.getItemCode();
@@ -576,41 +561,18 @@ public class Survive
                 inventory.removeQuantity(1);
             }
         }
-  }
-  public void invDirectionPushed()
-  {
-      if (leftPressed) {
-        if (selectionY > bagOverlayY) {
-            equippedSelection --;
-            if (equippedSelection < 0) {equippedSelection = 3;}
-            
-        }
-        selectionX = selectionX + 25; 
+      if (!holdingItem && !inEquip) {
+          selectionInteract(x, y);
       }
-      if (rightPressed) {
-        if (selectionY > bagOverlayY) {
-            equippedSelection ++;
-            if (equippedSelection > 3) {equippedSelection = 0;}
-        }
-        selectionX = selectionX - 25; 
-      }
-      if (upPressed) {
-        if (selectionY > bagOverlayY) {
-            equippedSelection ++;
-            if (equippedSelection > 3) {equippedSelection = 0;}
-        }
-        selectionY = selectionY + 25;    
-      }
-      if (downPressed) {
-        selectionY = selectionY - 25; 
-        if (selectionY > bagOverlayY) {
-            equippedSelection --;
-            if (equippedSelection == -1) {
-                selectionX = bagOverlayX - 30; 
-                selectionY = bagOverlayY - 35;
-                equippedSelection = 0;
-            }      
-        }   
+      if (!holdingItem && inEquip) {
+          itemSelection = equipped[equippedSelection];
+          for (Inventory inventory : inventorys) {
+              if (inventory.getItemCode() == itemSelection) {
+                  equipped[equippedSelection] = 0;
+                  inventory.addQuantity(1);
+                  inventory.slotEquipped[equippedSelection] = false;
+              }
+          }
       }
   }
   public void checkButtonPushed()
@@ -622,7 +584,7 @@ public class Survive
         craftingStructure = false;
       }
     }
-    if (iPressed) {
+    if (iPressed || ePressed) {
       if (!inventoryOpen) {
           holdingItem = false;
       }
@@ -660,19 +622,6 @@ public class Survive
       checkCollisionObject(direction);
       pRotate ++;
     }
-    if (leftPressed || rightPressed || upPressed || downPressed && inventoryOpen) {
-      invDirectionPushed();
-    }
-    if (spacePressed && !holdingItem && !inventoryOpen) {
-      interact();
-    }
-    if (spacePressed && holdingItem && !inventoryOpen) {
-      placeItemHeld(direction);
-    }
-    if (spacePressed && inventoryOpen) {
-      spacePushedInv();
-    }
-
     if (pRotate > 1) {
         pRotate = 0;
     }
@@ -750,7 +699,7 @@ public class Survive
           // Move to this location if not players
           if (finalMove.getX() != player.getCoords().getX() || finalMove.getY() != player.getCoords().getY()) {
           enemyLayers.remove(enemyLayer.coords);
-          zombie = new ZombieEntity(this, "sprites/ZombieN1.png", finalMove, "zombie", newdirection);
+          zombie = new ZombieEntity(this, "sprites/zombien1.png", finalMove, "zombie", newdirection);
           zombie.changeDirection(newdirection);
           int i = getRandomNum(2);
           if (i == 1) {zombie.changeDirection(newdirection);}
@@ -984,12 +933,6 @@ public class Survive
       Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
       g.setColor(Color.black);
       g.fillRect(0, 0, Global.xRes, Global.yRes);
-      
-      
-      
-  
-      
-      
 
       // Moves applicable enemy within its speed compared to loop time
       if (loopTime == 10) {
@@ -1006,7 +949,7 @@ public class Survive
         final Coords location = new Coords(player.getCoords().getX() - (Global.xRes / 2),
                 player.getCoords().getY() + (getRandomNum(Global.yRes / 20) * 20) - (getRandomNum(Global.yRes / 20) * 20) 
         );
-        zombie = new ZombieEntity(this, "sprites/ZombieN1.png", location, "zombie", Direction.UP);
+        zombie = new ZombieEntity(this, "sprites/zombien1.png", location, "zombie", Direction.UP);
         enemyLayers.put(location, zombie);
       }
       
@@ -1034,7 +977,7 @@ public class Survive
             middleLayers.get(coords).draw(g, screenOffset);
           }
           if (enemyLayers.containsKey(coords) && !upperLayers.containsKey(coords)) {
-            enemyLayers.get(coords).draw(g, screenOffset);
+            enemyLayers.get(coords).rotDraw(g, screenOffset, enemyLayers.get(coords).getRotation());
           }
           if (upperLayers.containsKey(coords)) {
             upperLayers.get(coords).draw(g, screenOffset);
@@ -1044,13 +987,12 @@ public class Survive
       }
       //Draws Player
       player.rotDraw(g, screenOffset, (int)getPlayerDirection());
-      
-      //What is to be removed gets removed
-      for (final Object object : removeList) {
-        middleLayers.remove(removeList);
-        huds.remove(removeList);
-
+      for (Hud hud : huds)
+      if ("use".equals(hud.getType())) {
+        use.rotDraw(g, screenOffset, (int)getPlayerDirection());
+        removeHudList.add(hud);
       }
+      //What is to be removed gets removed
       for (Hud hud : removeHudList){
         huds.remove(hud);
       }
@@ -1170,13 +1112,6 @@ public class Survive
               }
           }
         }
-        findSelectionCoords();
-        for (Hud hud : huds) {
-            if ("selection" == hud.getType()) {
-            hud.draw(g, new Coords(selectionX, selectionY));
-            }
-        }
-        
       }
       for (int i = 0; i < totalRandom; i++) {
         if (randomChance[i] > randomDefault[i] + 20) {
@@ -1213,51 +1148,15 @@ public class Survive
       }
     }
   }
-  public void findSelectionCoords()
-  {
-      if (selectionX > bagOverlayX - 30) {
-           selectionX = bagOverlayX - 30;
-        }
-        if (selectionY > bagOverlayY - 35) {
-            switch (equippedSelection) {
-                case 0:
-                    selectionX = -(Global.xRes - 78);
-                    selectionY = -120;                  
-                    break;
-                case 1:
-                    selectionX = -(Global.xRes - 24);
-                    selectionY = -75;
-                    break;
-                case 2:
-                    selectionX = -(Global.xRes - 55);
-                    selectionY = -5;
-                    break;
-                case 3:
-                    selectionX = -(Global.xRes - 145);
-                    selectionY = -39;
-                    break;
-            }
-        }
-        if (selectionX < -(Global.xRes - 70) && equippedSelection == 0) {
-           selectionX = -(Global.xRes - 70);
-        }
-        if (selectionY < -(Global.yRes - 90)) {
-            selectionY = -(Global.yRes - 90);
-        }
 
-  }
   private class MouseInputHandler
           extends MouseAdapter
   {
-
+    
     public void mousePressed(MouseEvent e)
     {
-     if (!holdingItem && !inventoryOpen) {
-      interact();
-     }
-     if (holdingItem && !inventoryOpen) {
-      placeItemHeld(direction);
-     }
+     mouseInteract();
+     
     }
   }
 
@@ -1296,6 +1195,9 @@ public class Survive
         case 67:
           cPressed = true;
           break;
+        case 69:
+          ePressed = true;
+          break;    
         case 73:
           iPressed = true;
           break;
@@ -1342,6 +1244,9 @@ public class Survive
         case 67:
           cPressed = false;
           break;
+        case 69:
+          ePressed = false;
+          break; 
         case 73:
           iPressed = false;
           break;

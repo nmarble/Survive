@@ -11,7 +11,7 @@ import survive.Direction;
    extends EnemyLayer
  {
    private Survive survive;
-   private Sprite[] frames = new Sprite[8];
+   private Sprite[] frames = new Sprite[2];
    private int lastX = 0;
    private int lastY = 0;
    
@@ -21,14 +21,9 @@ import survive.Direction;
    {
      super(ref, coords, type, direction);
      
-     frames[0] = SpriteStore.get().getSprite("sprites/ZombieN1.png");
-     frames[1] = SpriteStore.get().getSprite("sprites/ZombieN2.png");
-     frames[2] = SpriteStore.get().getSprite("sprites/ZombieE1.png");
-     frames[3] = SpriteStore.get().getSprite("sprites/ZombieE2.png");
-     frames[4] = SpriteStore.get().getSprite("sprites/ZombieS1.png");
-     frames[5] = SpriteStore.get().getSprite("sprites/ZombieS2.png");
-     frames[6] = SpriteStore.get().getSprite("sprites/ZombieW1.png");
-     frames[7] = SpriteStore.get().getSprite("sprites/ZombieW2.png");
+     frames[0] = SpriteStore.get().getSprite("sprites/zombien1.png");
+     frames[1] = SpriteStore.get().getSprite("sprites/zombien2.png");
+
      this.survive = survive;
    }
    public void setLife(int newLife)
@@ -59,52 +54,14 @@ import survive.Direction;
   public void changeDirection(final Direction d)
   {
       direction = d;
-      switch (direction)
-      {
-        case LEFT:
-            if (getSprite() == frames[7])
+      if (getSprite() == frames[1])
             {
-                changeFrame(6);    
+                changeFrame(0);    
             }
             else 
             {        
-                changeFrame(7);
-            }
-              break;
-        case RIGHT:
-            if (getSprite() == frames[2])
-            {
-            changeFrame(3);    
-            }
-            else 
-            {        
-            changeFrame(2);
-            }
-            break;
-        case UP:
-            if (getSprite() == frames[0])
-            {
-            changeFrame(1);    
-            }
-            else 
-            {        
-            changeFrame(0);
-            }
-            break;
-        case DOWN:
-            if (getSprite() == frames[5])
-            {
-            changeFrame(4);    
-            }
-            else 
-            {        
-            changeFrame(5);
-            }
-            break;
-          
-      } 
-      
-   
+                changeFrame(1);
+            }      
   }
    public long getSpeed()
    {

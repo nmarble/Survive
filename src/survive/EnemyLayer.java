@@ -22,7 +22,25 @@ public abstract class EnemyLayer extends Drawable
   {
     return type;
   }
-
+  public int getRotation()
+  {
+      int rot = 0;
+      switch (direction) {
+          case UP:
+              rot = 0;
+              break;
+          case DOWN:
+              rot = 180;
+              break;
+          case RIGHT:
+              rot = 90;
+              break;
+          case LEFT:
+              rot = 270;
+              break;
+      }
+      return rot;
+  }
   public abstract boolean interact();
   public abstract boolean passable();
   public abstract void changeDirection(Direction d);
