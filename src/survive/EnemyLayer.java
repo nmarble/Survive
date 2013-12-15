@@ -43,7 +43,7 @@ public abstract class EnemyLayer extends Drawable
   }
   public abstract boolean interact();
   public abstract boolean passable();
-  public abstract void changeDirection(Direction d);
+  public abstract void changeDirection(Direction d, boolean attack);
   public abstract long getSpeed();
   public abstract int getLastX();
   public abstract int getLastY();

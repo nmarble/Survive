@@ -56,6 +56,7 @@ public class Survive
   
 
   private EnemyLayer zombie;
+  private EnemyLayer zombieArms;
 
   private PlayerEntity player;
   
@@ -231,9 +232,7 @@ public class Survive
   }
   public void testEntities () 
   {
-    // Test Axe
-    Axe = new AxeEntity(this, "sprites/axe.png", new Coords(-100, -100), "axe");
-    middleLayers.put(new Coords(-100, -100), Axe);   
+      addToInventory(5,1);
   }
   public void drawEquipped(Coords coords) 
   {
@@ -669,7 +668,7 @@ public class Survive
   {
     enemyMovable.addAll(enemyLayers.values());
     for (EnemyLayer enemyLayer : enemyMovable) {
-      Coords finalMove = new Coords(0,0);
+      Coords finalMove = enemyLayer.getCoords();
       Direction newdirection = Direction.UP;
       
           int fD = 99999;
@@ -712,17 +711,18 @@ public class Survive
           enemyLayers.remove(enemyLayer.coords);
           zombie = enemyLayer;
           zombie.setCoords(finalMove);
-          zombie.changeDirection(newdirection);
-          int i = getRandomNum(2);
-          if (i == 1) {zombie.changeDirection(newdirection);}
+          zombie.changeDirection(newdirection, false);
           enemyLayers.put(finalMove, zombie);
           }
           // If the final move is players location do this
           else {
-              zombie.changeDirection(newdirection);
+              enemyLayers.remove(enemyLayer.coords);
+              zombie = enemyLayer;
+              zombie.changeDirection(newdirection, true);
+              enemyLayers.put(enemyLayer.coords, zombie);
               player.setLife(player.getLife() - enemyLayer.getSTR());
               hurtFlash = true;
-          }    
+          }   
     }
     enemyMovable.clear();
   }
@@ -961,7 +961,7 @@ public class Survive
         final Coords location = new Coords(player.getCoords().getX() - (Global.xRes / 2),
                 player.getCoords().getY() + (getRandomNum(Global.yRes / 20) * 20) - (getRandomNum(Global.yRes / 20) * 20) 
         );
-        zombie = new ZombieEntity(this, "sprites/zombien1.png", location, "zombie", Direction.UP);
+        zombie = new ZombieEntity(this, "sprites/zombie1.png", location, "zombie", Direction.UP);
         enemyLayers.put(location, zombie);
       }
       
@@ -995,7 +995,7 @@ public class Survive
             middleLayers.get(coords).draw(g, screenOffset);
           }
           if (enemyLayers.containsKey(coords) && !upperLayers.containsKey(coords)) {
-            enemyLayers.get(coords).rotDraw(g, screenOffset, enemyLayers.get(coords).getRotation());
+            enemyLayers.get(coords).rotDraw(g, screenOffset, enemyLayers.get(coords).getRotation());          
           }
           if (upperLayers.containsKey(coords)) {
             upperLayers.get(coords).draw(g, screenOffset);

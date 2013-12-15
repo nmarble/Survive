@@ -11,18 +11,20 @@ import survive.Direction;
    extends EnemyLayer
  {
    private Survive survive;
-   private Sprite[] frames = new Sprite[2];
+   private Sprite[] frames = new Sprite[4];
    private int lastX = 0;
    private int lastY = 0;
-   
+   private int fNumber = 0;
    private int life = 50;
    private int STR = 20;
    public ZombieEntity(Survive survive, String ref, final Coords coords, String type, final Direction direction)
    {
      super(ref, coords, type, direction);
      
-     frames[0] = SpriteStore.get().getSprite("sprites/zombien1.png");
-     frames[1] = SpriteStore.get().getSprite("sprites/zombien2.png");
+     frames[0] = SpriteStore.get().getSprite("sprites/zombie1.png");
+     frames[1] = SpriteStore.get().getSprite("sprites/zombie2.png");
+     frames[2] = SpriteStore.get().getSprite("sprites/zombieattack.png");
+
 
      this.survive = survive;
    }
@@ -51,17 +53,17 @@ import survive.Direction;
        return false;
    }
 
-  public void changeDirection(final Direction d)
+  public void changeDirection(final Direction d, boolean attack)
   {
       direction = d;
-      if (getSprite() == frames[1])
-            {
-                changeFrame(0);    
-            }
-            else 
-            {        
-                changeFrame(1);
-            }      
+      fNumber++;
+      if (fNumber > 1) {fNumber = 0;}
+      if (!attack) {
+          changeFrame(fNumber);
+      }
+      if (attack) {
+          changeFrame(2);
+      }
   }
    public long getSpeed()
    {
