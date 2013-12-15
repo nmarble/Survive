@@ -50,6 +50,7 @@ public class Survive
   private MiddleLayer Stone;
   private MiddleLayer Barrel;
   private MiddleLayer Axe;
+  private MiddleLayer WaterBorder;
 
   private UpperLayer black;
   
@@ -281,10 +282,16 @@ public class Survive
     {
       final EnemyLayer enemyLayer = enemyLayers.get(interactCoords);
       if (enemyLayer != null) {
-        if (enemyLayer.interact() == true) {
+        if (enemyLayer.interact() == true) { 
             enemyLayer.setLife(enemyLayer.getLife() - player.getSTR());
-            if (enemyLayer.getLife() == 0) {
+            Coords newCoords = direction.getCoordsFrom(enemyLayer.getCoords());
+            if (!enemyLayers.containsKey(newCoords)) {
+            enemyLayer.setCoords(newCoords);
+            enemyLayers.put(enemyLayer.getCoords(), enemyLayer);
             enemyLayers.remove(interactCoords);
+            }
+            if (enemyLayer.getLife() <= 0) {
+            enemyLayers.remove(enemyLayer.getCoords());
             }
         }
       }
@@ -388,6 +395,10 @@ public class Survive
     if (lowerLayer != null && !lowerLayer.passable()) {
       movePlayer(opposite);
     }
+    final EnemyLayer enemyLayer = enemyLayers.get(player.getCoords());
+    if (enemyLayer != null && !enemyLayer.passable()) {
+      movePlayer(opposite);
+    }
   }
 
   public boolean checkForMoreItem(int itemCode)
@@ -468,7 +479,7 @@ public class Survive
           middleLayers.remove(waterCoords);
           lowerLayers.remove(waterCoords);
           water = new WaterEntity(this, "sprites/water.gif", waterCoords, "water");
-          lowerLayers.put(waterCoords, water);
+          lowerLayers.put(waterCoords, water);        
         }
         break;
         case 3:
@@ -653,7 +664,7 @@ public class Survive
       huds.add(structureButton);
     }
   }
-
+  
   public void moveEnemy(Graphics2D g)
   {
     enemyMovable.addAll(enemyLayers.values());
@@ -697,9 +708,10 @@ public class Survive
               }
           }
           // Move to this location if not players
-          if (finalMove.getX() != player.getCoords().getX() || finalMove.getY() != player.getCoords().getY()) {
+          if (finalMove.getX() != player.getCoords().getX() || finalMove.getY() != player.getCoords().getY()) {          
           enemyLayers.remove(enemyLayer.coords);
-          zombie = new ZombieEntity(this, "sprites/zombien1.png", finalMove, "zombie", newdirection);
+          zombie = enemyLayer;
+          zombie.setCoords(finalMove);
           zombie.changeDirection(newdirection);
           int i = getRandomNum(2);
           if (i == 1) {zombie.changeDirection(newdirection);}
@@ -972,6 +984,12 @@ public class Survive
           if (!lowerLayers.containsKey(coords)) {
             addFloor(x, y);
           }
+            if(lowerLayers.get(coords).getType() == "water" && (loopTime % 5) == 0) {
+                LowerLayer lowerLayer = lowerLayers.get(coords);
+                lowerLayers.remove(coords);
+                lowerLayer.changeFrame(lowerLayer.nextFrame());
+                lowerLayers.put(coords, lowerLayer);
+            }
           lowerLayers.get(coords).draw(g, screenOffset);
           if (middleLayers.containsKey(coords)) {
             middleLayers.get(coords).draw(g, screenOffset);

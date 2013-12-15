@@ -12,6 +12,7 @@ public abstract class LowerLayer extends Drawable {
     public String getType() {
         return type;
     }
-
+    public void changeFrame(int frameNumber) {}
+    public int nextFrame() {return 0;}
     public abstract boolean passable();
 }
