@@ -109,7 +109,7 @@ public class Survive
   
   private int treeLikely = 60;
   private int boulderLikely = 20;
-  private int zombieChance = 100;
+  private int zombieChance = 400;
   private int pRotate = 0;
   private int itemSelection = 0;
   private int selectionX = 0;
@@ -119,9 +119,13 @@ public class Survive
   private boolean craftingOpen = false;
   private boolean craftingStructure = false;
   private boolean holdingItem = false;
-
   private boolean logWallReceipe = false;
-
+  
+  private int xLLimit = 0;
+  private int xRLimit = 0; 
+  private int yULimit = 0;
+  private int yDLimit = 0;
+   
   private Map<Coords, LowerLayer> lowerLayers = new HashMap<Coords, LowerLayer>();
   private Map<Coords, MiddleLayer> middleLayers = new HashMap<Coords, MiddleLayer>();
   private Map<Coords, UpperLayer> upperLayers = new HashMap<Coords, UpperLayer>();
@@ -711,10 +715,10 @@ public class Survive
                   LowerLayer lowerLayer = lowerLayers.get(coords);
                   MiddleLayer middleLayer = middleLayers.get(coords);
                   EnemyLayer otherEnemy = enemyLayers.get(coords);
-                  if (lowerLayer != null) {
+                  if (lowerLayer == null || lowerLayer.passable()) {
                   if (middleLayer == null || middleLayer.passable()) {
                   if (otherEnemy == null || otherEnemy.passable()) {
-                  if (tD < fD && lowerLayer.passable()) {
+                  if (tD < fD) {
                       fD = tD;
                       finalMove = new Coords(x,y);
                       if (finalMove.getX() < enemyLayer.getCoords().getX()) {
@@ -985,6 +989,52 @@ public class Survive
           }
       } 
   }
+  public void setSpawnLimit()
+  {
+      if (player.getCoords().getX() - Global.xRes / 2 < xLLimit) {
+        xLLimit = player.getCoords().getX() - Global.xRes / 2;
+      }
+      if (player.getCoords().getX() + Global.xRes / 2 > xRLimit) {
+        xRLimit = player.getCoords().getX() + Global.xRes / 2;
+      }
+      if (player.getCoords().getY() - Global.yRes / 2 < yULimit) {
+        yULimit = player.getCoords().getY() - Global.yRes / 2;
+      }
+      if (player.getCoords().getY() + Global.yRes / 2 > yDLimit) {
+        yDLimit = player.getCoords().getY() + Global.yRes / 2;
+      }
+  }
+  public Coords spawnZombie(int randomZombie)
+  {
+   
+      Coords location = new Coords(0,0);
+      Random r = new Random();
+      int y = 0;
+      int x = 0;
+      switch (randomZombie) {
+          case 0:
+              y = r.nextInt(yDLimit-yULimit) + yULimit;
+              y = Math.round(y / 20)* 20;
+              location = new Coords(xLLimit, y);
+              break;
+          case 1:
+              y = r.nextInt(yDLimit-yULimit) + yULimit;
+              y = Math.round(y / 20)* 20;
+              location = new Coords(xRLimit, y);
+              break;
+          case 2:
+              x = r.nextInt(xRLimit - xLLimit) + xLLimit;
+              x = Math.round(x / 20)* 20;
+              location = new Coords(x, yULimit);
+              break;
+          case 3:
+              x = r.nextInt(xRLimit - xLLimit) + xLLimit;
+              x = Math.round(x / 20)* 20;
+              location = new Coords(x, yDLimit);
+              break;
+      }
+      return location;
+  }
   //Loop of main game
   public void gameLoop()
   {
@@ -1009,20 +1059,13 @@ public class Survive
       if (loopTime == 1) {
           hurtFlash = false;
       }
-      
       int randomZombie = (int) (Math.random() * zombieChance);
-      if (randomZombie == 1) {
-        System.err.println("ZOMBIE");
-        final Coords location = new Coords(player.getCoords().getX() - (Global.xRes / 2),
-                player.getCoords().getY() + (getRandomNum(Global.yRes / 20) * 20) - (getRandomNum(Global.yRes / 20) * 20) 
-        );
-        zombie = new ZombieEntity(this, "sprites/zombie1.png", location, "zombie", Direction.UP);
-        enemyLayers.put(location, zombie);
+      if (randomZombie < 4) {
+          Coords location = spawnZombie(randomZombie);
+          zombie = new ZombieEntity(this, "sprites/zombie1.png", location, "zombie", Direction.UP);
+          enemyLayers.put(location, zombie);
       }
-      if (bulletsToRemove.size() > 0) {
-      bullets.removeAll(bulletsToRemove);
-      bulletsToRemove.clear();
-      }
+     
       checkLoS(); 
       checkButtonPushed();
       
@@ -1031,6 +1074,7 @@ public class Survive
       final Coords screenOffset = new Coords(
               player.getCoords().getX() - Global.xRes / 2,
               player.getCoords().getY() - Global.yRes / 2);
+      setSpawnLimit();
       final int xStart = screenOffset.getX();
       final int xStop = screenOffset.getX() + Global.xRes;
       final int xStep = 20;
@@ -1043,13 +1087,15 @@ public class Survive
           if (!lowerLayers.containsKey(coords)) {
             addFloor(x, y);
           }
-            if(lowerLayers.get(coords).getType() == "water" && (loopTime % 5) == 0) {
+          if(lowerLayers.containsKey(coords)) {
+          if("water".equals(lowerLayers.get(coords).getType()) && (loopTime % 5) == 0) {
                 LowerLayer lowerLayer = lowerLayers.get(coords);
                 lowerLayers.remove(coords);
                 lowerLayer.changeFrame(lowerLayer.nextFrame());
                 lowerLayers.put(coords, lowerLayer);
             }
           lowerLayers.get(coords).draw(g, screenOffset);
+          }
           if (middleLayers.containsKey(coords)) {
             middleLayers.get(coords).draw(g, screenOffset);
           }
@@ -1064,22 +1110,7 @@ public class Survive
       }
       //Draws Player
       player.rotDraw(g, screenOffset, (int)getPlayerDirection());
-      for (Hud hud : huds)
-      if ("use".equals(hud.getType())) {
-        use.rotDraw(g, screenOffset, (int)getPlayerDirection());
-        removeHudList.add(hud);
-      }
-      //Draw bullets
-      for (BulletEntity bullet : bullets) {
-           bullet.rotDraw(g, screenOffset, bullet.getRot());
-      }
-      //What is to be removed gets removed
-      for (Hud hud : removeHudList){
-        huds.remove(hud);
-      }
-      //Resets what is to be removed
-      removeList.clear();
-      
+
       //Draw Health Bar
       for(Hud hud : huds) {
           if ("healthOverlay".equals(hud.getType())) {
@@ -1093,7 +1124,11 @@ public class Survive
             g.setColor(Color.white);
             g.drawString(life, hud.getCoords().getX() + 155, hud.getCoords().getY()+17);
             
-          } 
+          }
+          if ("use".equals(hud.getType())) {
+            use.rotDraw(g, screenOffset, (int)getPlayerDirection());
+            removeHudList.add(hud);
+          }
       }
       //Draws what is being held
       if (holdingItem == true) {
@@ -1141,12 +1176,20 @@ public class Survive
         g.drawString(message, (Global.xRes - g.getFontMetrics().stringWidth(message)) / 2, 250);
         g.drawString("Press any key", (Global.xRes - g.getFontMetrics().stringWidth("Press space to continue")) / 2, (Global.yRes / 2));
       }
-      
+      //Draw bullets
+      for (BulletEntity bullet : bullets) {
+           bullet.rotDraw(g, screenOffset, bullet.getRot());
+      }
       int time = 0;
       while (time < bulletSpeed) {
       bulletAction(screenOffset);
       time++;
       }
+      if (bulletsToRemove.size() > 0) {
+      bullets.removeAll(bulletsToRemove);
+      bulletsToRemove.clear();
+      }
+      
       //Draws inventory background and items
       if (inventoryOpen == true) {       
         int col = 5;
@@ -1167,8 +1210,12 @@ public class Survive
           int drawY = 0;
           if (inventory.getQuantity() > 0) {
             col = col + 25;
+            if (col > 130) {
+                col = 30;
+                row ++;
+            }
             drawX = (bagOverlayX - (col));
-            drawY = (bagOverlayY - 20) - (15 * row);
+            drawY = (bagOverlayY - 5) - (30 * row);
 
             inventory.draw(g, new Coords(drawX, drawY));
             String quantity = String.valueOf(inventory.getQuantity());
@@ -1204,8 +1251,8 @@ public class Survive
           randomChance[i] = randomDefault[i] + 10;
         }
       }
-      //Draw hurt screen
       
+      //Draw hurt screen     
       if (hurtFlash == true) {
           for (Hud hud : huds) {
           if ("hurtOverlay" == hud.getType()) {
@@ -1228,6 +1275,12 @@ public class Survive
       if (loopTime > 10) {
         loopTime = 0;
       }
+      //What is to be removed gets removed
+      for (Hud hudremove : removeHudList){
+        huds.remove(hudremove);
+      }
+      //Resets what is to be removed
+      removeList.clear();
       try {
         Thread.sleep(100L);
       } catch (Exception e) {
