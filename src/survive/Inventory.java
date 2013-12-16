@@ -46,6 +46,9 @@
        if (itemCode == 5) {
            equip = true;
        }
+       if (itemCode == 6) {
+           equip = true;
+       }
        return equip;
    }
    public boolean isEquipped()

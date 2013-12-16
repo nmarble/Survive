@@ -51,6 +51,8 @@ public class Survive
   private MiddleLayer Barrel;
   private MiddleLayer Axe;
   private MiddleLayer WaterBorder;
+  private MiddleLayer Rifle;
+  
 
   private UpperLayer black;
   
@@ -59,6 +61,7 @@ public class Survive
   private EnemyLayer zombieArms;
 
   private PlayerEntity player;
+  private BulletEntity Bullet;
   
   private Hud structureButton;
   private Hud toolButton;
@@ -80,6 +83,7 @@ public class Survive
   private Inventory logWall;
   private Inventory barrel;
   private Inventory axe;
+  private Inventory rifle;
   
 
   private Direction direction = Direction.UP;
@@ -124,6 +128,8 @@ public class Survive
   private List<Inventory> inventorys = new ArrayList<Inventory>();
   private Map<Coords, EnemyLayer> enemyLayers = new HashMap<Coords, EnemyLayer>();
   private List<EnemyLayer> enemyMovable = new ArrayList<EnemyLayer>();
+  private List<BulletEntity> bullets = new ArrayList<BulletEntity>();
+  private List<BulletEntity> bulletsToRemove = new ArrayList<BulletEntity>();
   private ArrayList removeList = new ArrayList();
   private ArrayList<Hud> removeHudList = new ArrayList<Hud>();
   
@@ -233,18 +239,31 @@ public class Survive
   public void testEntities () 
   {
       addToInventory(5,1);
+      addToInventory(6,1);
   }
   public void drawEquipped(Coords coords) 
   {
       String pic = "";
-      int a = getRandomNum(2) ; 
+      int a = getRandomNum(2);
+      int mouseX = MouseInfo.getPointerInfo().getLocation().x;
+      int mouseY = MouseInfo.getPointerInfo().getLocation().y;
+      final Coords screenOffset = new Coords(
+              player.getCoords().getX() - Global.xRes / 2,
+              player.getCoords().getY() - Global.yRes / 2);
       switch (equipped[3]) {
           case 5:
               pic = "sprites/axeswingn1.png";
               if (a == 1) {pic = "sprites/axeswingn2.png";}
               use = new UseEntity(this, pic, coords, "use", 20);
               huds.add(use);
-              break;   
+              break;
+          case 6:
+              pic = "sprites/rifleuse.png";
+              use = new UseEntity(this, pic, coords, "use", 20);
+              huds.add(use);
+              Bullet = new BulletEntity(this,"sprites/bullet.png", coords, new Coords(mouseX + screenOffset.getX(), mouseY + screenOffset.getY()), (int)getPlayerDirection());
+              bullets.add(Bullet);
+              break;
       } 
   }
   
@@ -265,9 +284,10 @@ public class Survive
   public void interact()
   {
     final Coords interactCoords = direction.getCoordsFrom(player.getCoords());    
-    if (equipped[3] == 5) {
+    if (equipped[3] == 5 || equipped[3] == 6) {
     drawEquipped(interactCoords);
     }
+    
     {
       final MiddleLayer middleLayer = middleLayers.get(interactCoords);
       if (middleLayer != null) {
@@ -325,7 +345,8 @@ public class Survive
       inventorys.add(barrel);
       axe = new Inventory("sprites/axe.png", 5, 0, new Coords(0,0));
       inventorys.add(axe);
-      
+      rifle = new Inventory("sprites/rifle.png", 6, 0, new Coords(0,0));
+      inventorys.add(rifle);
     }
     for (Inventory inventory : inventorys) {
       if (inventory.getItemCode() == itemCode) {
@@ -375,6 +396,11 @@ public class Survive
         Axe = new AxeEntity(this, "sprites/axe.png", coords, "axe");
         middleLayers.put(coords, Axe);
         removeFromInventory(5, 1);
+        break;
+      case 6:
+        Rifle = new RifleEntity(this, "sprites/rifle.png", coords, "rifle");
+        middleLayers.put(coords, Rifle);
+        removeFromInventory(6, 1);
         break;
 
     }
@@ -477,7 +503,7 @@ public class Survive
           final Coords waterCoords = new Coords(x, y);
           middleLayers.remove(waterCoords);
           lowerLayers.remove(waterCoords);
-          water = new WaterEntity(this, "sprites/water.gif", waterCoords, "water");
+          water = new WaterEntity(this, "sprites/water1.png", waterCoords, "water");
           lowerLayers.put(waterCoords, water);        
         }
         break;
@@ -930,6 +956,33 @@ public class Survive
       if (playerRot > 292.5 && playerRot <= 337.5) {direction = Direction.UPLEFT;}
       return playerRot;
   }
+  public void bulletAction (Coords screenOffset)
+  {
+     Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
+      
+        if (bullets.size() > 0) {
+          for (BulletEntity bullet : bullets) {
+              bullet.moveBullet();
+              if (middleLayers.containsKey(bullet.getCoords())) {
+                  MiddleLayer obs = middleLayers.get(bullet.getCoords());
+                  if (!obs.passable()) {
+                      bulletsToRemove.add(bullet);
+                  }
+              }
+              if (enemyLayers.containsKey(bullet.getCoords())) {
+                EnemyLayer enemyLayer = enemyLayers.get(bullet.getCoords());
+                enemyLayer.setLife(enemyLayer.getLife()-player.getSTR());
+              if (enemyLayer.getLife() <= 0) {
+                enemyLayers.remove(enemyLayer.getCoords());
+              }
+              }
+              bullet.rotDraw(g, screenOffset, bullet.getRot());
+              if (bullet.getTime() > 40) {
+                  bulletsToRemove.add(bullet);
+              }
+          }
+      } 
+  }
   //Loop of main game
   public void gameLoop()
   {
@@ -964,7 +1017,10 @@ public class Survive
         zombie = new ZombieEntity(this, "sprites/zombie1.png", location, "zombie", Direction.UP);
         enemyLayers.put(location, zombie);
       }
-      
+      if (bulletsToRemove.size() > 0) {
+      bullets.removeAll(bulletsToRemove);
+      bulletsToRemove.clear();
+      }
       checkLoS(); 
       checkButtonPushed();
       //Draw all ground that is on screen
@@ -1078,8 +1134,13 @@ public class Survive
         g.drawString(message, (Global.xRes - g.getFontMetrics().stringWidth(message)) / 2, 250);
         g.drawString("Press any key", (Global.xRes - g.getFontMetrics().stringWidth("Press space to continue")) / 2, (Global.yRes / 2));
       }
-      //Draws inventory background and items
       
+      int time = 0;
+      while (time < 3) { 
+      bulletAction(screenOffset);
+      time++;
+      }
+      //Draws inventory background and items
       if (inventoryOpen == true) {       
         int col = 5;
         int row = 1;
