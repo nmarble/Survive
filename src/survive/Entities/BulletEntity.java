@@ -31,7 +31,8 @@ import survive.Drawable;
      yD = abs((double)coords.getY() - (double) endCoords.getY());
      xO = (double)coords.getX();
      yO = (double)coords.getY();
-     
+     x = (double)coords.getX();
+     y = (double)coords.getY();
      
      this.rotation = rotation;
      this.endCoords = endCoords;
@@ -51,8 +52,7 @@ import survive.Drawable;
    public void moveBullet()
    {
        
-       x = (double)coords.getX();
-       y = (double)coords.getY();
+       
        
        if (xO < endCoords.getX() && xD > yD) {    
        xV = 20;
@@ -81,26 +81,26 @@ import survive.Drawable;
        if (yE < -1) {
            yE = yE + 1;
            if (yO > endCoords.getY()&& xD > yD) {
-            y = (double)coords.getY() - 20;
+            y = y - 20;
            }
            if (yO < endCoords.getY()&& xD > yD) {
-            y = (double)coords.getY() + 20;
+            y = y + 20;
            }
        }
        if (xE < -1) {
            xE = xE + 1;
            if (xO > endCoords.getX()&& yD > xD) {
-            x = (double)coords.getX() - 20;
+            x = x - 20;
            }
            if (xO < endCoords.getX()&& yD > xD) {
-            x = (double)coords.getX() + 20;
+            x = x + 20;
            }
 
        }
        
        time++;
 
-       coords = new Coords((int)Math.round(x / 20) *20,(int)Math.round(y / 20) *20);
+       coords = new Coords((int)x,(int)y);
    }
    public int getRot()
    {
@@ -109,6 +109,10 @@ import survive.Drawable;
    public int getTime()
    {
        return time;
+   }
+   public Coords getBlockCoord()
+   {
+       return new Coords((int)Math.round(x / 20) * 20, (int)Math.round(y / 20) * 20);
    }
  }
 

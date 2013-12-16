@@ -52,6 +52,7 @@ public class Survive
   private MiddleLayer Axe;
   private MiddleLayer WaterBorder;
   private MiddleLayer Rifle;
+  private MiddleLayer Window;
   
 
   private UpperLayer black;
@@ -84,7 +85,7 @@ public class Survive
   private Inventory barrel;
   private Inventory axe;
   private Inventory rifle;
-  
+  private Inventory window;
 
   private Direction direction = Direction.UP;
   private double movementSpeed = 20;
@@ -104,7 +105,7 @@ public class Survive
   
   int[] equipped = new int [4];
   
-  
+  private int bulletSpeed = 4;
   
   private int treeLikely = 60;
   private int boulderLikely = 20;
@@ -240,6 +241,7 @@ public class Survive
   {
       addToInventory(5,1);
       addToInventory(6,1);
+      addToInventory(7,20);
   }
   public void drawEquipped(Coords coords) 
   {
@@ -347,6 +349,8 @@ public class Survive
       inventorys.add(axe);
       rifle = new Inventory("sprites/rifle.png", 6, 0, new Coords(0,0));
       inventorys.add(rifle);
+      window = new Inventory("sprites/window.png", 7, 0, new Coords(0,0));
+      inventorys.add(window);
     }
     for (Inventory inventory : inventorys) {
       if (inventory.getItemCode() == itemCode) {
@@ -375,35 +379,34 @@ public class Survive
       case 1:
         Log = new LogEntity(this, "sprites/log.png", coords, "log");
         middleLayers.put(coords, Log);
-        removeFromInventory(1, 1);
         break;
       case 2:
         Stone = new StoneEntity(this, "sprites/stone.png", coords, "stone");
         middleLayers.put(coords, Stone);
-        removeFromInventory(2, 1);
         break;
       case 3:
         LogWall = new LogWallEntity(this, "sprites/logwall.gif", coords, "logWall");
         middleLayers.put(coords, LogWall);
-        removeFromInventory(3, 1);
         break;
       case 4:
         Barrel = new LogWallEntity(this, "sprites/logwall.gif", coords, "logWall");
         middleLayers.put(coords, Barrel);
-        removeFromInventory(4, 1);
         break;
       case 5:
         Axe = new AxeEntity(this, "sprites/axe.png", coords, "axe");
         middleLayers.put(coords, Axe);
-        removeFromInventory(5, 1);
         break;
       case 6:
         Rifle = new RifleEntity(this, "sprites/rifle.png", coords, "rifle");
         middleLayers.put(coords, Rifle);
-        removeFromInventory(6, 1);
+        break;
+      case 7:
+        Window = new WindowEntity(this, "sprites/window.png", coords, "window");
+        middleLayers.put(coords, Window);
         break;
 
     }
+    removeFromInventory(itemSelection, 1);
     }
   }
   public void checkCollisionObject(Direction direction)
@@ -963,20 +966,19 @@ public class Survive
         if (bullets.size() > 0) {
           for (BulletEntity bullet : bullets) {
               bullet.moveBullet();
-              if (middleLayers.containsKey(bullet.getCoords())) {
-                  MiddleLayer obs = middleLayers.get(bullet.getCoords());
+              if (middleLayers.containsKey(bullet.getBlockCoord())) {
+                  MiddleLayer obs = middleLayers.get(bullet.getBlockCoord());
                   if (!obs.passable()) {
                       bulletsToRemove.add(bullet);
                   }
               }
-              if (enemyLayers.containsKey(bullet.getCoords())) {
-                EnemyLayer enemyLayer = enemyLayers.get(bullet.getCoords());
+              if (enemyLayers.containsKey(bullet.getBlockCoord())) {
+                EnemyLayer enemyLayer = enemyLayers.get(bullet.getBlockCoord());
                 enemyLayer.setLife(enemyLayer.getLife()-player.getSTR());
               if (enemyLayer.getLife() <= 0) {
                 enemyLayers.remove(enemyLayer.getCoords());
               }
               }
-              bullet.rotDraw(g, screenOffset, bullet.getRot());
               if (bullet.getTime() > 40) {
                   bulletsToRemove.add(bullet);
               }
@@ -1023,6 +1025,7 @@ public class Survive
       }
       checkLoS(); 
       checkButtonPushed();
+      
       //Draw all ground that is on screen
       // The upper right coordinates of the screen in game world coordinates.
       final Coords screenOffset = new Coords(
@@ -1065,6 +1068,10 @@ public class Survive
       if ("use".equals(hud.getType())) {
         use.rotDraw(g, screenOffset, (int)getPlayerDirection());
         removeHudList.add(hud);
+      }
+      //Draw bullets
+      for (BulletEntity bullet : bullets) {
+           bullet.rotDraw(g, screenOffset, bullet.getRot());
       }
       //What is to be removed gets removed
       for (Hud hud : removeHudList){
@@ -1136,7 +1143,7 @@ public class Survive
       }
       
       int time = 0;
-      while (time < 3) { 
+      while (time < bulletSpeed) {
       bulletAction(screenOffset);
       time++;
       }

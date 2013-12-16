@@ -76,6 +76,8 @@
 //Log Wall 3
 //Barrel 4
 //Axe 5
+//Rifle 6
+//Window 7
 
 
 
