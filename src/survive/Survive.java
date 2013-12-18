@@ -293,15 +293,21 @@ public class Survive
     if (equipped[3] == 5 || equipped[3] == 6) {
     drawEquipped(interactCoords);
     }
-    
-    {
+    for (Inventory inventory : inventorys) {
+        if (inventory.getItemCode() == equipped[3] || equipped[3] == 0 ) {
+            int[] interacable = inventory.interactableCodes(equipped[3]);
+
       final MiddleLayer middleLayer = middleLayers.get(interactCoords);
       if (middleLayer != null) {
         if (middleLayer.interact() == true) {
-            middleLayers.remove(interactCoords);            
-        }
-        
+            for (int i = 0; i < interacable.length; i++) {
+                if (middleLayer.getType() == interacable[i]) {               
+                middleLayers.remove(interactCoords);
+                }
+            }
+        } 
       }
+        }
     }
 
     {
@@ -381,31 +387,31 @@ public class Survive
     if (!middleLayers.containsKey(coords)) {
     switch (itemSelection) {
       case 1:
-        Log = new LogEntity(this, "sprites/log.png", coords, "log");
+        Log = new LogEntity(this, "sprites/log.png", coords, 1);
         middleLayers.put(coords, Log);
         break;
       case 2:
-        Stone = new StoneEntity(this, "sprites/stone.png", coords, "stone");
+        Stone = new StoneEntity(this, "sprites/stone.png", coords, 2);
         middleLayers.put(coords, Stone);
         break;
       case 3:
-        LogWall = new LogWallEntity(this, "sprites/logwall.gif", coords, "logWall");
+        LogWall = new LogWallEntity(this, "sprites/logwall.gif", coords, 3);
         middleLayers.put(coords, LogWall);
         break;
       case 4:
-        Barrel = new LogWallEntity(this, "sprites/logwall.gif", coords, "logWall");
+        Barrel = new BarrelEntity(this, "sprites/barrel.png", coords, 4);
         middleLayers.put(coords, Barrel);
         break;
       case 5:
-        Axe = new AxeEntity(this, "sprites/axe.png", coords, "axe");
+        Axe = new AxeEntity(this, "sprites/axe.png", coords, 5);
         middleLayers.put(coords, Axe);
         break;
       case 6:
-        Rifle = new RifleEntity(this, "sprites/rifle.png", coords, "rifle");
+        Rifle = new RifleEntity(this, "sprites/rifle.png", coords, 6);
         middleLayers.put(coords, Rifle);
         break;
       case 7:
-        Window = new WindowEntity(this, "sprites/window.png", coords, "window");
+        Window = new WindowEntity(this, "sprites/window.png", coords, 7);
         middleLayers.put(coords, Window);
         break;
 
@@ -471,22 +477,22 @@ public class Survive
               y = locs[a][1];              
               final Coords treeCoords = new Coords(x, y);
               if (a == 4) {
-              Tree = new TreeEntity(this, "sprites/tree/trunk.png", treeCoords, "tree");    
+              Tree = new TreeEntity(this, "sprites/tree/trunk.png", treeCoords, 1);    
               }
               if (a != 4 && a < 9) {
-              Tree = new LeavesEntity(this, "sprites/tree/leaves1_1.png", treeCoords, "leaves");
+              Tree = new LeavesEntity(this, "sprites/tree/leaves1_1.png", treeCoords, 8);
               }
               if (a == 9) {
-              Tree = new LeavesEntity(this, "sprites/tree/leaves1_d.png", treeCoords, "leaves");    
+              Tree = new LeavesEntity(this, "sprites/tree/leaves1_d.png", treeCoords, 8);    
               }
               if (a == 10) {
-              Tree = new LeavesEntity(this, "sprites/tree/leaves1_u.png", treeCoords, "leaves");    
+              Tree = new LeavesEntity(this, "sprites/tree/leaves1_u.png", treeCoords, 8);    
               }
               if (a == 11) {
-              Tree = new LeavesEntity(this, "sprites/tree/leaves1_r.png", treeCoords, "leaves");    
+              Tree = new LeavesEntity(this, "sprites/tree/leaves1_r.png", treeCoords, 8);    
               }
               if (a == 12) {
-              Tree = new LeavesEntity(this, "sprites/tree/leaves1_l.png", treeCoords, "leaves");    
+              Tree = new LeavesEntity(this, "sprites/tree/leaves1_l.png", treeCoords, 8);    
               }
               middleLayers.put(treeCoords, Tree);
           } 
@@ -497,7 +503,7 @@ public class Survive
         lowerLayers.put(newLocation, gravel);
         chance = getRandomNum(boulderLikely);
         if (chance == 1) {
-          Boulder = new BoulderEntity(this, "sprites/boulder.png", newLocation, "boulder");
+          Boulder = new BoulderEntity(this, "sprites/boulder.png", newLocation, 2);
           middleLayers.put(newLocation, Boulder);
         }
         break;
@@ -532,7 +538,7 @@ public class Survive
           y = locs[a][1];
           if (a > 0 && x == 0 && y == 0) break;
           final Coords logWallCoords = new Coords(x, y);
-          LogWall = new LogWallEntity(this, "sprites/logwall.gif", logWallCoords, "logwall");
+          LogWall = new LogWallEntity(this, "sprites/logwall.gif", logWallCoords, 3);
           middleLayers.put(logWallCoords, LogWall);
         }
         locs = PreSetGroups.houseItems(direction, 3, startX, startY, size);
@@ -541,7 +547,7 @@ public class Survive
           y = locs[a][1];
           if (a > 0 && x == 0 && y == 0) break;
           final Coords itemsCoords = new Coords(x, y);
-          Barrel = new BarrelEntity(this, "sprites/barrel.png", itemsCoords, "barrel");
+          Barrel = new BarrelEntity(this, "sprites/barrel.png", itemsCoords, 4);
           middleLayers.put(itemsCoords, Barrel);
         }
         break;
@@ -578,6 +584,7 @@ public class Survive
   }
   public void inventoryInteract(int x, int y) 
   {
+      //Check to see if you are clicking on the equipment slots
       boolean inEquip = false;
       int equippedSelection = 0;
       if (x <= -(Global.xRes - 78) && y <= -120 && x >= -(Global.xRes - 78)-20 && y >= -140) {
@@ -596,15 +603,20 @@ public class Survive
         equippedSelection = 3;
         inEquip = true;
       }
+      //What happens if you are clicking on the equipment slots
       if (holdingItem && inEquip)
         for (Inventory inventory : inventorys) {
-            if (inventory.getItemCode() == itemSelection && inventory.equipable()) {
+            if (inventory.getItemCode() == itemSelection && inventory.equipable() && equipped[equippedSelection] == 0) {
                 equipped[equippedSelection] = inventory.getItemCode();
-                inventory.slotEquipped[equippedSelection] = true;
+                inventory.removeQuantity(1);
+            }
+            if (inventory.getItemCode() == itemSelection && inventory.equipable() && equipped[equippedSelection] >= 0) {
+                addToInventory(equipped[equippedSelection], 1);
+                equipped[equippedSelection] = inventory.getItemCode();
                 inventory.removeQuantity(1);
             }
         }
-      if (!holdingItem && !inEquip) {
+      if (!inEquip) {
           selectionInteract(x, y);
       }
       if (!holdingItem && inEquip) {
@@ -613,7 +625,6 @@ public class Survive
               if (inventory.getItemCode() == itemSelection) {
                   equipped[equippedSelection] = 0;
                   inventory.addQuantity(1);
-                  inventory.slotEquipped[equippedSelection] = false;
               }
           }
       }
@@ -1222,28 +1233,20 @@ public class Survive
             g.drawString(quantity, -drawX, -drawY);
             inventory.setXY(drawX, drawY);
           }
-          if (inventory.isEquipped()) {
-              if (inventory.slotEquipped[0]) {
-                  int x = -(Global.xRes - 78);
-                  int y = -120;
-                  inventory.draw(g, new Coords(x, y));
-              }
-              if (inventory.slotEquipped[1]) {
-                  int x = -(Global.xRes - 24);
-                  int y = -75;
-                  inventory.draw(g, new Coords(x, y));
-              }
-              if (inventory.slotEquipped[2]) {
-                  int x = -(Global.xRes - 55);
-                  int y = -5;
-                  inventory.draw(g, new Coords(x, y));
-              }
-              if (inventory.slotEquipped[3]) {
-                  int x = -(Global.xRes - 145);
-                  int y = -39;
-                  inventory.draw(g, new Coords(x, y));
-              }
-          }
+            
+            if (equipped[0] == inventory.getItemCode()) {
+                  inventory.draw(g, new Coords(-(Global.xRes - 78), -120));
+            }
+            if (equipped[1] == inventory.itemCode) {
+                  inventory.draw(g, new Coords(-(Global.xRes - 24), -75));
+            }
+            if (equipped[2] == inventory.itemCode) {
+                  inventory.draw(g, new Coords(-(Global.xRes - 55), -5));
+            }
+            if (equipped[3] == inventory.itemCode) {
+                  inventory.draw(g, new Coords(-(Global.xRes - 145), -39));
+            }
+          
         }
       }
       for (int i = 0; i < totalRandom; i++) {

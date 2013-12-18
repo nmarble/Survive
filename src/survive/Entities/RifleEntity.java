@@ -10,7 +10,7 @@ public class RifleEntity
 
   private Survive survive;
 
-  public RifleEntity(Survive survive, String ref, final Coords coords, String type)
+  public RifleEntity(Survive survive, String ref, final Coords coords, int type)
   {
     super(ref, coords, type);
 

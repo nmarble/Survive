@@ -10,7 +10,7 @@ public class StoneEntity
 
   private Survive survive;
 
-  public StoneEntity(Survive survive, String ref, final Coords coords, String type)
+  public StoneEntity(Survive survive, String ref, final Coords coords, int type)
   {
     super(ref, coords, type);
 

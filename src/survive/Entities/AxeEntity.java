@@ -10,7 +10,7 @@ public class AxeEntity
 
   private Survive survive;
 
-  public AxeEntity(Survive survive, String ref, final Coords coords, String type)
+  public AxeEntity(Survive survive, String ref, final Coords coords, int type)
   {
     super(ref, coords, type);
 

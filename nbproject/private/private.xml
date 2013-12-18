@@ -4,11 +4,9 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/Users/Marble/Documents/GitHub/Survive/src/survive/Survive.java</file>
-            <file>file:/C:/Users/Marble/Documents/GitHub/Survive/src/survive/Inventory.java</file>
-            <file>file:/C:/Users/Marble/Documents/GitHub/Survive/src/survive/Entities/BulletEntity.java</file>
-            <file>file:/C:/Users/Marble/Documents/GitHub/Survive/src/survive/Entities/RifleEntity.java</file>
+            <file>file:/C:/Users/Marble/Documents/GitHub/Survive/src/survive/Sprite.java</file>
             <file>file:/C:/Users/Marble/Documents/GitHub/Survive/src/survive/Drawable.java</file>
-            <file>file:/C:/Users/Marble/Documents/GitHub/Survive/src/survive/PreSetGroups.java</file>
+            <file>file:/C:/Users/Marble/Documents/GitHub/Survive/src/survive/EnemyLayer.java</file>
         </group>
     </open-files>
 </project-private>

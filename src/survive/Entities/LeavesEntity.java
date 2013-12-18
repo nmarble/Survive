@@ -9,7 +9,7 @@ public class LeavesEntity extends MiddleLayer
 
   private Survive survive;
 
-  public LeavesEntity(Survive survive, String ref, final Coords coords, String type)
+  public LeavesEntity(Survive survive, String ref, final Coords coords, int type)
   {
     super(ref, coords, type);
 

@@ -10,7 +10,7 @@ public class WindowEntity
 
   private Survive survive;
 
-  public WindowEntity(Survive survive, String ref, final Coords coords, String type)
+  public WindowEntity(Survive survive, String ref, final Coords coords, int type)
   {
     super(ref, coords, type);
 

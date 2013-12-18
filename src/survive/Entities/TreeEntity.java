@@ -9,7 +9,7 @@ public class TreeEntity extends MiddleLayer
 
   private Survive survive;
 
-  public TreeEntity(Survive survive, String ref, final Coords coords, String type)
+  public TreeEntity(Survive survive, String ref, final Coords coords, int type)
   {
     super(ref, coords, type);
 

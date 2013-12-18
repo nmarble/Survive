@@ -9,7 +9,7 @@ public class WaterBorderEntity extends MiddleLayer
 
   private Survive survive;
 
-  public WaterBorderEntity(Survive survive, String ref, final Coords coords, String type)
+  public WaterBorderEntity(Survive survive, String ref, final Coords coords, int type)
   {
     super(ref, coords, type);
 

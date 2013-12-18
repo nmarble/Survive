@@ -5,13 +5,13 @@ import java.awt.Graphics;
 public abstract class MiddleLayer extends Drawable
 {
 
-  protected String type;
+  protected int type;
   protected double movementSpeed;
   protected Sprite sprite;
   protected int modifiedX;
   protected int modifiedY;
 
-  public MiddleLayer(String ref, final Coords coords, String type)
+  public MiddleLayer(String ref, final Coords coords, int type)
   {
     super(coords, SpriteStore.get().getSprite(ref));
     this.type = type;
@@ -22,7 +22,7 @@ public abstract class MiddleLayer extends Drawable
   {
   }
 
-  public String getType()
+  public int getType()
   {
     return type;
   }

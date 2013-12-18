@@ -10,7 +10,7 @@ public class BoulderEntity
 
   private Survive survive;
 
-  public BoulderEntity(Survive survive, String ref, final Coords coords, String type)
+  public BoulderEntity(Survive survive, String ref, final Coords coords, int type)
   {
     super(ref, coords, type);
 

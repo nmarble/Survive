@@ -10,7 +10,7 @@ public class LogWallEntity
 
   private Survive survive;
 
-  public LogWallEntity(Survive survive, String ref, final Coords coords, String type)
+  public LogWallEntity(Survive survive, String ref, final Coords coords, int type)
   {
     super(ref, coords, type);
 

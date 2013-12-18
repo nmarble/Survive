@@ -12,7 +12,7 @@
    private int itemCode;
    private int itemQ;
    private int[] randomChance = new int[Global.totalItemRandom];
-   public BarrelEntity(Survive survive, String ref, final Coords coords, String type)
+   public BarrelEntity(Survive survive, String ref, final Coords coords, int type)
    {
      super(ref, coords, type);
      this.survive = survive;

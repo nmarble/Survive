@@ -5,16 +5,11 @@
    protected int itemCode;
    protected int quantity;
    protected int x, y;
-   protected boolean[] slotEquipped = new boolean[4];
    public Inventory(String ref, int itemCode, int quantity, Coords coords)
    {
      super(coords, SpriteStore.get().getSprite(ref));
      this.itemCode = itemCode;
      this.quantity = quantity;
-     for(int i = 0; i < 4; i++) {
-         slotEquipped[i] = false;
-     }
-
    }
    
    public int getItemCode()
@@ -51,16 +46,6 @@
        }
        return equip;
    }
-   public boolean isEquipped()
-   {
-       boolean isEquipped = false;
-       for(int i = 0; i < slotEquipped.length; i++) {
-           if (slotEquipped[i] == true) {
-               isEquipped = true;
-           }          
-       } 
-       return isEquipped;
-   }
    public int getX()
    {
        return x;
@@ -68,6 +53,15 @@
    public int getY()
    {
        return y;
+   }
+   public int[] interactableCodes(int code)
+   {
+       if (code == 5) {
+          int[] interCodes = {1,3,4,5,6,7};
+          return interCodes;
+       }
+       int[] interCodes = {4,5,6,7,8};
+       return interCodes;
    }
  }
 //Item Codes
