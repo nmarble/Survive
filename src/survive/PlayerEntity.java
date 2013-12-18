@@ -1,4 +1,4 @@
- package survive.Entities;
+ package survive;
  
 import survive.Coords;
  import survive.Hud;
@@ -14,7 +14,7 @@ import survive.Drawable;
    private Survive survive;
    private Sprite[] frames = new Sprite[2];
    private int life = 100;
-   private int STR = 25;
+   private int STR = 10;
    
    public PlayerEntity(Survive survive, String ref, final Coords coords, String type)
    {
@@ -37,6 +37,10 @@ import survive.Drawable;
    public int getSTR()
    {
        return STR;
+   }
+   public void setSTR(int newSTR)
+   {
+       STR = newSTR;
    }
    public void changeFrame(int frameNumber)
    {

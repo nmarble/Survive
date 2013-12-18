@@ -4,13 +4,13 @@ import survive.Coords;
 import survive.MiddleLayer;
 import survive.Survive;
 
-public class AxeEntity
+public class AmmoEntity
         extends MiddleLayer
 {
 
   private Survive survive;
 
-  public AxeEntity(Survive survive, String ref, final Coords coords, int type)
+  public AmmoEntity(Survive survive, String ref, final Coords coords, int type)
   {
     super(ref, coords, type);
 
@@ -19,7 +19,7 @@ public class AxeEntity
 
   public boolean interact()
   {
-    survive.addToInventory(5, 1);
+    survive.addToInventory(9, 1);
     return true;
   }
 

@@ -38,54 +38,23 @@ public class Survive
   int[] randomChance = new int[totalRandom];
   int[] randomDefault = new int[totalRandom];
 
-  private LowerLayer grass;
-  private LowerLayer gravel;
-  private LowerLayer water;
-  private LowerLayer woodFloor;
+  private LowerLayer grass, gravel, water, woodFloor;
 
-  private MiddleLayer Tree;
-  private MiddleLayer Boulder;
-  private MiddleLayer LogWall;
-  private MiddleLayer Log;
-  private MiddleLayer Stone;
-  private MiddleLayer Barrel;
-  private MiddleLayer Axe;
-  private MiddleLayer WaterBorder;
-  private MiddleLayer Rifle;
-  private MiddleLayer Window;
-  
+  private MiddleLayer Tree, Boulder, LogWall, Log, Stone, Barrel, Axe, WaterBorder, Rifle, Window, Ammo;
 
   private UpperLayer black;
   
-
   private EnemyLayer zombie;
-  private EnemyLayer zombieArms;
 
   private PlayerEntity player;
   private BulletEntity Bullet;
   
-  private Hud structureButton;
-  private Hud toolButton;
-  private Hud consumableButton;
-  private Hud decorativeButton;
-  private Hud selectionWindow;
-  private Hud equipOverlay;
-  private Hud bagOverlay;
-  private Hud healthOverlay;
-  private Hud hurt;
-  private Hud use;
+  private Hud button, selectionWindow, equipOverlay, bagOverlay, healthOverlay, hurt, use;
   
   private int bagOverlayX = -Global.xRes + 200;
   private int bagOverlayY = -Global.yRes + 200;
 
-  private Inventory inventoryMan;
-  private Inventory log;
-  private Inventory stone;
-  private Inventory logWall;
-  private Inventory barrel;
-  private Inventory axe;
-  private Inventory rifle;
-  private Inventory window;
+  private Inventory log, stone, logWall, barrel, axe, rifle, window, ammo;
 
   private Direction direction = Direction.UP;
   private double movementSpeed = 20;
@@ -216,17 +185,17 @@ public class Survive
     player = new PlayerEntity(this, "sprites/playern.png", new Coords(0, 0), "player");
     
     //Add Crafting buttons
-    structureButton = new ButtonEntity(this, "sprites/structurebutton.jpg", new Coords(0, Global.yRes - 100), "crafting", 100);
-    huds.add(structureButton);
+    button = new ButtonEntity(this, "sprites/structurebutton.jpg", new Coords(0, Global.yRes - 100), "crafting", 100);
+    huds.add(button);
     
-    toolButton = new ButtonEntity(this, "sprites/toolbutton.jpg", new Coords(110, Global.yRes - 100), "crafting", 100);
-    huds.add(toolButton);
+    button = new ButtonEntity(this, "sprites/toolbutton.jpg", new Coords(110, Global.yRes - 100), "crafting", 100);
+    huds.add(button);
 
-    consumableButton = new ButtonEntity(this, "sprites/consumablebutton.jpg", new Coords(220, Global.yRes - 100), "crafting", 100);
-    huds.add(consumableButton);
+    button = new ButtonEntity(this, "sprites/consumablebutton.jpg", new Coords(220, Global.yRes - 100), "crafting", 100);
+    huds.add(button);
 
-    decorativeButton = new ButtonEntity(this, "sprites/decorativebutton.jpg", new Coords(330, Global.yRes - 100), "crafting", 100);
-    huds.add(decorativeButton);
+    button = new ButtonEntity(this, "sprites/decorativebutton.jpg", new Coords(330, Global.yRes - 100), "crafting", 100);
+    huds.add(button);
     
     equipOverlay = new ButtonEntity(this, "sprites/equipoverlay.png", new Coords(0,0), "equipOverlay", 150);
     huds.add(equipOverlay);
@@ -239,13 +208,29 @@ public class Survive
     
     hurt = new ButtonEntity(this, "sprites/hurt.png", new Coords(0,0), "hurtOverlay", 1000);
     huds.add(hurt);
-  
+    
+    if (inventorys.isEmpty()) {
+      log = new Inventory("sprites/log.png", 1, 0, new Coords(0,0));
+      inventorys.add(log);
+      stone = new Inventory("sprites/stone.png", 2, 0, new Coords(0,0));
+      inventorys.add(stone);
+      logWall = new Inventory("sprites/logwall.gif", 3, 0, new Coords(0,0));
+      inventorys.add(logWall);
+      barrel = new Inventory("sprites/barrel.png", 4, 0, new Coords(0,0));
+      inventorys.add(barrel);
+      axe = new Inventory("sprites/axe.png", 5, 0, new Coords(0,0));
+      inventorys.add(axe);
+      rifle = new Inventory("sprites/rifle.png", 6, 0, new Coords(0,0));
+      inventorys.add(rifle);
+      window = new Inventory("sprites/window.png", 7, 0, new Coords(0,0));
+      inventorys.add(window);
+      ammo = new Inventory("sprites/ammobox.png", 9, 0, new Coords(0,0));
+      inventorys.add(ammo);
+    }
   }
   public void testEntities () 
   {
-      addToInventory(5,1);
-      addToInventory(6,1);
-      addToInventory(7,20);
+
   }
   public void drawEquipped(Coords coords) 
   {
@@ -256,6 +241,7 @@ public class Survive
       final Coords screenOffset = new Coords(
               player.getCoords().getX() - Global.xRes / 2,
               player.getCoords().getY() - Global.yRes / 2);
+      
       switch (equipped[3]) {
           case 5:
               pic = "sprites/axeswingn1.png";
@@ -264,15 +250,18 @@ public class Survive
               huds.add(use);
               break;
           case 6:
+              if (checkForMoreItem(9)) {
               pic = "sprites/rifleuse.png";
               use = new UseEntity(this, pic, coords, "use", 20);
               huds.add(use);
               Bullet = new BulletEntity(this,"sprites/bullet.png", coords, new Coords(mouseX + screenOffset.getX(), mouseY + screenOffset.getY()), (int)getPlayerDirection());
               bullets.add(Bullet);
+              removeFromInventory(9,1);
+              }
               break;
       } 
   }
-  
+ 
   public void mouseInteract()
   {
      int mouseX = MouseInfo.getPointerInfo().getLocation().x;
@@ -348,22 +337,7 @@ public class Survive
   public void addToInventory(int itemCode, int quantity)
   {
     //Add entities if none are available
-    if (inventorys.isEmpty()) {
-      log = new Inventory("sprites/log.png", 1, 0, new Coords(0,0));
-      inventorys.add(log);
-      stone = new Inventory("sprites/stone.png", 2, 0, new Coords(0,0));
-      inventorys.add(stone);
-      logWall = new Inventory("sprites/logwall.gif", 3, 0, new Coords(0,0));
-      inventorys.add(logWall);
-      barrel = new Inventory("sprites/barrel.png", 4, 0, new Coords(0,0));
-      inventorys.add(barrel);
-      axe = new Inventory("sprites/axe.png", 5, 0, new Coords(0,0));
-      inventorys.add(axe);
-      rifle = new Inventory("sprites/rifle.png", 6, 0, new Coords(0,0));
-      inventorys.add(rifle);
-      window = new Inventory("sprites/window.png", 7, 0, new Coords(0,0));
-      inventorys.add(window);
-    }
+    
     for (Inventory inventory : inventorys) {
       if (inventory.getItemCode() == itemCode) {
 
@@ -415,6 +389,10 @@ public class Survive
       case 7:
         Window = new WindowEntity(this, "sprites/window.png", coords, 7);
         middleLayers.put(coords, Window);
+        break;
+      case 9:
+        Ammo = new AmmoEntity(this, "sprites/ammobox.png", coords, 9);
+        middleLayers.put(coords, Ammo);
         break;
 
     }
@@ -707,8 +685,8 @@ public class Survive
 
       //Set location to put icons
       final Coords coords = new Coords(0, Global.yRes - 30);
-      structureButton = new ButtonEntity(this, "sprites/logwall.gif", coords, "LogWall", 20);
-      huds.add(structureButton);
+      button = new ButtonEntity(this, "sprites/logwall.gif", coords, "LogWall", 20);
+      huds.add(button);
     }
   }
   
@@ -1058,6 +1036,20 @@ public class Survive
       }
       return location;
   }
+  public void setPlayerSTR()
+  {
+      switch (equipped[3]) {
+          case 0:
+              player.setSTR(10);
+              break;
+          case 5:
+              player.setSTR(25);
+              break;
+          case 6:
+              player.setSTR(100);
+              break;
+      }
+  }
   //Loop of main game
   public void gameLoop()
   {
@@ -1091,7 +1083,7 @@ public class Survive
      
       checkLoS(); 
       checkButtonPushed();
-      
+      setPlayerSTR();
       //Draw all ground that is on screen
       // The upper right coordinates of the screen in game world coordinates.
       final Coords screenOffset = new Coords(

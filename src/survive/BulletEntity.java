@@ -1,4 +1,4 @@
- package survive.Entities;
+ package survive;
  
 import static java.lang.Math.abs;
 import survive.Coords;

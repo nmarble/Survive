@@ -17,6 +17,6 @@ public class Global {
     
   public static int xRes = 800;
   public static int yRes = 600;
-  public static int totalItemRandom = 4;
+  public static int totalItemRandom = 10;
 
 }

@@ -57,10 +57,10 @@
    public int[] interactableCodes(int code)
    {
        if (code == 5) {
-          int[] interCodes = {1,3,4,5,6,7};
+          int[] interCodes = {1,3,4,5,6,7,8,9};
           return interCodes;
        }
-       int[] interCodes = {4,5,6,7,8};
+       int[] interCodes = {4,5,6,7,8,9};
        return interCodes;
    }
  }
@@ -72,6 +72,8 @@
 //Axe 5
 //Rifle 6
 //Window 7
+//Leaves 8
+//Ammo 9
 
 
 

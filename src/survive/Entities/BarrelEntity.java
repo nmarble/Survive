@@ -20,8 +20,10 @@
      int choice = 0;
      int choiceNum = 0;
      randomChance[1] = 20;
-     randomChance[2] = 10;
-     randomChance[3] = 5;
+     randomChance[5] = 10;
+     randomChance[6] = 5;
+     randomChance[7] = 15;    
+     randomChance[9] = 20;
      
      for (int i = 1; i < Global.totalItemRandom; i++ )
      {
@@ -33,17 +35,21 @@
              itemCode = i;
          }
      }
+     if (itemCode == 5 || itemCode == 6) {
+         itemQ = 1;
+     }
+     else {
      itemQ = (int)(Math.random() * 5)+1;
+     }
    }
 
    public boolean interact()
    {
-     if (itemQ > 0) {
+     if (itemQ > 0 && itemCode != 0) {
         survive.addToInventory(itemCode, itemQ);
         itemQ = 0;
         return false;
      }
-     survive.addToInventory(4, 1);
      return true;     
    }
    public boolean passable()
