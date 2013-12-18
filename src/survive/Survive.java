@@ -332,8 +332,10 @@ public class Survive
   {
       for (Inventory inventory : inventorys) {
           if (inventory.getX() >= x && inventory.getY() >= y && inventory.getX() - 20 <= x && inventory.getY() - 20 <= y ) {
+              if (inventory.getQuantity() > 0) {
               holdingItem = !holdingItem;
               itemSelection = inventory.getItemCode();
+              }
           }
       }
   }    
@@ -603,8 +605,9 @@ public class Survive
         equippedSelection = 3;
         inEquip = true;
       }
+
       //What happens if you are clicking on the equipment slots
-      if (holdingItem && inEquip)
+      if (holdingItem && inEquip) {
         for (Inventory inventory : inventorys) {
             if (inventory.getItemCode() == itemSelection && inventory.equipable() && equipped[equippedSelection] == 0) {
                 equipped[equippedSelection] = inventory.getItemCode();
@@ -616,8 +619,6 @@ public class Survive
                 inventory.removeQuantity(1);
             }
         }
-      if (!inEquip) {
-          selectionInteract(x, y);
       }
       if (!holdingItem && inEquip) {
           itemSelection = equipped[equippedSelection];
@@ -627,6 +628,9 @@ public class Survive
                   inventory.addQuantity(1);
               }
           }
+      }
+      if (!inEquip) {
+          selectionInteract(x, y);
       }
   }
   public void checkButtonPushed()
@@ -949,8 +953,15 @@ public class Survive
   }
   public double getPlayerDirection()
   {
-      double mouseX = MouseInfo.getPointerInfo().getLocation().x - (Global.xRes /2);
-      double mouseY = MouseInfo.getPointerInfo().getLocation().y - (Global.yRes /2);
+      double mouseX, mouseY;
+      try {
+      mouseX = MouseInfo.getPointerInfo().getLocation().x - (Global.xRes /2);
+      mouseY = MouseInfo.getPointerInfo().getLocation().y - (Global.yRes /2);
+      }
+      catch (NullPointerException ex) {
+          mouseX = 0;
+          mouseY = 0;  
+      }
       double xD = abs(10 - mouseX);
       double yD = abs(30 - mouseY);
       double playerRot = Math.toDegrees(Math.atan(xD/yD));
@@ -979,7 +990,8 @@ public class Survive
      Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
       
         if (bullets.size() > 0) {
-          for (BulletEntity bullet : bullets) {
+          for (int i = 0; i < bullets.size(); i++) {
+              BulletEntity bullet = bullets.get(i);
               bullet.moveBullet();
               if (middleLayers.containsKey(bullet.getBlockCoord())) {
                   MiddleLayer obs = middleLayers.get(bullet.getBlockCoord());
@@ -1123,7 +1135,8 @@ public class Survive
       player.rotDraw(g, screenOffset, (int)getPlayerDirection());
 
       //Draw Health Bar
-      for(Hud hud : huds) {
+      for(int i = 0; i <  huds.size(); i++) {
+          Hud hud = huds.get(i);
           if ("healthOverlay".equals(hud.getType())) {
             String life = String.valueOf(player.getLife());
             g.setColor(Color.red);
@@ -1188,7 +1201,8 @@ public class Survive
         g.drawString("Press any key", (Global.xRes - g.getFontMetrics().stringWidth("Press space to continue")) / 2, (Global.yRes / 2));
       }
       //Draw bullets
-      for (BulletEntity bullet : bullets) {
+      for (int i = 0; i < bullets.size(); i++) {
+           BulletEntity bullet = bullets.get(i);
            bullet.rotDraw(g, screenOffset, bullet.getRot());
       }
       int time = 0;
