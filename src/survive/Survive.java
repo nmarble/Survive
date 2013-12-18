@@ -1050,6 +1050,85 @@ public class Survive
               break;
       }
   }
+  public boolean getSimBlock (Coords coords, Direction dFromBlock, int itemCode)
+  {
+      Coords returnCoords = dFromBlock.getCoordsFrom(coords);
+      if (middleLayers.containsKey(returnCoords)) {
+      MiddleLayer middleLayer = middleLayers.get(returnCoords);
+      if (middleLayer.getType() == itemCode) {
+          return true;
+      }
+      }
+      return false;
+  }
+  public void setSimBlockImage (Coords coords, Coords screenOffset)
+  {
+      Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
+      
+      int checkCode = middleLayers.get(coords).getType();
+            if (getSimBlock(coords, Direction.UP, checkCode) && getSimBlock(coords, Direction.DOWN, checkCode) && getSimBlock(coords, Direction.LEFT, checkCode) && getSimBlock(coords, Direction.RIGHT, checkCode) ) {
+                middleLayers.get(coords).changeFrame(0);
+                middleLayers.get(coords).rotDraw(g, screenOffset, 0);              
+            }
+            else if (getSimBlock(coords, Direction.UP, checkCode) && (getSimBlock(coords, Direction.RIGHT, checkCode)) && (getSimBlock(coords, Direction.DOWN, checkCode))) {
+                middleLayers.get(coords).changeFrame(3);
+                middleLayers.get(coords).rotDraw(g, screenOffset, 0); 
+            }
+            else if (getSimBlock(coords, Direction.UP, checkCode) && (getSimBlock(coords, Direction.LEFT, checkCode)) && (getSimBlock(coords, Direction.DOWN, checkCode))) {
+                middleLayers.get(coords).changeFrame(3);
+                middleLayers.get(coords).rotDraw(g, screenOffset, 180); 
+            }
+            else if (getSimBlock(coords, Direction.RIGHT, checkCode) && (getSimBlock(coords, Direction.LEFT, checkCode)) && (getSimBlock(coords, Direction.DOWN, checkCode))) {
+                middleLayers.get(coords).changeFrame(3);
+                middleLayers.get(coords).rotDraw(g, screenOffset, 90); 
+            }
+            else if (getSimBlock(coords, Direction.RIGHT, checkCode) && (getSimBlock(coords, Direction.LEFT, checkCode)) && (getSimBlock(coords, Direction.UP, checkCode))) {
+                middleLayers.get(coords).changeFrame(3);
+                middleLayers.get(coords).rotDraw(g, screenOffset, 270); 
+            }
+            else if (getSimBlock(coords, Direction.UP, checkCode) && (getSimBlock(coords, Direction.RIGHT, checkCode))) {
+                middleLayers.get(coords).changeFrame(1);
+                middleLayers.get(coords).rotDraw(g, screenOffset, 0); 
+            }
+            else if (getSimBlock(coords, Direction.RIGHT, checkCode) && (getSimBlock(coords, Direction.DOWN, checkCode))) {
+                middleLayers.get(coords).changeFrame(1);
+                middleLayers.get(coords).rotDraw(g, screenOffset, 90); 
+            }
+            else if (getSimBlock(coords, Direction.DOWN, checkCode) && (getSimBlock(coords, Direction.LEFT, checkCode))) {
+                middleLayers.get(coords).changeFrame(1);
+                middleLayers.get(coords).rotDraw(g, screenOffset, 180); 
+            }
+            else if (getSimBlock(coords, Direction.LEFT, checkCode) && (getSimBlock(coords, Direction.UP, checkCode))) {
+                middleLayers.get(coords).changeFrame(1);
+                middleLayers.get(coords).rotDraw(g, screenOffset, 270); 
+            }
+            else if (getSimBlock(coords, Direction.DOWN, checkCode) && (getSimBlock(coords, Direction.UP, checkCode))) {
+                middleLayers.get(coords).changeFrame(2);
+                middleLayers.get(coords).rotDraw(g, screenOffset, 0); 
+            }
+            else if (getSimBlock(coords, Direction.LEFT, checkCode) && (getSimBlock(coords, Direction.RIGHT, checkCode))) {
+                middleLayers.get(coords).changeFrame(2);
+                middleLayers.get(coords).rotDraw(g, screenOffset, 90); 
+            }
+
+            else if (getSimBlock(coords, Direction.UP, checkCode)) {
+                middleLayers.get(coords).changeFrame(4);
+                middleLayers.get(coords).rotDraw(g, screenOffset, 0); 
+            }
+            else if (getSimBlock(coords, Direction.RIGHT, checkCode)) {
+                middleLayers.get(coords).changeFrame(4);
+                middleLayers.get(coords).rotDraw(g, screenOffset, 90); 
+            }
+            else if (getSimBlock(coords, Direction.DOWN, checkCode)) {
+                middleLayers.get(coords).changeFrame(4);
+                middleLayers.get(coords).rotDraw(g, screenOffset, 180); 
+            }
+            else if (getSimBlock(coords, Direction.LEFT, checkCode)) {
+                middleLayers.get(coords).changeFrame(4);
+                middleLayers.get(coords).rotDraw(g, screenOffset, 270); 
+            }
+            
+  }
   //Loop of main game
   public void gameLoop()
   {
@@ -1112,8 +1191,13 @@ public class Survive
           lowerLayers.get(coords).draw(g, screenOffset);
           }
           if (middleLayers.containsKey(coords)) {
-            middleLayers.get(coords).draw(g, screenOffset);
-          }
+              if (middleLayers.get(coords).getType() == 3) {
+              setSimBlockImage(coords, screenOffset);
+              }
+              else {
+                middleLayers.get(coords).draw(g, screenOffset);
+              }
+          }  
           if (enemyLayers.containsKey(coords) && !upperLayers.containsKey(coords)) {
             enemyLayers.get(coords).rotDraw(g, screenOffset, enemyLayers.get(coords).getRotation());          
           }
