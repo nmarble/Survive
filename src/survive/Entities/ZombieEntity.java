@@ -17,13 +17,15 @@ import survive.Direction;
    private int fNumber = 0;
    private int life = 50;
    private int STR = 20;
+   private boolean passable = false;
+  
    public ZombieEntity(Survive survive, String ref, final Coords coords, String type, final Direction direction)
    {
      super(ref, coords, type, direction);
      
      frames[0] = SpriteStore.get().getSprite("sprites/zombie1.png");
      frames[1] = SpriteStore.get().getSprite("sprites/zombie2.png");
-     frames[2] = SpriteStore.get().getSprite("sprites/zombieattack.png");
+     frames[2] = SpriteStore.get().getSprite("sprites/zombie1.png");
 
 
      this.survive = survive;
@@ -50,9 +52,12 @@ import survive.Direction;
    }
     public boolean passable()
    {
-       return false;
+       return passable;
    }
-
+    public void setPassable(boolean newPass)
+   {
+       passable = newPass;
+   }
   public void changeDirection(final Direction d, boolean attack)
   {
       direction = d;

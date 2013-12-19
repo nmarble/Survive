@@ -40,7 +40,7 @@ public class Survive
 
   private LowerLayer grass, gravel, water, woodFloor;
 
-  private MiddleLayer Tree, Boulder, LogWall, Log, Stone, Barrel, Axe, WaterBorder, Rifle, Window, Ammo;
+  private MiddleLayer Tree, Boulder, LogWall, Log, Stone, Barrel, Axe, WaterBorder, Rifle, Window, Ammo, DeadBody;
 
   private UpperLayer black;
   
@@ -170,7 +170,7 @@ public class Survive
   {
     
     randomDefault[0] = 150;
-    randomDefault[1] = 10;
+    randomDefault[1] = 30;
     randomDefault[2] = 0;
     randomDefault[3] = 0;
 
@@ -305,13 +305,15 @@ public class Survive
         if (enemyLayer.interact() == true) { 
             enemyLayer.setLife(enemyLayer.getLife() - player.getSTR());
             Coords newCoords = direction.getCoordsFrom(enemyLayer.getCoords());
-            if (!enemyLayers.containsKey(newCoords)) {
+            if (!enemyLayers.containsKey(newCoords) && !middleLayers.containsKey(newCoords) || middleLayers.get(newCoords).passable()) {
             enemyLayer.setCoords(newCoords);
             enemyLayers.put(enemyLayer.getCoords(), enemyLayer);
             enemyLayers.remove(interactCoords);
             }
             if (enemyLayer.getLife() <= 0) {
-            enemyLayers.remove(enemyLayer.getCoords());
+            enemyLayers.remove(newCoords);
+            DeadBody = new DeadBodyEntity(this, "sprites/deadzomb.png", interactCoords, 10);
+            middleLayers.put(interactCoords, DeadBody);
             }
         }
       }
@@ -447,7 +449,7 @@ public class Survive
     int startY = y;
     switch (getRandomGround(x, y)) {
       case 0:
-        grass = new GrassEntity(this, "sprites/grass.gif", newLocation, "grass");
+        grass = new GrassEntity(this, "sprites/grass.gif", newLocation, 11);
         lowerLayers.put(newLocation, grass);
         chance = getRandomNum(treeLikely);
         if (chance == 1) {
@@ -479,7 +481,7 @@ public class Survive
         }
         break;
       case 1:
-        gravel = new GravelEntity(this, "sprites/gravel.gif", newLocation, "gravel");
+        gravel = new GravelEntity(this, "sprites/gravel.gif", newLocation, 12);
         lowerLayers.put(newLocation, gravel);
         chance = getRandomNum(boulderLikely);
         if (chance == 1) {
@@ -496,7 +498,7 @@ public class Survive
           final Coords waterCoords = new Coords(x, y);
           middleLayers.remove(waterCoords);
           lowerLayers.remove(waterCoords);
-          water = new WaterEntity(this, "sprites/water1.png", waterCoords, "water");
+          water = new WaterEntity(this, "sprites/water1.png", waterCoords, 13);
           lowerLayers.put(waterCoords, water);        
         }
         break;
@@ -509,7 +511,7 @@ public class Survive
           final Coords floorCoords = new Coords(x, y);
           middleLayers.remove(floorCoords);
           lowerLayers.remove(floorCoords);
-          woodFloor = new WoodFloorEntity(this, "sprites/woodfloor.gif", floorCoords, "woodfloor");
+          woodFloor = new WoodFloorEntity(this, "sprites/woodfloor.gif", floorCoords, 14);
           lowerLayers.put(floorCoords, woodFloor);
         }
         locs = PreSetGroups.houseWalls(direction, startX, startY, size);
@@ -696,7 +698,6 @@ public class Survive
     for (EnemyLayer enemyLayer : enemyMovable) {
       Coords finalMove = enemyLayer.getCoords();
       Direction newdirection = Direction.UP;
-      
           int fD = 99999;
           
           for (int x = enemyLayer.getCoords().getX() - 20; x <= enemyLayer.getCoords().getX() + 20; x  = x + 20) {
@@ -1059,75 +1060,64 @@ public class Survive
           return true;
       }
       }
+      if (lowerLayers.containsKey(returnCoords)) {
+      LowerLayer lowerLayer = lowerLayers.get(returnCoords);
+      if (lowerLayer.getType() == itemCode) {
+          return true;
+      }
+      }
       return false;
   }
-  public void setSimBlockImage (Coords coords, Coords screenOffset)
+  public Surrounding setSimBlockImage (Coords coords, int checkCode)
   {
-      Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
-      
-      int checkCode = middleLayers.get(coords).getType();
             if (getSimBlock(coords, Direction.UP, checkCode) && getSimBlock(coords, Direction.DOWN, checkCode) && getSimBlock(coords, Direction.LEFT, checkCode) && getSimBlock(coords, Direction.RIGHT, checkCode) ) {
-                middleLayers.get(coords).changeFrame(0);
-                middleLayers.get(coords).rotDraw(g, screenOffset, 0);              
+                return new Surrounding(0,0);
             }
             else if (getSimBlock(coords, Direction.UP, checkCode) && (getSimBlock(coords, Direction.RIGHT, checkCode)) && (getSimBlock(coords, Direction.DOWN, checkCode))) {
-                middleLayers.get(coords).changeFrame(3);
-                middleLayers.get(coords).rotDraw(g, screenOffset, 0); 
+                return new Surrounding(3,0);
             }
             else if (getSimBlock(coords, Direction.UP, checkCode) && (getSimBlock(coords, Direction.LEFT, checkCode)) && (getSimBlock(coords, Direction.DOWN, checkCode))) {
-                middleLayers.get(coords).changeFrame(3);
-                middleLayers.get(coords).rotDraw(g, screenOffset, 180); 
+                return new Surrounding(3,180);
             }
             else if (getSimBlock(coords, Direction.RIGHT, checkCode) && (getSimBlock(coords, Direction.LEFT, checkCode)) && (getSimBlock(coords, Direction.DOWN, checkCode))) {
-                middleLayers.get(coords).changeFrame(3);
-                middleLayers.get(coords).rotDraw(g, screenOffset, 90); 
+                return new Surrounding(3,90);
             }
             else if (getSimBlock(coords, Direction.RIGHT, checkCode) && (getSimBlock(coords, Direction.LEFT, checkCode)) && (getSimBlock(coords, Direction.UP, checkCode))) {
-                middleLayers.get(coords).changeFrame(3);
-                middleLayers.get(coords).rotDraw(g, screenOffset, 270); 
+                return new Surrounding(3,270);
             }
             else if (getSimBlock(coords, Direction.UP, checkCode) && (getSimBlock(coords, Direction.RIGHT, checkCode))) {
-                middleLayers.get(coords).changeFrame(1);
-                middleLayers.get(coords).rotDraw(g, screenOffset, 0); 
+                return new Surrounding(1,0);
             }
             else if (getSimBlock(coords, Direction.RIGHT, checkCode) && (getSimBlock(coords, Direction.DOWN, checkCode))) {
-                middleLayers.get(coords).changeFrame(1);
-                middleLayers.get(coords).rotDraw(g, screenOffset, 90); 
+                return new Surrounding(1,90);
             }
             else if (getSimBlock(coords, Direction.DOWN, checkCode) && (getSimBlock(coords, Direction.LEFT, checkCode))) {
-                middleLayers.get(coords).changeFrame(1);
-                middleLayers.get(coords).rotDraw(g, screenOffset, 180); 
+                return new Surrounding(1,180);
             }
             else if (getSimBlock(coords, Direction.LEFT, checkCode) && (getSimBlock(coords, Direction.UP, checkCode))) {
-                middleLayers.get(coords).changeFrame(1);
-                middleLayers.get(coords).rotDraw(g, screenOffset, 270); 
+                return new Surrounding(1,270);
             }
             else if (getSimBlock(coords, Direction.DOWN, checkCode) && (getSimBlock(coords, Direction.UP, checkCode))) {
-                middleLayers.get(coords).changeFrame(2);
-                middleLayers.get(coords).rotDraw(g, screenOffset, 0); 
+                return new Surrounding(2,0);
             }
             else if (getSimBlock(coords, Direction.LEFT, checkCode) && (getSimBlock(coords, Direction.RIGHT, checkCode))) {
-                middleLayers.get(coords).changeFrame(2);
-                middleLayers.get(coords).rotDraw(g, screenOffset, 90); 
+                return new Surrounding(2,90);
             }
-
             else if (getSimBlock(coords, Direction.UP, checkCode)) {
-                middleLayers.get(coords).changeFrame(4);
-                middleLayers.get(coords).rotDraw(g, screenOffset, 0); 
+                return new Surrounding(4,0);
             }
             else if (getSimBlock(coords, Direction.RIGHT, checkCode)) {
-                middleLayers.get(coords).changeFrame(4);
-                middleLayers.get(coords).rotDraw(g, screenOffset, 90); 
+                return new Surrounding(4,90);
             }
             else if (getSimBlock(coords, Direction.DOWN, checkCode)) {
-                middleLayers.get(coords).changeFrame(4);
-                middleLayers.get(coords).rotDraw(g, screenOffset, 180); 
+                return new Surrounding(4,180);
             }
             else if (getSimBlock(coords, Direction.LEFT, checkCode)) {
-                middleLayers.get(coords).changeFrame(4);
-                middleLayers.get(coords).rotDraw(g, screenOffset, 270); 
+                return new Surrounding(4, 270);
             }
-            
+            else {
+                return new Surrounding(5,0);
+            }
   }
   //Loop of main game
   public void gameLoop()
@@ -1182,17 +1172,23 @@ public class Survive
             addFloor(x, y);
           }
           if(lowerLayers.containsKey(coords)) {
-          if("water".equals(lowerLayers.get(coords).getType()) && (loopTime % 5) == 0) {
-                LowerLayer lowerLayer = lowerLayers.get(coords);
-                lowerLayers.remove(coords);
-                lowerLayer.changeFrame(lowerLayer.nextFrame());
-                lowerLayers.put(coords, lowerLayer);
+          if(lowerLayers.get(coords).getType() == 13 && (loopTime % 5) == 0) {
+                lowerLayers.get(coords).changeFrame(lowerLayers.get(coords).nextFrame());
             }
+          if(lowerLayers.get(coords).getType() == 11) {
+             Surrounding surround = setSimBlockImage(coords, 11);
+             lowerLayers.get(coords).changeFrame(surround.getFrame());
+             lowerLayers.get(coords).rotDraw(g, screenOffset, surround.getRotate());
+          }
+          else{
           lowerLayers.get(coords).draw(g, screenOffset);
+          }
           }
           if (middleLayers.containsKey(coords)) {
               if (middleLayers.get(coords).getType() == 3) {
-              setSimBlockImage(coords, screenOffset);
+              Surrounding surround = setSimBlockImage(coords, 3);
+              middleLayers.get(coords).changeFrame(surround.getFrame());
+              middleLayers.get(coords).rotDraw(g, screenOffset, surround.getRotate());
               }
               else {
                 middleLayers.get(coords).draw(g, screenOffset);
@@ -1347,7 +1343,8 @@ public class Survive
       
       //Draw hurt screen     
       if (hurtFlash == true) {
-          for (Hud hud : huds) {
+          for (int i = 0; i < huds.size(); i++) {
+          Hud hud = huds.get(i);
           if ("hurtOverlay" == hud.getType()) {
                 double x = 0;
                 double y = 0;

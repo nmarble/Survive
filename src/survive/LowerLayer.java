@@ -2,14 +2,14 @@ package survive;
 
 public abstract class LowerLayer extends Drawable {
 
-    protected String type;
+    protected int type;
 
-    public LowerLayer(String ref, final Coords coords, String type) {
+    public LowerLayer(String ref, final Coords coords, int type) {
         super(coords, SpriteStore.get().getSprite(ref));
         this.type = type;
     }
 
-    public String getType() {
+    public int getType() {
         return type;
     }
     public void changeFrame(int frameNumber) {}

@@ -10,7 +10,7 @@ import survive.Global;
  {
    private Survive survive;
    
-   public WoodFloorEntity(Survive survive, String ref, Coords coords, String type)
+   public WoodFloorEntity(Survive survive, String ref, Coords coords, int type)
    {
      super(ref, coords, type);
      

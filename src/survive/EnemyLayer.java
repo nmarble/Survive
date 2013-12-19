@@ -8,7 +8,6 @@ public abstract class EnemyLayer extends Drawable
   protected String type;
   protected Direction direction;
   protected double movementSpeed;
-  
   public EnemyLayer(String ref, final Coords coords, String type, final Direction direction)
   {
     super(coords, SpriteStore.get().getSprite(ref));
@@ -51,6 +50,8 @@ public abstract class EnemyLayer extends Drawable
   public abstract int getLife();
   public abstract void setLife(int newLife);
   public abstract int getSTR();
+  public abstract void setPassable(boolean newPass);
+  
 }
 
 
