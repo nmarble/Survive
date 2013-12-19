@@ -1070,54 +1070,88 @@ public class Survive
   }
   public Surrounding setSimBlockImage (Coords coords, int checkCode)
   {
-            if (getSimBlock(coords, Direction.UP, checkCode) && getSimBlock(coords, Direction.DOWN, checkCode) && getSimBlock(coords, Direction.LEFT, checkCode) && getSimBlock(coords, Direction.RIGHT, checkCode) ) {
-                return new Surrounding(0,0);
+            if (getSimBlock(coords, Direction.UP, checkCode)) {
+                if (getSimBlock(coords, Direction.RIGHT, checkCode)) {
+                    if (getSimBlock(coords, Direction.DOWN, checkCode)) {
+                        if (getSimBlock(coords, Direction.LEFT, checkCode)) {
+                           return new Surrounding (0, 0); 
+                        }
+                        if (getSimBlock(coords, Direction.DOWNLEFT, checkCode)) {
+                            if (getSimBlock(coords, Direction.UPLEFT, checkCode)) {
+                                return new Surrounding (3, 0);
+                            }
+                            return new Surrounding (7, 270);
+                        }
+                        if (getSimBlock(coords, Direction.UPLEFT, checkCode)) {
+                            return new Surrounding (8, 270);
+                        }
+                        return new Surrounding (6, 270);
+                    }
+                    if (getSimBlock(coords, Direction.LEFT, checkCode)) {
+                        if (getSimBlock(coords, Direction.DOWNRIGHT, checkCode)) {
+                            if (getSimBlock(coords, Direction.DOWNLEFT, checkCode)) {
+                                return new Surrounding (3, 270);
+                            }
+                            return new Surrounding (7, 180);
+                        }
+                        if (getSimBlock(coords, Direction.DOWNLEFT, checkCode)) {
+                            return new Surrounding (8, 180);
+                        }
+                        return new Surrounding (6, 180);
+                    }
+                    return new Surrounding (1, 0);
+                }
+                if (getSimBlock(coords, Direction.DOWN, checkCode)) {
+                    if (getSimBlock(coords, Direction.LEFT, checkCode)) {
+                        if (getSimBlock(coords, Direction.UPRIGHT, checkCode)) {
+                            if (getSimBlock(coords, Direction.DOWNRIGHT, checkCode)) {
+                                return new Surrounding (3, 180);
+                            }
+                            return new Surrounding (7, 90);
+                        }
+                        if (getSimBlock(coords, Direction.DOWNRIGHT, checkCode)) {
+                            return new Surrounding (8, 90);
+                        }
+                        return new Surrounding (6, 90);
+                    }
+                    return new Surrounding (2, 0);
+                }
+                if (getSimBlock(coords, Direction.LEFT, checkCode)) {
+                    return new Surrounding (1, 270);
+                }
+                return new Surrounding (4,0);
             }
-            else if (getSimBlock(coords, Direction.UP, checkCode) && (getSimBlock(coords, Direction.RIGHT, checkCode)) && (getSimBlock(coords, Direction.DOWN, checkCode))) {
-                return new Surrounding(3,0);
+            if (getSimBlock(coords, Direction.RIGHT, checkCode)) {
+                if (getSimBlock(coords, Direction.DOWN, checkCode)) {
+                    if (getSimBlock(coords, Direction.LEFT, checkCode)) {
+                        if (getSimBlock(coords, Direction.UPLEFT, checkCode)) {
+                            if (getSimBlock(coords, Direction.UPRIGHT, checkCode)) {
+                                return new Surrounding (3, 90);
+                            }
+                            return new Surrounding (7,0);
+                        }
+                        if (getSimBlock(coords, Direction.UPRIGHT, checkCode)) {
+                            return new Surrounding (8,0);
+                        }
+                        return new Surrounding (6, 0);
+                    }
+                    return new Surrounding (1, 90);
+                }
+                if (getSimBlock(coords, Direction.LEFT, checkCode)) {                   
+                    return new Surrounding (2, 90);
+                }
+                return new Surrounding (4, 90);
             }
-            else if (getSimBlock(coords, Direction.UP, checkCode) && (getSimBlock(coords, Direction.LEFT, checkCode)) && (getSimBlock(coords, Direction.DOWN, checkCode))) {
-                return new Surrounding(3,180);
+            if (getSimBlock(coords, Direction.DOWN, checkCode)) {
+                if (getSimBlock(coords, Direction.LEFT, checkCode)) {
+                    return new Surrounding (1, 180);
+                }
+                return new Surrounding (4, 180);
             }
-            else if (getSimBlock(coords, Direction.RIGHT, checkCode) && (getSimBlock(coords, Direction.LEFT, checkCode)) && (getSimBlock(coords, Direction.DOWN, checkCode))) {
-                return new Surrounding(3,90);
+            if (getSimBlock(coords, Direction.LEFT, checkCode)) {
+                return new Surrounding (4,270);
             }
-            else if (getSimBlock(coords, Direction.RIGHT, checkCode) && (getSimBlock(coords, Direction.LEFT, checkCode)) && (getSimBlock(coords, Direction.UP, checkCode))) {
-                return new Surrounding(3,270);
-            }
-            else if (getSimBlock(coords, Direction.UP, checkCode) && (getSimBlock(coords, Direction.RIGHT, checkCode))) {
-                return new Surrounding(1,0);
-            }
-            else if (getSimBlock(coords, Direction.RIGHT, checkCode) && (getSimBlock(coords, Direction.DOWN, checkCode))) {
-                return new Surrounding(1,90);
-            }
-            else if (getSimBlock(coords, Direction.DOWN, checkCode) && (getSimBlock(coords, Direction.LEFT, checkCode))) {
-                return new Surrounding(1,180);
-            }
-            else if (getSimBlock(coords, Direction.LEFT, checkCode) && (getSimBlock(coords, Direction.UP, checkCode))) {
-                return new Surrounding(1,270);
-            }
-            else if (getSimBlock(coords, Direction.DOWN, checkCode) && (getSimBlock(coords, Direction.UP, checkCode))) {
-                return new Surrounding(2,0);
-            }
-            else if (getSimBlock(coords, Direction.LEFT, checkCode) && (getSimBlock(coords, Direction.RIGHT, checkCode))) {
-                return new Surrounding(2,90);
-            }
-            else if (getSimBlock(coords, Direction.UP, checkCode)) {
-                return new Surrounding(4,0);
-            }
-            else if (getSimBlock(coords, Direction.RIGHT, checkCode)) {
-                return new Surrounding(4,90);
-            }
-            else if (getSimBlock(coords, Direction.DOWN, checkCode)) {
-                return new Surrounding(4,180);
-            }
-            else if (getSimBlock(coords, Direction.LEFT, checkCode)) {
-                return new Surrounding(4, 270);
-            }
-            else {
-                return new Surrounding(5,0);
-            }
+            return new Surrounding (5,0);
   }
   //Loop of main game
   public void gameLoop()
