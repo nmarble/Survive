@@ -12,7 +12,7 @@ import survive.SpriteStore;
    private Survive survive;
    private Sprite[] frames = new Sprite[3];
    int fNumber = 0;
-   public WaterEntity(Survive survive, String ref, final Coords coords, String type)
+   public WaterEntity(Survive survive, String ref, final Coords coords, int type)
    {
      super(ref, coords, type);
      

@@ -11,7 +11,7 @@ public class LogWallEntity
 {
 
   private Survive survive;
-  private Sprite[] frames = new Sprite[5];
+  private Sprite[] frames = new Sprite[6];
   
   public LogWallEntity(Survive survive, String ref, final Coords coords, int type)
   {
@@ -22,6 +22,7 @@ public class LogWallEntity
     frames[2] = SpriteStore.get().getSprite("sprites/woodwall.png");
     frames[3] = SpriteStore.get().getSprite("sprites/woodwallsplit.png");
     frames[4] = SpriteStore.get().getSprite("sprites/woodentryway1.png");
+    frames[5] = SpriteStore.get().getSprite("sprites/woodwallintersect.png");
 
     this.survive = survive;
   }

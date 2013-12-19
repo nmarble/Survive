@@ -74,7 +74,11 @@
 //Window 7
 //Leaves 8
 //Ammo 9
-
+//Dead Body 10
+//Grass 11
+//Gravel 12
+//Water 13
+//WoodFloor 14
 
 
 

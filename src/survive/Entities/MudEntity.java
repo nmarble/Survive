@@ -9,7 +9,7 @@
  {
    private Survive survive;
    
-   public MudEntity(Survive survive, String ref, final Coords coords, String type)
+   public MudEntity(Survive survive, String ref, final Coords coords, int type)
    {
      super(ref, coords, type);
      
