@@ -17,12 +17,12 @@ public class LogWallEntity
   {
     super(ref, coords, type);
 
-    frames[0] = SpriteStore.get().getSprite("sprites/woodwallintersect.png");
-    frames[1] = SpriteStore.get().getSprite("sprites/woodwallcorner.png");
-    frames[2] = SpriteStore.get().getSprite("sprites/woodwall.png");
-    frames[3] = SpriteStore.get().getSprite("sprites/woodwallsplit.png");
-    frames[4] = SpriteStore.get().getSprite("sprites/woodentryway1.png");
-    frames[5] = SpriteStore.get().getSprite("sprites/woodwallintersect.png");
+    frames[0] = SpriteStore.get().getSprite("sprites/object/woodwallintersect.png");
+    frames[1] = SpriteStore.get().getSprite("sprites/object/woodwallcorner.png");
+    frames[2] = SpriteStore.get().getSprite("sprites/object/woodwall.png");
+    frames[3] = SpriteStore.get().getSprite("sprites/object/woodwallsplit.png");
+    frames[4] = SpriteStore.get().getSprite("sprites/object/woodentryway1.png");
+    frames[5] = SpriteStore.get().getSprite("sprites/object/woodwallintersect.png");
 
     this.survive = survive;
   }
@@ -34,6 +34,9 @@ public class LogWallEntity
   }
   public void changeFrame(int frameNumber)
   {
+      if (frameNumber > 5) {
+          frameNumber = 3;
+      }
       setSprite(frames[frameNumber]);
   }
 

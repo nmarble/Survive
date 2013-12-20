@@ -170,7 +170,7 @@ public class Survive
   {
     
     randomDefault[0] = 150;
-    randomDefault[1] = 30;
+    randomDefault[1] = 15;
     randomDefault[2] = 0;
     randomDefault[3] = 0;
 
@@ -182,49 +182,49 @@ public class Survive
     //Add Test entities
     testEntities();
     //Add player entity
-    player = new PlayerEntity(this, "sprites/playern.png", new Coords(0, 0), "player");
+    player = new PlayerEntity(this, "sprites/player/playern.png", new Coords(0, 0), "player");
     
     //Add Crafting buttons
-    button = new ButtonEntity(this, "sprites/structurebutton.jpg", new Coords(0, Global.yRes - 100), "crafting", 100);
+    button = new ButtonEntity(this, "sprites/hud/structurebutton.jpg", new Coords(0, Global.yRes - 100), "crafting", 100);
     huds.add(button);
     
-    button = new ButtonEntity(this, "sprites/toolbutton.jpg", new Coords(110, Global.yRes - 100), "crafting", 100);
+    button = new ButtonEntity(this, "sprites/hud/toolbutton.jpg", new Coords(110, Global.yRes - 100), "crafting", 100);
     huds.add(button);
 
-    button = new ButtonEntity(this, "sprites/consumablebutton.jpg", new Coords(220, Global.yRes - 100), "crafting", 100);
+    button = new ButtonEntity(this, "sprites/hud/consumablebutton.jpg", new Coords(220, Global.yRes - 100), "crafting", 100);
     huds.add(button);
 
-    button = new ButtonEntity(this, "sprites/decorativebutton.jpg", new Coords(330, Global.yRes - 100), "crafting", 100);
+    button = new ButtonEntity(this, "sprites/hud/decorativebutton.jpg", new Coords(330, Global.yRes - 100), "crafting", 100);
     huds.add(button);
     
-    equipOverlay = new ButtonEntity(this, "sprites/equipoverlay.png", new Coords(0,0), "equipOverlay", 150);
+    equipOverlay = new ButtonEntity(this, "sprites/hud/equipoverlay.png", new Coords(0,0), "equipOverlay", 150);
     huds.add(equipOverlay);
     
-    bagOverlay = new ButtonEntity(this, "sprites/bagoverlay.png", new Coords(0,0), "bagOverlay", 150);
+    bagOverlay = new ButtonEntity(this, "sprites/hud/bagoverlay.png", new Coords(0,0), "bagOverlay", 150);
     huds.add(bagOverlay);
     
-    healthOverlay = new ButtonEntity(this, "sprites/healthoverlay.png", new Coords(0,0), "healthOverlay", 150);
+    healthOverlay = new ButtonEntity(this, "sprites/hud/healthoverlay.png", new Coords(0,0), "healthOverlay", 150);
     huds.add(healthOverlay);
     
-    hurt = new ButtonEntity(this, "sprites/hurt.png", new Coords(0,0), "hurtOverlay", 1000);
+    hurt = new ButtonEntity(this, "sprites/hud/hurt.png", new Coords(0,0), "hurtOverlay", 1000);
     huds.add(hurt);
     
     if (inventorys.isEmpty()) {
-      log = new Inventory("sprites/log.png", 1, 0, new Coords(0,0));
+      log = new Inventory("sprites/object/log.png", 1, 0, new Coords(0,0));
       inventorys.add(log);
-      stone = new Inventory("sprites/stone.png", 2, 0, new Coords(0,0));
+      stone = new Inventory("sprites/object/stone.png", 2, 0, new Coords(0,0));
       inventorys.add(stone);
-      logWall = new Inventory("sprites/logwall.gif", 3, 0, new Coords(0,0));
+      logWall = new Inventory("sprites/object/logwall.gif", 3, 0, new Coords(0,0));
       inventorys.add(logWall);
-      barrel = new Inventory("sprites/barrel.png", 4, 0, new Coords(0,0));
+      barrel = new Inventory("sprites/object/barrel.png", 4, 0, new Coords(0,0));
       inventorys.add(barrel);
-      axe = new Inventory("sprites/axe.png", 5, 0, new Coords(0,0));
+      axe = new Inventory("sprites/object/axe.png", 5, 0, new Coords(0,0));
       inventorys.add(axe);
-      rifle = new Inventory("sprites/rifle.png", 6, 0, new Coords(0,0));
+      rifle = new Inventory("sprites/object/rifle.png", 6, 0, new Coords(0,0));
       inventorys.add(rifle);
-      window = new Inventory("sprites/window.png", 7, 0, new Coords(0,0));
+      window = new Inventory("sprites/object/window.png", 7, 0, new Coords(0,0));
       inventorys.add(window);
-      ammo = new Inventory("sprites/ammobox.png", 9, 0, new Coords(0,0));
+      ammo = new Inventory("sprites/object/ammobox.png", 9, 0, new Coords(0,0));
       inventorys.add(ammo);
     }
   }
@@ -244,17 +244,17 @@ public class Survive
       
       switch (equipped[3]) {
           case 5:
-              pic = "sprites/axeswingn1.png";
-              if (a == 1) {pic = "sprites/axeswingn2.png";}
+              pic = "sprites/action/axeswingn1.png";
+              if (a == 1) {pic = "sprites/action/axeswingn2.png";}
               use = new UseEntity(this, pic, coords, "use", 20);
               huds.add(use);
               break;
           case 6:
               if (checkForMoreItem(9)) {
-              pic = "sprites/rifleuse.png";
+              pic = "sprites/action/rifleuse.png";
               use = new UseEntity(this, pic, coords, "use", 20);
               huds.add(use);
-              Bullet = new BulletEntity(this,"sprites/bullet.png", coords, new Coords(mouseX + screenOffset.getX(), mouseY + screenOffset.getY()), (int)getPlayerDirection());
+              Bullet = new BulletEntity(this,"sprites/object/bullet.png", coords, new Coords(mouseX + screenOffset.getX(), mouseY + screenOffset.getY()), (int)getPlayerDirection());
               bullets.add(Bullet);
               removeFromInventory(9,1);
               }
@@ -312,7 +312,7 @@ public class Survive
             }
             if (enemyLayer.getLife() <= 0) {
             enemyLayers.remove(newCoords);
-            DeadBody = new DeadBodyEntity(this, "sprites/deadzomb.png", interactCoords, 10);
+            DeadBody = new DeadBodyEntity(this, "sprites/object/deadzomb.png", interactCoords, 10);
             middleLayers.put(interactCoords, DeadBody);
             }
         }
@@ -365,35 +365,35 @@ public class Survive
     if (!middleLayers.containsKey(coords)) {
     switch (itemSelection) {
       case 1:
-        Log = new LogEntity(this, "sprites/log.png", coords, 1);
+        Log = new LogEntity(this, "sprites/object/log.png", coords, 1);
         middleLayers.put(coords, Log);
         break;
       case 2:
-        Stone = new StoneEntity(this, "sprites/stone.png", coords, 2);
+        Stone = new StoneEntity(this, "sprites/object/stone.png", coords, 2);
         middleLayers.put(coords, Stone);
         break;
       case 3:
-        LogWall = new LogWallEntity(this, "sprites/logwall.gif", coords, 3);
+        LogWall = new LogWallEntity(this, "sprites/object/logwall.gif", coords, 3);
         middleLayers.put(coords, LogWall);
         break;
       case 4:
-        Barrel = new BarrelEntity(this, "sprites/barrel.png", coords, 4);
+        Barrel = new BarrelEntity(this, "sprites/object/barrel.png", coords, 4);
         middleLayers.put(coords, Barrel);
         break;
       case 5:
-        Axe = new AxeEntity(this, "sprites/axe.png", coords, 5);
+        Axe = new AxeEntity(this, "sprites/object/axe.png", coords, 5);
         middleLayers.put(coords, Axe);
         break;
       case 6:
-        Rifle = new RifleEntity(this, "sprites/rifle.png", coords, 6);
+        Rifle = new RifleEntity(this, "sprites/object/rifle.png", coords, 6);
         middleLayers.put(coords, Rifle);
         break;
       case 7:
-        Window = new WindowEntity(this, "sprites/window.png", coords, 7);
+        Window = new WindowEntity(this, "sprites/object/window.png", coords, 7);
         middleLayers.put(coords, Window);
         break;
       case 9:
-        Ammo = new AmmoEntity(this, "sprites/ammobox.png", coords, 9);
+        Ammo = new AmmoEntity(this, "sprites/object/ammobox.png", coords, 9);
         middleLayers.put(coords, Ammo);
         break;
 
@@ -449,7 +449,7 @@ public class Survive
     int startY = y;
     switch (getRandomGround(x, y)) {
       case 0:
-        grass = new GrassEntity(this, "sprites/grass.gif", newLocation, 11);
+        grass = new GrassEntity(this, "sprites/lowerlayer/grass.gif", newLocation, 11);
         lowerLayers.put(newLocation, grass);
         chance = getRandomNum(treeLikely);
         if (chance == 1) {
@@ -459,33 +459,33 @@ public class Survive
               y = locs[a][1];              
               final Coords treeCoords = new Coords(x, y);
               if (a == 4) {
-              Tree = new TreeEntity(this, "sprites/tree/trunk.png", treeCoords, 1);    
+              Tree = new TreeEntity(this, "sprites/object/tree/trunk.png", treeCoords, 1);    
               }
               if (a != 4 && a < 9) {
-              Tree = new LeavesEntity(this, "sprites/tree/leaves1_1.png", treeCoords, 8);
+              Tree = new LeavesEntity(this, "sprites/object/tree/leaves1_1.png", treeCoords, 8);
               }
               if (a == 9) {
-              Tree = new LeavesEntity(this, "sprites/tree/leaves1_d.png", treeCoords, 8);    
+              Tree = new LeavesEntity(this, "sprites/object/tree/leaves1_d.png", treeCoords, 8);    
               }
               if (a == 10) {
-              Tree = new LeavesEntity(this, "sprites/tree/leaves1_u.png", treeCoords, 8);    
+              Tree = new LeavesEntity(this, "sprites/object/tree/leaves1_u.png", treeCoords, 8);    
               }
               if (a == 11) {
-              Tree = new LeavesEntity(this, "sprites/tree/leaves1_r.png", treeCoords, 8);    
+              Tree = new LeavesEntity(this, "sprites/object/tree/leaves1_r.png", treeCoords, 8);    
               }
               if (a == 12) {
-              Tree = new LeavesEntity(this, "sprites/tree/leaves1_l.png", treeCoords, 8);    
+              Tree = new LeavesEntity(this, "sprites/object/tree/leaves1_l.png", treeCoords, 8);    
               }
               middleLayers.put(treeCoords, Tree);
           } 
         }
         break;
       case 1:
-        gravel = new GravelEntity(this, "sprites/gravel.gif", newLocation, 12);
+        gravel = new GravelEntity(this, "sprites/lowerlayer/gravel.gif", newLocation, 12);
         lowerLayers.put(newLocation, gravel);
         chance = getRandomNum(boulderLikely);
         if (chance == 1) {
-          Boulder = new BoulderEntity(this, "sprites/boulder.png", newLocation, 2);
+          Boulder = new BoulderEntity(this, "sprites/object/boulder.png", newLocation, 2);
           middleLayers.put(newLocation, Boulder);
         }
         break;
@@ -498,7 +498,7 @@ public class Survive
           final Coords waterCoords = new Coords(x, y);
           middleLayers.remove(waterCoords);
           lowerLayers.remove(waterCoords);
-          water = new WaterEntity(this, "sprites/water1.png", waterCoords, 13);
+          water = new WaterEntity(this, "sprites/lowerlayer/water1.png", waterCoords, 13);
           lowerLayers.put(waterCoords, water);        
         }
         break;
@@ -511,7 +511,7 @@ public class Survive
           final Coords floorCoords = new Coords(x, y);
           middleLayers.remove(floorCoords);
           lowerLayers.remove(floorCoords);
-          woodFloor = new WoodFloorEntity(this, "sprites/woodfloor.gif", floorCoords, 14);
+          woodFloor = new WoodFloorEntity(this, "sprites/lowerlayer/woodfloor.gif", floorCoords, 14);
           lowerLayers.put(floorCoords, woodFloor);
         }
         locs = PreSetGroups.houseWalls(direction, startX, startY, size);
@@ -520,7 +520,7 @@ public class Survive
           y = locs[a][1];
           if (a > 0 && x == 0 && y == 0) break;
           final Coords logWallCoords = new Coords(x, y);
-          LogWall = new LogWallEntity(this, "sprites/logwall.gif", logWallCoords, 3);
+          LogWall = new LogWallEntity(this, "sprites/object/logwall.gif", logWallCoords, 3);
           middleLayers.put(logWallCoords, LogWall);
         }
         locs = PreSetGroups.houseItems(direction, 3, startX, startY, size);
@@ -529,7 +529,7 @@ public class Survive
           y = locs[a][1];
           if (a > 0 && x == 0 && y == 0) break;
           final Coords itemsCoords = new Coords(x, y);
-          Barrel = new BarrelEntity(this, "sprites/barrel.png", itemsCoords, 4);
+          Barrel = new BarrelEntity(this, "sprites/object/barrel.png", itemsCoords, 4);
           middleLayers.put(itemsCoords, Barrel);
         }
         break;
@@ -687,7 +687,7 @@ public class Survive
 
       //Set location to put icons
       final Coords coords = new Coords(0, Global.yRes - 30);
-      button = new ButtonEntity(this, "sprites/logwall.gif", coords, "LogWall", 20);
+      button = new ButtonEntity(this, "sprites/object/logwall.gif", coords, "LogWall", 20);
       huds.add(button);
     }
   }
@@ -776,7 +776,7 @@ public class Survive
       for (int x = startCoord.getX(); x >= endCoord.getX(); x = x - 20) {
           Coords location = new Coords(x,y);
           if (unseen) {
-            black = new BlackEntity(this, "sprites/black.gif", location, "black");
+            black = new BlackEntity(this, "sprites/hud/black.gif", location, "black");
             upperLayers.put(location, black);  
           }
 
@@ -819,7 +819,7 @@ public class Survive
       for (int x = startCoord.getX(); x <= endCoord.getX(); x = x + 20) {
           Coords location = new Coords(x,y);
           if (unseen) {
-            black = new BlackEntity(this, "sprites/black.gif", location, "black");
+            black = new BlackEntity(this, "sprites/hud/black.gif", location, "black");
             upperLayers.put(location, black);  
           }
 
@@ -862,7 +862,7 @@ public class Survive
       for (int y = startCoord.getY(); y >= endCoord.getY(); y = y - 20) {
           Coords location = new Coords(x,y);
           if (unseen) {
-            black = new BlackEntity(this, "sprites/black.gif", location, "black");
+            black = new BlackEntity(this, "sprites/hud/black.gif", location, "black");
             upperLayers.put(location, black);  
           }
 
@@ -905,7 +905,7 @@ public class Survive
       for (int y = startCoord.getY(); y <= endCoord.getY(); y = y + 20) {
           Coords location = new Coords(x,y);
           if (unseen) {
-            black = new BlackEntity(this, "sprites/black.gif", location, "black");
+            black = new BlackEntity(this, "sprites/hud/black.gif", location, "black");
             upperLayers.put(location, black);  
           }
 
@@ -1180,7 +1180,7 @@ public class Survive
       int randomZombie = (int) (Math.random() * zombieChance);
       if (randomZombie < 4) {
           Coords location = spawnZombie(randomZombie);
-          zombie = new ZombieEntity(this, "sprites/zombie1.png", location, "zombie", Direction.UP);
+          zombie = new ZombieEntity(this, "sprites/npc/zombie1.png", location, "zombie", Direction.UP);
           enemyLayers.put(location, zombie);
       }
      
@@ -1221,6 +1221,7 @@ public class Survive
           if (middleLayers.containsKey(coords)) {
               if (middleLayers.get(coords).getType() == 3) {
               Surrounding surround = setSimBlockImage(coords, 3);
+              if (surround.getFrame() > 5) {surround.addRotate(90);}
               middleLayers.get(coords).changeFrame(surround.getFrame());
               middleLayers.get(coords).rotDraw(g, screenOffset, surround.getRotate());
               }

@@ -16,9 +16,9 @@ import survive.SpriteStore;
    {
      super(ref, coords, type);
      
-     frames[0] = SpriteStore.get().getSprite("sprites/water1.png");
-     frames[1] = SpriteStore.get().getSprite("sprites/water2.png");
-     frames[2] = SpriteStore.get().getSprite("sprites/water3.png");
+     frames[0] = SpriteStore.get().getSprite("sprites/lowerlayer/water1.png");
+     frames[1] = SpriteStore.get().getSprite("sprites/lowerlayer/water2.png");
+     frames[2] = SpriteStore.get().getSprite("sprites/lowerlayer/water3.png");
      
      this.survive = survive;
    }

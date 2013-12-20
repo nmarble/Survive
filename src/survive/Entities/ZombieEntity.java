@@ -23,9 +23,9 @@ import survive.Direction;
    {
      super(ref, coords, type, direction);
      
-     frames[0] = SpriteStore.get().getSprite("sprites/zombie1.png");
-     frames[1] = SpriteStore.get().getSprite("sprites/zombie2.png");
-     frames[2] = SpriteStore.get().getSprite("sprites/zombie1.png");
+     frames[0] = SpriteStore.get().getSprite("sprites/npc/zombie1.png");
+     frames[1] = SpriteStore.get().getSprite("sprites/npc/zombie2.png");
+     frames[2] = SpriteStore.get().getSprite("sprites/npc/zombie1.png");
 
 
      this.survive = survive;
