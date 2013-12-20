@@ -1100,7 +1100,10 @@ public class Survive
                         }
                         return new Surrounding (6, 180);
                     }
-                    if (getSimBlock(coords, Direction.UPLEFT, checkCode)) {
+                    if (getSimBlock(coords, Direction.UPLEFT, checkCode)) {                       
+                        if (getSimBlock(coords, Direction.DOWNRIGHT, checkCode)) {
+                        return new Surrounding (1, 0);
+                        }
                         return new Surrounding (10, 270);
                     }
                     if (getSimBlock(coords, Direction.DOWNRIGHT, checkCode)) {
@@ -1125,6 +1128,9 @@ public class Survive
                 }
                 if (getSimBlock(coords, Direction.LEFT, checkCode)) {
                     if (getSimBlock(coords, Direction.DOWNLEFT, checkCode)) {
+                        if (getSimBlock(coords, Direction.UPRIGHT, checkCode)) {
+                            return new Surrounding (1, 270);
+                        }
                         return new Surrounding (10, 180);
                     }
                     if (getSimBlock(coords, Direction.UPRIGHT, checkCode)) {
@@ -1149,6 +1155,9 @@ public class Survive
                         return new Surrounding (6, 0);
                     }
                     if (getSimBlock(coords, Direction.UPRIGHT, checkCode)) {
+                        if (getSimBlock(coords, Direction.DOWNLEFT, checkCode)) {
+                            return new Surrounding (1, 90);
+                        }
                         return new Surrounding (10, 0);
                     }
                     if (getSimBlock(coords, Direction.DOWNLEFT, checkCode)) {
@@ -1164,6 +1173,9 @@ public class Survive
             if (getSimBlock(coords, Direction.DOWN, checkCode)) {
                 if (getSimBlock(coords, Direction.LEFT, checkCode)) {
                     if (getSimBlock(coords, Direction.UPLEFT, checkCode)) {
+                        if (getSimBlock(coords, Direction.DOWNRIGHT, checkCode)) {
+                            return new Surrounding (1, 180);
+                        }
                         return new Surrounding (9, 0);
                     }
                     if (getSimBlock(coords, Direction.DOWNRIGHT, checkCode)) {
