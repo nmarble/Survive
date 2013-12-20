@@ -23,8 +23,14 @@ public abstract class Drawable {
   public void rotDraw(final Graphics2D g, final Coords offset, int degree) {
     sprite.rotDraw(g, coords.getX() - offset.getX(), coords.getY() - offset.getY(), degree);
   }
+  public void fadeRotDraw(final Graphics2D g, final Coords offset, int degree, float alpha) {
+    sprite.fadeRotDraw(g, coords.getX() - offset.getX(), coords.getY() - offset.getY(), degree, alpha);
+  }
   public void scaleDraw(Graphics2D g, final Coords offset, double xScale, double yScale) {
     sprite.scaleDraw(g, coords.getX() - offset.getX(), coords.getY() - offset.getY(), xScale, yScale);  
+  }
+  public void changeBrightness(float val) {
+    sprite.changeBrightness(val);
   }
   public Coords getCoords() {
     return coords;

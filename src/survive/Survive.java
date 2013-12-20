@@ -28,6 +28,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import survive.Entities.*;
 
+
 public class Survive
         extends Canvas
 {
@@ -1099,6 +1100,12 @@ public class Survive
                         }
                         return new Surrounding (6, 180);
                     }
+                    if (getSimBlock(coords, Direction.UPLEFT, checkCode)) {
+                        return new Surrounding (10, 270);
+                    }
+                    if (getSimBlock(coords, Direction.DOWNRIGHT, checkCode)) {
+                        return new Surrounding (9, 180);
+                    }
                     return new Surrounding (1, 0);
                 }
                 if (getSimBlock(coords, Direction.DOWN, checkCode)) {
@@ -1117,6 +1124,12 @@ public class Survive
                     return new Surrounding (2, 0);
                 }
                 if (getSimBlock(coords, Direction.LEFT, checkCode)) {
+                    if (getSimBlock(coords, Direction.DOWNLEFT, checkCode)) {
+                        return new Surrounding (10, 180);
+                    }
+                    if (getSimBlock(coords, Direction.UPRIGHT, checkCode)) {
+                        return new Surrounding (9, 90);
+                    }
                     return new Surrounding (1, 270);
                 }
                 return new Surrounding (4,0);
@@ -1135,6 +1148,12 @@ public class Survive
                         }
                         return new Surrounding (6, 0);
                     }
+                    if (getSimBlock(coords, Direction.UPRIGHT, checkCode)) {
+                        return new Surrounding (10, 0);
+                    }
+                    if (getSimBlock(coords, Direction.DOWNLEFT, checkCode)) {
+                        return new Surrounding (9, 270);
+                    }
                     return new Surrounding (1, 90);
                 }
                 if (getSimBlock(coords, Direction.LEFT, checkCode)) {                   
@@ -1144,7 +1163,14 @@ public class Survive
             }
             if (getSimBlock(coords, Direction.DOWN, checkCode)) {
                 if (getSimBlock(coords, Direction.LEFT, checkCode)) {
+                    if (getSimBlock(coords, Direction.UPLEFT, checkCode)) {
+                        return new Surrounding (9, 0);
+                    }
+                    if (getSimBlock(coords, Direction.DOWNRIGHT, checkCode)) {
+                        return new Surrounding (10, 90);
+                    }
                     return new Surrounding (1, 180);
+                    
                 }
                 return new Surrounding (4, 180);
             }
@@ -1206,11 +1232,11 @@ public class Survive
             addFloor(x, y);
           }
           if(lowerLayers.containsKey(coords)) {
-          if(lowerLayers.get(coords).getType() == 13 && (loopTime % 5) == 0) {
+          /*if(lowerLayers.get(coords).getType() == 13 && (loopTime % 5) == 0) {
                 lowerLayers.get(coords).changeFrame(lowerLayers.get(coords).nextFrame());
-            }
-          if(lowerLayers.get(coords).getType() == 11) {
-             Surrounding surround = setSimBlockImage(coords, 11);
+            }*/
+          if(lowerLayers.get(coords).getType() == 11 || lowerLayers.get(coords).getType() == 13) {
+             Surrounding surround = setSimBlockImage(coords, lowerLayers.get(coords).getType());
              lowerLayers.get(coords).changeFrame(surround.getFrame());
              lowerLayers.get(coords).rotDraw(g, screenOffset, surround.getRotate());
           }

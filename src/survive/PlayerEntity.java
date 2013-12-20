@@ -20,8 +20,8 @@ import survive.Drawable;
    {
      super(coords, SpriteStore.get().getSprite(ref));
 
-     frames[0] = SpriteStore.get().getSprite("sprites/playern.png");
-     frames[1] = SpriteStore.get().getSprite("sprites/playern2.png");
+     frames[0] = SpriteStore.get().getSprite("sprites/player/playern.png");
+     frames[1] = SpriteStore.get().getSprite("sprites/player/playern2.png");
 
      
      this.survive = survive;
