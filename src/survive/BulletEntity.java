@@ -24,7 +24,7 @@ import survive.Drawable;
    {
      super(coords, SpriteStore.get().getSprite(ref));
 
-     frames[0] = SpriteStore.get().getSprite("sprites/bullet.png");
+     frames[0] = SpriteStore.get().getSprite("sprites/object/bullet.png");
      xE = 0;
      yE = 0;
      xD = abs((double)coords.getX() - (double) endCoords.getX());

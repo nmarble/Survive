@@ -21,7 +21,7 @@
      int choiceNum = 0;
      randomChance[1] = 20;
      randomChance[5] = 10;
-     randomChance[6] = 5;
+     randomChance[6] = 8;
      randomChance[7] = 15;    
      randomChance[9] = 20;
      
@@ -41,6 +41,7 @@
      else {
      itemQ = (int)(Math.random() * 5)+1;
      }
+     System.err.println(itemCode);
    }
 
    public boolean interact()

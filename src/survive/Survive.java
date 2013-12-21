@@ -1279,7 +1279,6 @@ public class Survive
         }
         else {
             nextDay++;
-            System.err.println(nextDay);
             if (nextDay > 100) {dayTrans = !dayTrans; dayTime = !dayTime; nextDay = 0;}
         }
       }
