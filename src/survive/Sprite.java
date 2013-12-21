@@ -48,9 +48,10 @@ import java.awt.image.RescaleOp;
        AffineTransform old = g.getTransform();
        g.translate(x, y);
        g.rotate(Math.toRadians(degree), 10, 10);
-       
-       g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+       Composite oldComp = g.getComposite();
+       g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, alpha));
        g.drawImage(image, 0, 0, null);
+       g.setComposite(oldComp);
        g.setTransform(old);
 
    }

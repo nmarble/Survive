@@ -77,6 +77,12 @@ public class Survive
   
   private int bulletSpeed = 4;
   
+  private int nextDay = 0;
+  private boolean dayTime = true;
+  private boolean dayTrans = true;
+  private int daySpeed = 1;
+  private int timeOfDay = 10;
+  private float darkness = 0.8f;
   private int treeLikely = 60;
   private int boulderLikely = 20;
   private int zombieChance = 400;
@@ -499,7 +505,7 @@ public class Survive
           final Coords waterCoords = new Coords(x, y);
           middleLayers.remove(waterCoords);
           lowerLayers.remove(waterCoords);
-          water = new WaterEntity(this, "sprites/lowerlayer/water1.png", waterCoords, 13);
+          water = new WaterEntity(this, "sprites/lowerlayer/waterborder.png", waterCoords, 13);
           lowerLayers.put(waterCoords, water);        
         }
         break;
@@ -777,7 +783,7 @@ public class Survive
       for (int x = startCoord.getX(); x >= endCoord.getX(); x = x - 20) {
           Coords location = new Coords(x,y);
           if (unseen) {
-            black = new BlackEntity(this, "sprites/hud/black.gif", location, "black");
+            black = new BlackEntity(this, "sprites/hud/fullblack.png", location, "black");
             upperLayers.put(location, black);  
           }
 
@@ -820,7 +826,7 @@ public class Survive
       for (int x = startCoord.getX(); x <= endCoord.getX(); x = x + 20) {
           Coords location = new Coords(x,y);
           if (unseen) {
-            black = new BlackEntity(this, "sprites/hud/black.gif", location, "black");
+            black = new BlackEntity(this, "sprites/hud/fullblack.png", location, "black");
             upperLayers.put(location, black);  
           }
 
@@ -863,7 +869,7 @@ public class Survive
       for (int y = startCoord.getY(); y >= endCoord.getY(); y = y - 20) {
           Coords location = new Coords(x,y);
           if (unseen) {
-            black = new BlackEntity(this, "sprites/hud/black.gif", location, "black");
+            black = new BlackEntity(this, "sprites/hud/fullblack.png", location, "black");
             upperLayers.put(location, black);  
           }
 
@@ -906,7 +912,7 @@ public class Survive
       for (int y = startCoord.getY(); y <= endCoord.getY(); y = y + 20) {
           Coords location = new Coords(x,y);
           if (unseen) {
-            black = new BlackEntity(this, "sprites/hud/black.gif", location, "black");
+            black = new BlackEntity(this, "sprites/hud/fullblack.png", location, "black");
             upperLayers.put(location, black);  
           }
 
@@ -1069,6 +1075,46 @@ public class Survive
       }
       return false;
   }
+  public void addBlack(Coords coords) {
+      black = new BlackEntity(this, "sprites/hud/fullblack.png", coords, "fullblack");
+      upperLayers.put(coords, black); 
+  }
+  public void setTimeOfDay(Coords coords, int size) {
+      int xLoc = coords.getX();
+      int yLoc = coords.getY();
+      int y = 0 - size;
+      int x = 0;
+      for (int i = 0; i<=size*2; i++)
+          { 
+
+              x = (int)Math.sqrt((size*size) - y*y);
+              int dist = Math.abs(-x)+ x;
+              
+              
+              Coords setCoords = new Coords((x*20) + xLoc,((y*20) + yLoc));
+              if (upperLayers.containsKey(setCoords)) {
+                  upperLayers.remove(setCoords);
+              }
+              addBlack(setCoords);
+              for (int r = 1; r <= dist; r++)
+              {
+                  setCoords = new Coords(((x-r)*20)+xLoc,((y*20) + yLoc));
+                  if (upperLayers.containsKey(setCoords)) {
+                  upperLayers.remove(setCoords);
+                  }
+                  setCoords = new Coords(((-x+r)*20)+xLoc,((y*20) + yLoc));
+                  if (upperLayers.containsKey(setCoords)) {
+                  upperLayers.remove(setCoords);
+                  }
+                  
+              }
+              setCoords = new Coords((-x*20) + xLoc,((y*20) + yLoc));
+              if (upperLayers.containsKey(setCoords)) {
+                  upperLayers.remove(setCoords);
+              }
+              y++;
+          }
+  }
   public Surrounding setSimBlockImage (Coords coords, int checkCode)
   {
             if (getSimBlock(coords, Direction.UP, checkCode)) {
@@ -1191,12 +1237,26 @@ public class Survive
             }
             return new Surrounding (5,0);
   }
+  public void dayTransition() {
+            if (dayTime == true) {
+                darkness = darkness - .03f;
+                if (darkness < 0) {darkness = 0;}
+            }
+            else {
+                darkness = darkness + .03f; 
+                if (darkness > .8f) {darkness = .8f;}
+            }
+            
+        timeOfDay = timeOfDay + daySpeed;
+        if (timeOfDay > 40) {timeOfDay = 40; daySpeed = -daySpeed; dayTrans = false;darkness = 0;}
+        if (timeOfDay < 10) {timeOfDay = 10; daySpeed = -daySpeed; dayTrans = false;darkness = .8f;}    
+  
+  }
   //Loop of main game
   public void gameLoop()
   {
     long lastLoopTime = System.currentTimeMillis();
     long loopTime = 0;
-    
     
     while (gameRunning) {
       long delta = System.currentTimeMillis() - lastLoopTime;
@@ -1207,30 +1267,42 @@ public class Survive
       g.setColor(Color.black);
       g.fillRect(0, 0, Global.xRes, Global.yRes);
 
-      // Moves applicable enemy within its speed compared to loop time
-      if (loopTime == 10) {
+      //Do Things Loop
+      if (loopTime == 8) {
+        // Moves applicable enemy within its speed compared to loop time
         moveEnemy(g);
         loopTime = 0;
+        
+        //Day transitions
+        if (dayTrans == true) {
+           dayTransition();      
+        }
+        else {
+            nextDay++;
+            System.err.println(nextDay);
+            if (nextDay > 10) {dayTrans = !dayTrans; dayTime = !dayTime; nextDay = 0;}
+        }
       }
+      
       if (loopTime == 1) {
           hurtFlash = false;
       }
+      setSpawnLimit();
       int randomZombie = (int) (Math.random() * zombieChance);
       if (randomZombie < 4) {
           Coords location = spawnZombie(randomZombie);
           zombie = new ZombieEntity(this, "sprites/npc/zombie1.png", location, "zombie", Direction.UP);
           enemyLayers.put(location, zombie);
       }
-     
-      checkLoS(); 
+      
       checkButtonPushed();
       setPlayerSTR();
+   
       //Draw all ground that is on screen
       // The upper right coordinates of the screen in game world coordinates.
       final Coords screenOffset = new Coords(
               player.getCoords().getX() - Global.xRes / 2,
               player.getCoords().getY() - Global.yRes / 2);
-      setSpawnLimit();
       final int xStart = screenOffset.getX();
       final int xStop = screenOffset.getX() + Global.xRes;
       final int xStep = 20;
@@ -1240,13 +1312,14 @@ public class Survive
       for (int x = xStart; x <= xStop; x += xStep) {
         for (int y = yStart; y <= yStop; y += yStep) {
           final Coords coords = new Coords(x, y);
+          addBlack(coords);
           if (!lowerLayers.containsKey(coords)) {
             addFloor(x, y);
           }
           if(lowerLayers.containsKey(coords)) {
           /*if(lowerLayers.get(coords).getType() == 13 && (loopTime % 5) == 0) {
                 lowerLayers.get(coords).changeFrame(lowerLayers.get(coords).nextFrame());
-            }*/
+            }    CODE FOR MOVING WATER*/
           if(lowerLayers.get(coords).getType() == 11 || lowerLayers.get(coords).getType() == 13) {
              Surrounding surround = setSimBlockImage(coords, lowerLayers.get(coords).getType());
              lowerLayers.get(coords).changeFrame(surround.getFrame());
@@ -1267,15 +1340,38 @@ public class Survive
                 middleLayers.get(coords).draw(g, screenOffset);
               }
           }  
-          if (enemyLayers.containsKey(coords) && !upperLayers.containsKey(coords)) {
-            enemyLayers.get(coords).rotDraw(g, screenOffset, enemyLayers.get(coords).getRotation());          
-          }
-          if (upperLayers.containsKey(coords)) {
-            upperLayers.get(coords).draw(g, screenOffset);
-            upperLayers.remove(coords);
-          }
+          if (upperLayers.containsKey(coords) && "fullblack".equals(upperLayers.get(coords).getType()) && darkness > 0){
+                upperLayers.get(coords).fadeRotDraw(g, screenOffset, 0, darkness);   
+            }
         }
       }
+      //Remove black in accordance with time in transition
+      setTimeOfDay(player.getCoords(), timeOfDay);
+      
+      //Check for Line of Sight
+      checkLoS(); 
+      //Set Line of Sight Darkness if to low     
+      float LoSDarkness = darkness;
+      if (LoSDarkness < .5f) {LoSDarkness = .5f;}
+      
+      //Redraws upperlayer and enemys according to time
+      for (int x = xStart; x <= xStop; x += xStep) {
+        for (int y = yStart; y <= yStop; y += yStep) {
+            final Coords coords = new Coords(x, y);
+            if (enemyLayers.containsKey(coords) && !upperLayers.containsKey(coords)) {
+                enemyLayers.get(coords).rotDraw(g, screenOffset, enemyLayers.get(coords).getRotation());          
+            }
+            if (upperLayers.containsKey(coords) && "black".equals(upperLayers.get(coords).getType())) {
+                upperLayers.get(coords).fadeRotDraw(g, screenOffset, 0, LoSDarkness);
+                upperLayers.remove(coords);
+            }
+            else if (upperLayers.containsKey(coords) && "fullblack".equals(upperLayers.get(coords).getType())){
+                upperLayers.get(coords).fadeRotDraw(g, screenOffset, 0, darkness);
+                upperLayers.remove(coords);    
+            }
+        }
+      }
+           
       //Draws Player
       player.rotDraw(g, screenOffset, (int)getPlayerDirection());
 
