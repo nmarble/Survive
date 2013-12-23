@@ -2,7 +2,7 @@ package survive;
 
 import java.awt.Graphics;
 
-public abstract class MiddleLayer extends Drawable
+public abstract class MiddleLayer extends Drawable implements java.io.Serializable
 {
 
   protected int type;

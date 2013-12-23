@@ -1,6 +1,6 @@
  package survive;
 
- public class Inventory extends Drawable
+ public class Inventory extends Drawable implements java.io.Serializable
  {
    protected int itemCode;
    protected int quantity;

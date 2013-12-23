@@ -1,6 +1,6 @@
 package survive;
 
-public abstract class LowerLayer extends Drawable {
+public abstract class LowerLayer extends Drawable implements java.io.Serializable{
 
     protected int type;
 

@@ -5,7 +5,7 @@ import java.util.Objects;
 /**
  * Holds integer X,Y coordinates for entities.
  */
-public class Coords {
+public class Coords implements java.io.Serializable{
 
     private final int x;
     private final int y;
@@ -16,11 +16,21 @@ public class Coords {
     }
 
     public int getX() {
+        try {
         return x;
+        }
+        catch (Exception ex) {
+            return 0;
+        }
     }
 
     public int getY() {
+        try {
         return y;
+        }
+        catch (Exception ex) {
+            return 0;
+        }
     }
 
     @Override

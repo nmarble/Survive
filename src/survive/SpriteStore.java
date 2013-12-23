@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.imageio.ImageIO;
 
-public class SpriteStore
+public class SpriteStore implements java.io.Serializable
 {
   private static SpriteStore single = new SpriteStore();
   

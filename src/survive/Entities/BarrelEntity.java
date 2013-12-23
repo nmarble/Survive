@@ -41,7 +41,6 @@
      else {
      itemQ = (int)(Math.random() * 5)+1;
      }
-     System.err.println(itemCode);
    }
 
    public boolean interact()
