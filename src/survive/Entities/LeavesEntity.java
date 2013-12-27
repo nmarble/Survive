@@ -12,9 +12,10 @@ public class LeavesEntity extends MiddleLayer
   private Survive survive;
   private Sprite[] frames = new Sprite[6];
   
-  public LeavesEntity(Survive survive, String ref, final Coords coords, int type)
+  public LeavesEntity(Survive survive, final Coords coords, int type)
   {
-    super(ref, coords, type);
+    super(coords, type);
+    setSprite(SpriteStore.get().getSprite("sprites/object/tree/leaves1_1.png"));
     
     frames[0] = SpriteStore.get().getSprite("sprites/object/tree/leaves1_1.png");
     frames[1] = SpriteStore.get().getSprite("sprites/object/tree/leaves1_1.png");

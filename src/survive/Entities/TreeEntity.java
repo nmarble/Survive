@@ -2,6 +2,7 @@ package survive.Entities;
 
 import survive.Coords;
 import survive.MiddleLayer;
+import survive.SpriteStore;
 import survive.Survive;
 
 public class TreeEntity extends MiddleLayer
@@ -9,9 +10,10 @@ public class TreeEntity extends MiddleLayer
 
   private Survive survive;
 
-  public TreeEntity(Survive survive, String ref, final Coords coords, int type)
+  public TreeEntity(Survive survive, final Coords coords, int type)
   {
-    super(ref, coords, type);
+    super(coords, type);
+    setSprite(SpriteStore.get().getSprite("sprites/object/tree/trunk.png"));
 
     this.survive = survive;
   }

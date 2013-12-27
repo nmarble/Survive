@@ -2,6 +2,7 @@ package survive.Entities;
 
 import survive.Coords;
 import survive.MiddleLayer;
+import survive.SpriteStore;
 import survive.Survive;
 
 public class BoulderEntity
@@ -10,9 +11,10 @@ public class BoulderEntity
 
   private Survive survive;
 
-  public BoulderEntity(Survive survive, String ref, final Coords coords, int type)
+  public BoulderEntity(Survive survive, final Coords coords, int type)
   {
-    super(ref, coords, type);
+    super(coords, type);
+    setSprite(SpriteStore.get().getSprite("sprites/object/boulder.png"));
 
     this.survive = survive;
   }

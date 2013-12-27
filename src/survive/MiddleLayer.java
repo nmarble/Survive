@@ -10,10 +10,9 @@ public abstract class MiddleLayer extends Drawable implements java.io.Serializab
   protected Sprite sprite;
   protected int modifiedX;
   protected int modifiedY;
-
-  public MiddleLayer(String ref, final Coords coords, int type)
+  public MiddleLayer(final Coords coords, int type)
   {
-    super(coords, SpriteStore.get().getSprite(ref));
+    super(coords, SpriteStore.get().getSprite("sprites/null.png"));
     this.type = type;
 
   }
@@ -26,7 +25,14 @@ public abstract class MiddleLayer extends Drawable implements java.io.Serializab
   {
     return type;
   }
-
+  public int getItemCode()
+   {
+       return 0;
+   }
+   public int getItemQ()
+   {
+       return 0;
+   }
   public abstract boolean interact();
 
   public abstract boolean passable();

@@ -2,6 +2,7 @@ package survive.Entities;
 
 import survive.Coords;
 import survive.MiddleLayer;
+import survive.SpriteStore;
 import survive.Survive;
 
 public class StoneEntity
@@ -10,9 +11,10 @@ public class StoneEntity
 
   private Survive survive;
 
-  public StoneEntity(Survive survive, String ref, final Coords coords, int type)
+  public StoneEntity(Survive survive, final Coords coords, int type)
   {
-    super(ref, coords, type);
+    super(coords, type);
+    setSprite(SpriteStore.get().getSprite("sprites/object/stone.png"));
 
     this.survive = survive;
   }

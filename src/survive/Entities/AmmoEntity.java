@@ -2,6 +2,7 @@ package survive.Entities;
 
 import survive.Coords;
 import survive.MiddleLayer;
+import survive.SpriteStore;
 import survive.Survive;
 
 public class AmmoEntity
@@ -10,9 +11,10 @@ public class AmmoEntity
 
   private Survive survive;
 
-  public AmmoEntity(Survive survive, String ref, final Coords coords, int type)
+  public AmmoEntity(Survive survive, final Coords coords, int type)
   {
-    super(ref, coords, type);
+    super(coords, type);
+    setSprite(SpriteStore.get().getSprite("sprites/object/ammobox.png"));
 
     this.survive = survive;
   }

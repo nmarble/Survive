@@ -19,9 +19,9 @@ import survive.Direction;
    private int STR = 20;
    private boolean passable = false;
   
-   public ZombieEntity(Survive survive, String ref, final Coords coords, String type, final Direction direction)
+   public ZombieEntity(Survive survive, String ref, final Coords coords, final Direction direction, int enemyType)
    {
-     super(ref, coords, type, direction);
+     super(ref, coords, direction, enemyType);
      
      frames[0] = SpriteStore.get().getSprite("sprites/npc/zombie1.png");
      frames[1] = SpriteStore.get().getSprite("sprites/npc/zombie2.png");
