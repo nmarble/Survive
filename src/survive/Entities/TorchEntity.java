@@ -5,22 +5,23 @@ import survive.MiddleLayer;
 import survive.SpriteStore;
 import survive.Survive;
 
-public class AxeEntity
+public class TorchEntity
         extends MiddleLayer
 {
 
   private Survive survive;
 
-  public AxeEntity(Survive survive, final Coords coords, int type)
+  public TorchEntity(Survive survive, final Coords coords, int type)
   {
     super(coords, type);
-    setSprite(SpriteStore.get().getSprite("sprites/object/axe.png"));
+    setSprite(SpriteStore.get().getSprite("sprites/object/torch.png"));
+
     this.survive = survive;
   }
 
   public boolean interact()
   {
-    survive.addToInventory(5, 1);
+    survive.addToInventory(15, 1);
     return true;
   }
 

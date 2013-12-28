@@ -10,6 +10,7 @@ import survive.Drawable;
  
  public class PlayerEntity
  extends Drawable
+ implements java.io.Serializable
  {
    private Survive survive;
    private Sprite[] frames = new Sprite[2];

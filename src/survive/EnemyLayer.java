@@ -5,19 +5,20 @@ import java.awt.Graphics;
 
 public abstract class EnemyLayer extends Drawable
 {
-  protected String type;
+
   protected Direction direction;
   protected double movementSpeed;
-  public EnemyLayer(String ref, final Coords coords, String type, final Direction direction)
+  protected int type;
+  public EnemyLayer(String ref, final Coords coords, final Direction direction, int enemyType)
   {
     super(coords, SpriteStore.get().getSprite(ref));
-    this.type = type;
     this.direction = direction;
+    type = enemyType;
   }
   
   public void changeFrame(int frameNumber) {}
   
-  public String getType()
+  public int getType()
   {
     return type;
   }

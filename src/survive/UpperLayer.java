@@ -2,7 +2,7 @@ package survive;
 
 import java.awt.Graphics;
 
-public abstract class UpperLayer extends Drawable
+public abstract class UpperLayer extends Drawable implements java.io.Serializable
 {
 
   protected String type;

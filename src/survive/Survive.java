@@ -17,6 +17,10 @@ import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import static java.lang.Math.abs;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,7 +45,7 @@ public class Survive
 
   private LowerLayer grass, gravel, water, woodFloor;
 
-  private MiddleLayer Tree, Boulder, LogWall, Log, Stone, Barrel, Axe, WaterBorder, Rifle, Window, Ammo, DeadBody;
+  private MiddleLayer Tree, Boulder, LogWall, Log, Stone, Barrel, Axe, WaterBorder, Rifle, Window, Ammo, DeadBody, Torch;
 
   private UpperLayer black;
   
@@ -55,7 +59,7 @@ public class Survive
   private int bagOverlayX = -Global.xRes + 200;
   private int bagOverlayY = -Global.yRes + 200;
 
-  private Inventory log, stone, logWall, barrel, axe, rifle, window, ammo;
+  private Inventory log, stone, logWall, barrel, axe, rifle, window, ammo, torch;
 
   private Direction direction = Direction.UP;
   private double movementSpeed = 20;
@@ -82,7 +86,7 @@ public class Survive
   private boolean dayTrans = true;
   private int daySpeed = 1;
   private int timeOfDay = 10;
-  private float darkness = 0.8f;
+  private float darkness = 0.95f;
   private int treeLikely = 60;
   private int boulderLikely = 20;
   private int zombieChance = 400;
@@ -91,6 +95,7 @@ public class Survive
   private int selectionX = 0;
   private int selectionY = 0;
   private boolean gameRunning = true;
+  private boolean menuRunning = true;
   private boolean inventoryOpen = false;
   private boolean craftingOpen = false;
   private boolean craftingStructure = false;
@@ -113,6 +118,8 @@ public class Survive
   private List<BulletEntity> bulletsToRemove = new ArrayList<BulletEntity>();
   private ArrayList removeList = new ArrayList();
   private ArrayList<Hud> removeHudList = new ArrayList<Hud>();
+  private ArrayList<Coords> removeUpperList = new ArrayList<Coords>();
+  
   
   Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
   
@@ -154,40 +161,223 @@ public class Survive
 
     createBufferStrategy(2);
     strategy = getBufferStrategy();
-
+   
     initEntities();
-    randomChance[2] = 3;
-    randomChance[3] = 3;
-    for (int i = 0; i < 4; i++) {
-        equipped[i] = 0;
-    }
+    startMenu();
+    
   }
-
-  private void startGame()
+  private void saveAll()
   {
-    lowerLayers.clear();
-    initEntities();
+      try{ 
+      FileOutputStream saveFile = new FileOutputStream("save.sav");
+      
+      ObjectOutputStream save = new ObjectOutputStream(saveFile);
+      
+      ArrayList<SaveVariables> lowerVar = new ArrayList<SaveVariables>();
+      ArrayList<SaveVariables> middleVar = new ArrayList<SaveVariables>();
+      ArrayList<SaveVariables> invVar = new ArrayList<SaveVariables>();
+      ArrayList<SaveVariables> enemyVar = new ArrayList<SaveVariables>();
+      
+      SaveVariables newPlayer = new SaveVariables(player.getCoords().getX(), player.getCoords().getY(), player.getLife());
+      for (Coords coords: lowerLayers.keySet()) {      
+      SaveVariables newItem = new SaveVariables(coords.getX(), coords.getY(), lowerLayers.get(coords).getType());      
+      lowerVar.add(newItem);
+      }
+      for (Coords coords: middleLayers.keySet()) {
+      SaveVariables newItem = new SaveVariables(coords.getX(), coords.getY(), middleLayers.get(coords).getType());      
+      middleVar.add(newItem);
+      }
+      for (Inventory inventory : inventorys) {
+          SaveVariables newItem = new SaveVariables(inventory.getItemCode(), inventory.getQuantity(), 0);
+          invVar.add(newItem);
+      }
+      for (Coords coords: enemyLayers.keySet()) {
+          SaveVariables newItem = new SaveVariables(coords.getX(), coords.getY(), enemyLayers.get(coords).type);
+          enemyVar.add(newItem);
+      }
+      save.writeObject(lowerVar);
+      save.writeObject(middleVar);
+      save.writeObject(invVar);
+      save.writeObject(enemyVar);
+      save.writeObject(newPlayer);
+      save.writeObject(equipped);
+      save.writeObject(xLLimit);
+      save.writeObject(xRLimit);
+      save.writeObject(yULimit);
+      save.writeObject(yDLimit);
 
-    leftPressed = false;
-    rightPressed = false;
-    spacePressed = false;
+      save.close();
+      }
+      catch(Exception ex){
+          ex.printStackTrace();
+      }
+      
   }
+  private void loadAll()
+  {
+      lowerLayers.clear();
+      middleLayers.clear();
 
+      ArrayList<SaveVariables> lowerVar = new ArrayList<SaveVariables>();
+      ArrayList<SaveVariables> middleVar = new ArrayList<SaveVariables>();
+      ArrayList<SaveVariables> invVar = new ArrayList<SaveVariables>();
+      ArrayList<SaveVariables> enemyVar = new ArrayList<SaveVariables>();
+      
+      SaveVariables newPlayer = new SaveVariables(0,0,0);
+      try {
+      FileInputStream saveFile = new FileInputStream("save.sav");
+      
+      ObjectInputStream save = new ObjectInputStream(saveFile); 
+      
+      lowerVar = (ArrayList) save.readObject();
+      middleVar = (ArrayList) save.readObject();
+      invVar = (ArrayList) save.readObject();
+      enemyVar = (ArrayList) save.readObject();
+      newPlayer = (SaveVariables) save.readObject();
+      equipped = (int[]) save.readObject();
+      xLLimit = (int) save.readObject();
+      xRLimit = (int) save.readObject();
+      yULimit = (int) save.readObject();
+      yDLimit = (int) save.readObject();
+
+      
+      save.close();
+      }      
+      catch(Exception ex){
+          ex.printStackTrace();
+      }
+      
+      player.setCoords(new Coords(newPlayer.getX(), newPlayer.getY()));
+      player.setLife(newPlayer.getType());
+      for (SaveVariables inventory : invVar) {
+          addToInventory(inventory.getX(), inventory.getY()); 
+      }
+      for (SaveVariables newMiddleLayer : middleVar) {
+          Coords coords = new Coords(newMiddleLayer.getX(), newMiddleLayer.getY());
+          switch (newMiddleLayer.getType()) {
+              case 1:
+                Tree = new TreeEntity(this, coords, 1);
+                middleLayers.put(coords, Tree);
+                break;
+              case 2:
+                Boulder = new BoulderEntity(this, coords, 2);
+                middleLayers.put(coords, Boulder);
+                break;
+              case 3:
+                LogWall = new LogWallEntity(this, coords, 3);
+                middleLayers.put(coords, LogWall);
+                break;
+              case 4:
+                Barrel = new BarrelEntity(this, coords, 4);
+                middleLayers.put(coords, Barrel);
+                break;
+              case 5:
+                Axe = new AxeEntity(this, coords, 5);
+                middleLayers.put(coords, Axe);
+                break;
+              case 6:
+                Rifle = new RifleEntity(this, coords, 6);
+                middleLayers.put(coords, Rifle);
+                break;
+              case 7:
+                Window = new WindowEntity(this, coords, 7);
+                middleLayers.put(coords, Window);
+                break;
+              case 8:
+                Tree = new LeavesEntity(this, coords, 8);
+                middleLayers.put(coords, Tree);
+                break;
+              case 9:
+                Ammo = new AmmoEntity(this, coords, 9);
+                middleLayers.put(coords, Ammo);
+                break;
+              case 10:
+                DeadBody = new DeadBodyEntity(this, coords, 10);
+                middleLayers.put(coords, DeadBody);
+                break;
+              case 15:
+                Torch = new TorchEntity(this, coords, 15);
+                middleLayers.put(coords, Torch);
+                break;
+          }
+      } 
+      for (SaveVariables newLowerLayer : lowerVar) {
+          Coords coords = new Coords(newLowerLayer.getX(), newLowerLayer.getY());
+          switch (newLowerLayer.getType()) {
+              case 11:
+                  grass = new GrassEntity(this, "sprites/lowerlayer/grass.png", coords, 11);
+                  lowerLayers.put(coords, grass);
+                  break;
+              case 12:
+                  gravel = new GravelEntity(this, "sprites/lowerlayer/gravel.png", coords, 12);
+                  lowerLayers.put(coords, gravel);
+                  break;
+              case 13:
+                  water = new WaterEntity(this, "sprites/lowerlayer/waterborder.png", coords, 13);
+                  lowerLayers.put(coords, water);
+                  break;
+              case 14:
+                  woodFloor = new WoodFloorEntity(this, "sprites/lowerlayer/woodfloor.gif", coords, 14);
+                  lowerLayers.put(coords, woodFloor); 
+                  break;
+          }
+      }
+      for (SaveVariables newEnemyLayer : enemyVar) {
+          Coords coords = new Coords(newEnemyLayer.getX(), newEnemyLayer.getY());
+          switch (newEnemyLayer.getType()) {
+              case 1:
+                  zombie = new ZombieEntity(this, "sprites/npc/zombie1.png", coords, Direction.UP, 1);
+                  enemyLayers.put(coords, zombie);
+                  break;
+                  
+          }
+      }
+      menuRunning = false; 
+  }
+  private void startMenu()
+  {
+      while (menuRunning) {
+          
+      Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
+      g.setColor(Color.black);
+      g.fillRect(0, 0, Global.xRes, Global.yRes);
+      
+      button  = new ButtonEntity(this, "sprites/hud/newbutton.jpg", new Coords(Global.xRes / 2 - 50, Global.yRes / 2 - 100), "start", 100);
+      huds.add(button);
+      button  = new ButtonEntity(this, "sprites/hud/loadbutton.jpg", new Coords(Global.xRes / 2 - 50, Global.yRes / 2 + 100), "load", 100);
+      huds.add(button);
+      
+      for (Hud hud : huds) {
+          if (hud.getType() == "start" || hud.getType() == "load") {
+          hud.draw(g, new Coords(0,0));
+          }
+      }
+      
+      strategy.show();
+      try {
+        Thread.sleep(100L);
+      } catch (Exception e) {
+      }
+      
+      }
+  }
+  
   private void initEntities()
   {
     
     randomDefault[0] = 150;
     randomDefault[1] = 15;
-    randomDefault[2] = 0;
-    randomDefault[3] = 0;
+    randomDefault[2] = 3;
+    randomDefault[3] = 3;
 
+    for (int i = 0; i < 4; i++) {
+        equipped[i] = 0;
+    }
     randomChance[0] = randomDefault[0];    //Grass
     randomChance[1] = randomDefault[1];    //Gravel
     randomChance[2] = randomDefault[2];    //Pond
     randomChance[3] = randomDefault[3];    //House
     
-    //Add Test entities
-    testEntities();
     //Add player entity
     player = new PlayerEntity(this, "sprites/player/playern.png", new Coords(0, 0), "player");
     
@@ -216,7 +406,7 @@ public class Survive
     hurt = new ButtonEntity(this, "sprites/hud/hurt.png", new Coords(0,0), "hurtOverlay", 1000);
     huds.add(hurt);
     
-    if (inventorys.isEmpty()) {
+    
       log = new Inventory("sprites/object/log.png", 1, 0, new Coords(0,0));
       inventorys.add(log);
       stone = new Inventory("sprites/object/stone.png", 2, 0, new Coords(0,0));
@@ -233,11 +423,16 @@ public class Survive
       inventorys.add(window);
       ammo = new Inventory("sprites/object/ammobox.png", 9, 0, new Coords(0,0));
       inventorys.add(ammo);
-    }
+      torch = new Inventory("sprites/object/torch.png", 15, 0, new Coords(0,0));
+      inventorys.add(torch);
+      
+    //Add Test entities
+    testEntities();
+    
   }
   public void testEntities () 
   {
-
+      addToInventory(15,10);
   }
   public void drawEquipped(Coords coords) 
   {
@@ -268,7 +463,24 @@ public class Survive
               break;
       } 
   }
- 
+  public void mouseMenuInteract()
+  {
+      int mouseX = MouseInfo.getPointerInfo().getLocation().x;
+      int mouseY = MouseInfo.getPointerInfo().getLocation().y;
+      
+      for (int i = 0; i < huds.size(); i++) {
+          Hud hud = huds.get(i);
+          if (mouseX >= hud.getCoords().getX() && mouseY >= hud.getCoords().getY() && mouseX <= hud.getCoords().getX() + 100 && mouseY <= hud.getCoords().getY() + 100) {
+              if ("start".equals(hud.getType()) && menuRunning == true) {
+                  menuRunning = false;
+              }
+              if ("load".equals(hud.getType()) && menuRunning == true) {
+                  menuRunning = false;
+                  loadAll();
+              }
+          }
+      }
+  }
   public void mouseInteract()
   {
      int mouseX = MouseInfo.getPointerInfo().getLocation().x;
@@ -297,8 +509,14 @@ public class Survive
       if (middleLayer != null) {
         if (middleLayer.interact() == true) {
             for (int i = 0; i < interacable.length; i++) {
-                if (middleLayer.getType() == interacable[i]) {               
-                middleLayers.remove(interactCoords);
+                if (middleLayer.getType() == interacable[i]) {
+                    if (middleLayer.getType() == 15) {
+                        removeUpperList.remove(interactCoords);
+                    }
+                    if (middleLayer.getType() == 4) {
+                        addToInventory(middleLayer.getItemCode(), middleLayer.getItemQ());
+                    }
+                middleLayers.remove(interactCoords);    
                 }
             }
         } 
@@ -319,7 +537,7 @@ public class Survive
             }
             if (enemyLayer.getLife() <= 0) {
             enemyLayers.remove(newCoords);
-            DeadBody = new DeadBodyEntity(this, "sprites/object/deadzomb.png", interactCoords, 10);
+            DeadBody = new DeadBodyEntity(this, interactCoords, 10);
             middleLayers.put(interactCoords, DeadBody);
             }
         }
@@ -366,42 +584,50 @@ public class Survive
       }
     }
   }
+  public void placeBlock (Coords coords, int itemCode) 
+  {
+      
+  }
   public void placeItemHeld(Direction direction)
   {
     final Coords coords = direction.getCoordsFrom(player.getCoords());
     if (!middleLayers.containsKey(coords)) {
     switch (itemSelection) {
       case 1:
-        Log = new LogEntity(this, "sprites/object/log.png", coords, 1);
+        Log = new LogEntity(this, coords, 1);
         middleLayers.put(coords, Log);
         break;
       case 2:
-        Stone = new StoneEntity(this, "sprites/object/stone.png", coords, 2);
+        Stone = new StoneEntity(this, coords, 2);
         middleLayers.put(coords, Stone);
         break;
       case 3:
-        LogWall = new LogWallEntity(this, "sprites/object/logwall.gif", coords, 3);
+        LogWall = new LogWallEntity(this, coords, 3);
         middleLayers.put(coords, LogWall);
         break;
       case 4:
-        Barrel = new BarrelEntity(this, "sprites/object/barrel.png", coords, 4);
+        Barrel = new BarrelEntity(this, coords, 4);
         middleLayers.put(coords, Barrel);
         break;
       case 5:
-        Axe = new AxeEntity(this, "sprites/object/axe.png", coords, 5);
+        Axe = new AxeEntity(this, coords, 5);
         middleLayers.put(coords, Axe);
         break;
       case 6:
-        Rifle = new RifleEntity(this, "sprites/object/rifle.png", coords, 6);
+        Rifle = new RifleEntity(this, coords, 6);
         middleLayers.put(coords, Rifle);
         break;
       case 7:
-        Window = new WindowEntity(this, "sprites/object/window.png", coords, 7);
+        Window = new WindowEntity(this, coords, 7);
         middleLayers.put(coords, Window);
         break;
       case 9:
-        Ammo = new AmmoEntity(this, "sprites/object/ammobox.png", coords, 9);
+        Ammo = new AmmoEntity(this, coords, 9);
         middleLayers.put(coords, Ammo);
+        break;
+      case 15:
+        Torch = new TorchEntity(this, coords, 15);
+        middleLayers.put(coords, Torch);
         break;
 
     }
@@ -466,22 +692,10 @@ public class Survive
               y = locs[a][1];              
               final Coords treeCoords = new Coords(x, y);
               if (a == 4) {
-              Tree = new TreeEntity(this, "sprites/object/tree/trunk.png", treeCoords, 1);    
+              Tree = new TreeEntity(this, treeCoords, 1);    
               }
-              if (a != 4 && a < 9) {
-              Tree = new LeavesEntity(this, "sprites/object/tree/leaves1_1.png", treeCoords, 8);
-              }
-              if (a == 9) {
-              Tree = new LeavesEntity(this, "sprites/object/tree/leaves1_d.png", treeCoords, 8);    
-              }
-              if (a == 10) {
-              Tree = new LeavesEntity(this, "sprites/object/tree/leaves1_u.png", treeCoords, 8);    
-              }
-              if (a == 11) {
-              Tree = new LeavesEntity(this, "sprites/object/tree/leaves1_r.png", treeCoords, 8);    
-              }
-              if (a == 12) {
-              Tree = new LeavesEntity(this, "sprites/object/tree/leaves1_l.png", treeCoords, 8);    
+              if (a != 4) {
+              Tree = new LeavesEntity(this, treeCoords, 8);
               }
               middleLayers.put(treeCoords, Tree);
           } 
@@ -492,7 +706,7 @@ public class Survive
         lowerLayers.put(newLocation, gravel);
         chance = getRandomNum(boulderLikely);
         if (chance == 1) {
-          Boulder = new BoulderEntity(this, "sprites/object/boulder.png", newLocation, 2);
+          Boulder = new BoulderEntity(this, newLocation, 2);
           middleLayers.put(newLocation, Boulder);
         }
         break;
@@ -527,7 +741,7 @@ public class Survive
           y = locs[a][1];
           if (a > 0 && x == 0 && y == 0) break;
           final Coords logWallCoords = new Coords(x, y);
-          LogWall = new LogWallEntity(this, "sprites/object/logwall.gif", logWallCoords, 3);
+          LogWall = new LogWallEntity(this, logWallCoords, 3);
           middleLayers.put(logWallCoords, LogWall);
         }
         locs = PreSetGroups.houseItems(direction, 3, startX, startY, size);
@@ -536,7 +750,7 @@ public class Survive
           y = locs[a][1];
           if (a > 0 && x == 0 && y == 0) break;
           final Coords itemsCoords = new Coords(x, y);
-          Barrel = new BarrelEntity(this, "sprites/object/barrel.png", itemsCoords, 4);
+          Barrel = new BarrelEntity(this, itemsCoords, 4);
           middleLayers.put(itemsCoords, Barrel);
         }
         break;
@@ -629,7 +843,10 @@ public class Survive
         craftingStructure = false;
       }
     }
-    if (iPressed || ePressed) {
+    if (iPressed) {
+        saveAll();
+    }
+    if (ePressed) {
       if (!inventoryOpen) {
           holdingItem = false;
       }
@@ -638,7 +855,7 @@ public class Survive
       selectionY = bagOverlayY - 35;
        
     }
-    if (leftPressed && !inventoryOpen) {
+    if (leftPressed) {
       direction = Direction.LEFT;
       player.changeFrame(pRotate);
       movePlayer(direction);           
@@ -646,21 +863,21 @@ public class Survive
       pRotate ++;
     }
     
-    if (rightPressed && !inventoryOpen) {
+    if (rightPressed) {
       direction = Direction.RIGHT;
       player.changeFrame(pRotate);
       movePlayer(direction);          
       checkCollisionObject(direction);
       pRotate ++;
     }
-    if (upPressed && !inventoryOpen) {
+    if (upPressed) {
       direction = Direction.UP;
       player.changeFrame(pRotate);
       movePlayer(direction);           
       checkCollisionObject(direction);
       pRotate ++;
     }
-    if (downPressed && !inventoryOpen) {
+    if (downPressed) {
       direction = Direction.DOWN;
       player.changeFrame(pRotate);
       movePlayer(direction);          
@@ -1079,7 +1296,7 @@ public class Survive
       black = new BlackEntity(this, "sprites/hud/fullblack.png", coords, "fullblack");
       upperLayers.put(coords, black); 
   }
-  public void setTimeOfDay(Coords coords, int size) {
+  public void setVision(Coords coords, int size) {
       int xLoc = coords.getX();
       int yLoc = coords.getY();
       int y = 0 - size;
@@ -1244,12 +1461,12 @@ public class Survive
             }
             else {
                 darkness = darkness + .03f; 
-                if (darkness > .8f) {darkness = .8f;}
+                if (darkness > .95f) {darkness = .95f;}
             }
             
         timeOfDay = timeOfDay + daySpeed;
         if (timeOfDay > 40) {timeOfDay = 40; daySpeed = -daySpeed; dayTrans = false;darkness = 0;}
-        if (timeOfDay < 10) {timeOfDay = 10; daySpeed = -daySpeed; dayTrans = false;darkness = .8f;}    
+        if (timeOfDay < 10) {timeOfDay = 10; daySpeed = -daySpeed; dayTrans = false;darkness = .95f;}    
   
   }
   //Loop of main game
@@ -1290,7 +1507,7 @@ public class Survive
       int randomZombie = (int) (Math.random() * zombieChance);
       if (randomZombie < 4) {
           Coords location = spawnZombie(randomZombie);
-          zombie = new ZombieEntity(this, "sprites/npc/zombie1.png", location, "zombie", Direction.UP);
+          zombie = new ZombieEntity(this, "sprites/npc/zombie1.png", location, Direction.UP, 1);
           enemyLayers.put(location, zombie);
       }
       
@@ -1329,8 +1546,8 @@ public class Survive
           }
           }
           if (middleLayers.containsKey(coords)) {
-              if (middleLayers.get(coords).getType() == 3) {
-              Surrounding surround = setSimBlockImage(coords, 3);
+              if (middleLayers.get(coords).getType() == 3 || middleLayers.get(coords).getType() == 8) {
+              Surrounding surround = setSimBlockImage(coords, middleLayers.get(coords).getType());
               if (surround.getFrame() > 5) {surround.addRotate(90);}
               middleLayers.get(coords).changeFrame(surround.getFrame());
               middleLayers.get(coords).rotDraw(g, screenOffset, surround.getRotate());
@@ -1338,14 +1555,23 @@ public class Survive
               else {
                 middleLayers.get(coords).draw(g, screenOffset);
               }
+              if (middleLayers.get(coords).getType() == 15) {
+                  removeUpperList.add(coords);
+              }
           }  
-          if (upperLayers.containsKey(coords) && "fullblack".equals(upperLayers.get(coords).getType()) && darkness > 0){
-                upperLayers.get(coords).fadeRotDraw(g, screenOffset, 0, darkness);   
-            }
         }
       }
+     // if (darkness > 0) {
+     //     upperLayers.get(screenOffset).scaleFadeDraw(g, screenOffset, Global.xRes, Global.yRes, darkness);
+     // }
+      
       //Remove black in accordance with time in transition
-      setTimeOfDay(player.getCoords(), timeOfDay);
+      for (Coords remove : removeUpperList) {
+      setVision(remove, 5);    
+      }
+      
+
+      setVision(player.getCoords(), timeOfDay);
       
       //Check for Line of Sight
       checkLoS(); 
@@ -1550,10 +1776,23 @@ public class Survive
           extends MouseAdapter
   {
     
+    /*public void mousePressed(MouseEvent e)
+    {
+        if (menuRunning) {
+            mouseMenuInteract();
+        }
+        else {
+            mouseInteract();
+        }
+    }*/
     public void mousePressed(MouseEvent e)
     {
-     mouseInteract();
-     
+        if (menuRunning) {
+            mouseMenuInteract();
+        }
+        else {
+            mouseInteract();
+        }
     }
   }
 

@@ -6,8 +6,6 @@
 
 package survive;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *

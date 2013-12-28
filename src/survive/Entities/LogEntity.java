@@ -2,6 +2,7 @@ package survive.Entities;
 
 import survive.Coords;
 import survive.MiddleLayer;
+import survive.SpriteStore;
 import survive.Survive;
 
 public class LogEntity
@@ -10,9 +11,10 @@ public class LogEntity
 
   private Survive survive;
 
-  public LogEntity(Survive survive, String ref, final Coords coords, int type)
+  public LogEntity(Survive survive, final Coords coords, int type)
   {
-    super(ref, coords, type);
+    super(coords, type);
+    setSprite(SpriteStore.get().getSprite("sprites/object/tree/log.png"));
 
     this.survive = survive;
   }

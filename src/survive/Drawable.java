@@ -29,6 +29,9 @@ public abstract class Drawable {
   public void scaleDraw(Graphics2D g, final Coords offset, double xScale, double yScale) {
     sprite.scaleDraw(g, coords.getX() - offset.getX(), coords.getY() - offset.getY(), xScale, yScale);  
   }
+  public void scaleFadeDraw(Graphics2D g, final Coords offset, double xScale, double yScale, float alpha) {
+    sprite.scaleFadeDraw(g, coords.getX() - offset.getX(), coords.getY() - offset.getY(), xScale, yScale, alpha);  
+  }
   public void changeBrightness(float val) {
     sprite.changeBrightness(val);
   }

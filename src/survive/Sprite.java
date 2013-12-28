@@ -9,7 +9,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
  
- public class Sprite
+ public class Sprite implements java.io.Serializable
  {
    private Image image;
    
@@ -61,6 +61,17 @@ import java.awt.image.RescaleOp;
       AffineTransform newG = new AffineTransform();
       newG.scale(xScale, yScale);
       g.drawImage(image, newG, null);
+      g.setTransform(old);
+   }
+   public void scaleFadeDraw(Graphics2D g, int x, int y, double xScale, double yScale, float alpha)
+   {
+      AffineTransform old = g.getTransform();
+      Composite oldComp = g.getComposite();
+      AffineTransform newG = new AffineTransform();
+      newG.scale(xScale, yScale);
+      g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, alpha));
+      g.drawImage(image, newG, null);
+      g.setComposite(oldComp);
       g.setTransform(old);
    }
    public void changeBrightness(float val) 

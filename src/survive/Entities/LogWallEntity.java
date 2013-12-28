@@ -13,9 +13,10 @@ public class LogWallEntity
   private Survive survive;
   private Sprite[] frames = new Sprite[6];
   
-  public LogWallEntity(Survive survive, String ref, final Coords coords, int type)
+  public LogWallEntity(Survive survive, final Coords coords, int type)
   {
-    super(ref, coords, type);
+    super(coords, type);
+    setSprite(SpriteStore.get().getSprite("sprites/object/woodwall.png"));
 
     frames[0] = SpriteStore.get().getSprite("sprites/object/woodwallintersect.png");
     frames[1] = SpriteStore.get().getSprite("sprites/object/woodwallcorner.png");
