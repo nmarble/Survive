@@ -1,4 +1,4 @@
-package survive.Entities;
+package survive.Entities.middlelayer;
 
 import survive.Coords;
 import survive.MiddleLayer;

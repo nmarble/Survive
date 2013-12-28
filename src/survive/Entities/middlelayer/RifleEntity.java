@@ -1,26 +1,27 @@
-package survive.Entities;
+package survive.Entities.middlelayer;
 
 import survive.Coords;
 import survive.MiddleLayer;
 import survive.SpriteStore;
 import survive.Survive;
 
-public class AxeEntity
+public class RifleEntity
         extends MiddleLayer
 {
 
   private Survive survive;
 
-  public AxeEntity(Survive survive, final Coords coords, int type)
+  public RifleEntity(Survive survive, final Coords coords, int type)
   {
     super(coords, type);
-    setSprite(SpriteStore.get().getSprite("sprites/object/axe.png"));
+    setSprite(SpriteStore.get().getSprite("sprites/object/rifle.png"));
+
     this.survive = survive;
   }
 
   public boolean interact()
   {
-    survive.addToInventory(5, 1);
+    survive.addToInventory(6, 1);
     return true;
   }
 

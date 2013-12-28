@@ -1,9 +1,5 @@
 package survive;
  
-
-import survive.Entities.WaterEntity;
-
- 
 public class PreSetGroups
 {
   

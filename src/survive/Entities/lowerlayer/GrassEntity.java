@@ -1,4 +1,4 @@
-package survive.Entities;
+package survive.Entities.lowerlayer;
 
 import survive.Coords;
 import survive.LowerLayer;
@@ -12,10 +12,10 @@ public class GrassEntity
   private Survive survive;
   private Sprite[] frames = new Sprite[11];
   
-  public GrassEntity(Survive survive, String ref, final Coords coords, int type)
+  public GrassEntity(Survive survive, final Coords coords, int type)
   {
-    super(ref, coords, type);
-    
+    super(coords, type);
+    setSprite(SpriteStore.get().getSprite("sprites/lowerlayer/grass.png"));
     frames[0] = SpriteStore.get().getSprite("sprites/lowerlayer/grass.png");
     frames[1] = SpriteStore.get().getSprite("sprites/lowerlayer/grass3.png");
     frames[2] = SpriteStore.get().getSprite("sprites/lowerlayer/grass6.png");

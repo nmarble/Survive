@@ -57,11 +57,14 @@
    public int[] interactableCodes(int code)
    {
        if (code == 5) {
-          int[] interCodes = {1,3,4,5,6,7,8,9,15};
+          int[] interCodes = {1,3,4,5,6,7,8,9,15,16,18,19};
           return interCodes;
        }
-       int[] interCodes = {4,5,6,7,8,9,15};
-       return interCodes;
+       else if (code == 0) {
+          int[] interCodes = {4,5,6,7,8,9,15,18,19};
+          return interCodes;
+       }
+       return new int[]{0};
    }
  }
 //Item Codes
@@ -80,6 +83,11 @@
 //Water 13
 //WoodFloor 14
 //Torch 15
+//Trunk 16
+//Boulder 17
+//Door 18
+
+
 
 
 

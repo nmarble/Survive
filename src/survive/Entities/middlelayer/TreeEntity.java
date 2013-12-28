@@ -1,27 +1,26 @@
-package survive.Entities;
+package survive.Entities.middlelayer;
 
 import survive.Coords;
 import survive.MiddleLayer;
 import survive.SpriteStore;
 import survive.Survive;
 
-public class BoulderEntity
-        extends MiddleLayer
+public class TreeEntity extends MiddleLayer
 {
 
   private Survive survive;
 
-  public BoulderEntity(Survive survive, final Coords coords, int type)
+  public TreeEntity(Survive survive, final Coords coords, int type)
   {
     super(coords, type);
-    setSprite(SpriteStore.get().getSprite("sprites/object/boulder.png"));
+    setSprite(SpriteStore.get().getSprite("sprites/object/tree/trunk.png"));
 
     this.survive = survive;
   }
 
   public boolean interact()
   {
-    survive.addToInventory(2, 1);
+    survive.addToInventory(1, 2);
     return true;
   }
 
@@ -35,6 +34,6 @@ public class BoulderEntity
    }
   public boolean seePassed()
    {
-       return true;
+       return false;
    }
 }

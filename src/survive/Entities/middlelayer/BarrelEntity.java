@@ -1,4 +1,4 @@
- package survive.Entities;
+ package survive.Entities.middlelayer;
  
  import survive.Global;
  import survive.MiddleLayer;
@@ -19,7 +19,7 @@ import survive.SpriteStore;
      
      int choice = 0;
      int choiceNum = 0;
-     int[] randomChance = {0,20,0,0,0,10,8,15,0,20,0,0,0,0,0,15};
+     int[] randomChance = {0,20,0,0,0,10,8,15,0,20,0,0,0,0,0,15,0,0,10};
          
      for (int i = 0; i < randomChance.length; i++ )
      {

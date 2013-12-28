@@ -4,8 +4,8 @@ public abstract class LowerLayer extends Drawable implements java.io.Serializabl
 
     protected int type;
 
-    public LowerLayer(String ref, final Coords coords, int type) {
-        super(coords, SpriteStore.get().getSprite(ref));
+    public LowerLayer(final Coords coords, int type) {
+        super(coords, SpriteStore.get().getSprite("sprites/null.png"));
         this.type = type;
     }
 

@@ -1,19 +1,20 @@
- package survive.Entities;
+package survive.Entities.lowerlayer;
  
 import survive.Global;
  import survive.LowerLayer;
  import survive.Survive;
  import survive.Coords;
+import survive.SpriteStore;
  
  public class WoodFloorEntity
    extends LowerLayer
  {
    private Survive survive;
    
-   public WoodFloorEntity(Survive survive, String ref, Coords coords, int type)
+   public WoodFloorEntity(Survive survive, Coords coords, int type)
    {
-     super(ref, coords, type);
-     
+     super(coords, type);
+     setSprite(SpriteStore.get().getSprite("sprites/lowerlayer/woodfloor.gif"));
      this.survive = survive;
    }
 

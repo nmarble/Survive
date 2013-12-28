@@ -1,4 +1,4 @@
-package survive.Entities;
+package survive.Entities.lowerlayer;
 
 import survive.Coords;
 import survive.LowerLayer;
@@ -13,10 +13,10 @@ public class GravelEntity
   private Survive survive;
   private Sprite[] frames = new Sprite[10];
   
-  public GravelEntity(Survive survive, String ref, final Coords coords, int type)
+  public GravelEntity(Survive survive, final Coords coords, int type)
   {
-    super(ref, coords, type);
-    
+    super(coords, type);
+    setSprite(SpriteStore.get().getSprite("sprites/lowerlayer/gravel.png"));
     frames[0] = SpriteStore.get().getSprite("sprites/lowerlayer/gravel.png");
     frames[1] = SpriteStore.get().getSprite("sprites/lowerlayer/gravel.png");
     frames[2] = SpriteStore.get().getSprite("sprites/lowerlayer/gravel.png");

@@ -31,6 +31,8 @@ import java.util.Random;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import survive.Entities.*;
+import survive.Entities.middlelayer.*;
+import survive.Entities.lowerlayer.*;
 
 
 public class Survive
@@ -43,9 +45,9 @@ public class Survive
   int[] randomChance = new int[totalRandom];
   int[] randomDefault = new int[totalRandom];
 
-  private LowerLayer grass, gravel, water, woodFloor;
+  private LowerLayer newLower;
 
-  private MiddleLayer Tree, Boulder, LogWall, Log, Stone, Barrel, Axe, WaterBorder, Rifle, Window, Ammo, DeadBody, Torch;
+  private MiddleLayer newMiddle;
 
   private UpperLayer black;
   
@@ -59,7 +61,7 @@ public class Survive
   private int bagOverlayX = -Global.xRes + 200;
   private int bagOverlayY = -Global.yRes + 200;
 
-  private Inventory log, stone, logWall, barrel, axe, rifle, window, ammo, torch;
+  private Inventory log, stone, logWall, barrel, axe, rifle, window, ammo, torch, door;
 
   private Direction direction = Direction.UP;
   private double movementSpeed = 20;
@@ -119,11 +121,9 @@ public class Survive
   private ArrayList removeList = new ArrayList();
   private ArrayList<Hud> removeHudList = new ArrayList<Hud>();
   private ArrayList<Coords> removeUpperList = new ArrayList<Coords>();
-  
-  
+   
   Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-  
-  
+
   public Survive()
   {
     JFrame container = new JFrame("Survive");
@@ -254,73 +254,11 @@ public class Survive
       }
       for (SaveVariables newMiddleLayer : middleVar) {
           Coords coords = new Coords(newMiddleLayer.getX(), newMiddleLayer.getY());
-          switch (newMiddleLayer.getType()) {
-              case 1:
-                Tree = new TreeEntity(this, coords, 1);
-                middleLayers.put(coords, Tree);
-                break;
-              case 2:
-                Boulder = new BoulderEntity(this, coords, 2);
-                middleLayers.put(coords, Boulder);
-                break;
-              case 3:
-                LogWall = new LogWallEntity(this, coords, 3);
-                middleLayers.put(coords, LogWall);
-                break;
-              case 4:
-                Barrel = new BarrelEntity(this, coords, 4);
-                middleLayers.put(coords, Barrel);
-                break;
-              case 5:
-                Axe = new AxeEntity(this, coords, 5);
-                middleLayers.put(coords, Axe);
-                break;
-              case 6:
-                Rifle = new RifleEntity(this, coords, 6);
-                middleLayers.put(coords, Rifle);
-                break;
-              case 7:
-                Window = new WindowEntity(this, coords, 7);
-                middleLayers.put(coords, Window);
-                break;
-              case 8:
-                Tree = new LeavesEntity(this, coords, 8);
-                middleLayers.put(coords, Tree);
-                break;
-              case 9:
-                Ammo = new AmmoEntity(this, coords, 9);
-                middleLayers.put(coords, Ammo);
-                break;
-              case 10:
-                DeadBody = new DeadBodyEntity(this, coords, 10);
-                middleLayers.put(coords, DeadBody);
-                break;
-              case 15:
-                Torch = new TorchEntity(this, coords, 15);
-                middleLayers.put(coords, Torch);
-                break;
-          }
+          addEntity("middle", coords, newMiddleLayer.getType());        
       } 
       for (SaveVariables newLowerLayer : lowerVar) {
           Coords coords = new Coords(newLowerLayer.getX(), newLowerLayer.getY());
-          switch (newLowerLayer.getType()) {
-              case 11:
-                  grass = new GrassEntity(this, "sprites/lowerlayer/grass.png", coords, 11);
-                  lowerLayers.put(coords, grass);
-                  break;
-              case 12:
-                  gravel = new GravelEntity(this, "sprites/lowerlayer/gravel.png", coords, 12);
-                  lowerLayers.put(coords, gravel);
-                  break;
-              case 13:
-                  water = new WaterEntity(this, "sprites/lowerlayer/waterborder.png", coords, 13);
-                  lowerLayers.put(coords, water);
-                  break;
-              case 14:
-                  woodFloor = new WoodFloorEntity(this, "sprites/lowerlayer/woodfloor.gif", coords, 14);
-                  lowerLayers.put(coords, woodFloor); 
-                  break;
-          }
+          addEntity("lower", coords, newLowerLayer.getType());
       }
       for (SaveVariables newEnemyLayer : enemyVar) {
           Coords coords = new Coords(newEnemyLayer.getX(), newEnemyLayer.getY());
@@ -333,6 +271,74 @@ public class Survive
           }
       }
       menuRunning = false; 
+  }
+  private void addEntity(String entityType, Coords coords, int itemCode)
+  {
+      if ("middle".equals(entityType)) {
+          switch (itemCode) {
+              case 1:
+                  newMiddle = new LogEntity(this, coords, 1);
+                  break;
+              case 2:
+                  newMiddle = new StoneEntity(this, coords, 2);
+                  break;
+              case 3:
+                  newMiddle = new LogWallEntity(this, coords, 3);
+                  break;
+              case 4:
+                  newMiddle = new BarrelEntity(this, coords, 4);
+                  break;
+              case 5:
+                  newMiddle = new AxeEntity(this, coords, 5);
+                  break;
+              case 6:
+                  newMiddle = new RifleEntity(this, coords, 6);
+                  break;
+              case 7:
+                  newMiddle = new WindowEntity(this, coords, 7);
+                  break;
+              case 8:
+                  newMiddle = new LeavesEntity(this, coords, 8);
+                  break;
+              case 9:
+                  newMiddle = new AmmoEntity(this, coords, 9);
+                  break;
+              case 10:
+                  newMiddle = new DeadBodyEntity(this, coords, 10);
+                  break;
+              case 15:
+                  newMiddle = new TorchEntity(this, coords, 15);
+                  break;
+              case 16:
+                  newMiddle = new TreeEntity(this, coords, 16);
+                  break;
+              case 17:
+                  newMiddle = new BoulderEntity(this, coords, 17);
+                  break;
+              case 18:
+                  newMiddle = new DoorEntity(this, coords, 18);
+                  break;
+          }
+          middleLayers.put(coords, newMiddle);
+      }
+      if ("lower".equals(entityType)) {
+          switch (itemCode) {
+              case 11:
+                  newLower = new GrassEntity(this, coords, 11);
+                  break;
+              case 12:
+                  newLower = new GravelEntity(this, coords, 12);
+                  break;
+              case 13:
+                  newLower = new WaterEntity(this, coords, 13);
+                  break;
+              case 14:
+                  newLower = new WoodFloorEntity(this, coords, 14);
+                  break;
+          }
+          lowerLayers.put(coords, newLower);
+      }
+      
   }
   private void startMenu()
   {
@@ -425,6 +431,8 @@ public class Survive
       inventorys.add(ammo);
       torch = new Inventory("sprites/object/torch.png", 15, 0, new Coords(0,0));
       inventorys.add(torch);
+      door = new Inventory("sprites/object/doorclose1.png", 18, 0, new Coords(0,0));
+      inventorys.add(door);
       
     //Add Test entities
     testEntities();
@@ -432,7 +440,7 @@ public class Survive
   }
   public void testEntities () 
   {
-      addToInventory(15,10);
+      addToInventory(18,10);
   }
   public void drawEquipped(Coords coords) 
   {
@@ -501,8 +509,9 @@ public class Survive
     if (equipped[3] == 5 || equipped[3] == 6) {
     drawEquipped(interactCoords);
     }
+    boolean first = true;
     for (Inventory inventory : inventorys) {
-        if (inventory.getItemCode() == equipped[3] || equipped[3] == 0 ) {
+        if (inventory.getItemCode() == equipped[3] || equipped[3] == 0 && first) {
             int[] interacable = inventory.interactableCodes(equipped[3]);
 
       final MiddleLayer middleLayer = middleLayers.get(interactCoords);
@@ -516,12 +525,19 @@ public class Survive
                     if (middleLayer.getType() == 4) {
                         addToInventory(middleLayer.getItemCode(), middleLayer.getItemQ());
                     }
-                middleLayers.remove(interactCoords);    
+                    middleLayers.remove(interactCoords);                   
                 }
             }
-        } 
-      }
         }
+        else {
+           if (middleLayer.getType() == 18 && equipped[3] == 5) {
+               addToInventory(18,1);
+               middleLayers.remove(interactCoords);
+           }
+        }
+      }
+      first = false;
+     }
     }
 
     {
@@ -537,8 +553,7 @@ public class Survive
             }
             if (enemyLayer.getLife() <= 0) {
             enemyLayers.remove(newCoords);
-            DeadBody = new DeadBodyEntity(this, interactCoords, 10);
-            middleLayers.put(interactCoords, DeadBody);
+            addEntity("middle", newCoords, 10);
             }
         }
       }
@@ -556,15 +571,12 @@ public class Survive
       }
   }    
 
-  public void removeMiddleLayer(MiddleLayer object)
-  {
-    removeList.add(object);
-  }
-  
   public void addToInventory(int itemCode, int quantity)
   {
     //Add entities if none are available
-    
+    if (itemCode == 19) {
+        itemCode = 18;
+    }
     for (Inventory inventory : inventorys) {
       if (inventory.getItemCode() == itemCode) {
 
@@ -592,45 +604,7 @@ public class Survive
   {
     final Coords coords = direction.getCoordsFrom(player.getCoords());
     if (!middleLayers.containsKey(coords)) {
-    switch (itemSelection) {
-      case 1:
-        Log = new LogEntity(this, coords, 1);
-        middleLayers.put(coords, Log);
-        break;
-      case 2:
-        Stone = new StoneEntity(this, coords, 2);
-        middleLayers.put(coords, Stone);
-        break;
-      case 3:
-        LogWall = new LogWallEntity(this, coords, 3);
-        middleLayers.put(coords, LogWall);
-        break;
-      case 4:
-        Barrel = new BarrelEntity(this, coords, 4);
-        middleLayers.put(coords, Barrel);
-        break;
-      case 5:
-        Axe = new AxeEntity(this, coords, 5);
-        middleLayers.put(coords, Axe);
-        break;
-      case 6:
-        Rifle = new RifleEntity(this, coords, 6);
-        middleLayers.put(coords, Rifle);
-        break;
-      case 7:
-        Window = new WindowEntity(this, coords, 7);
-        middleLayers.put(coords, Window);
-        break;
-      case 9:
-        Ammo = new AmmoEntity(this, coords, 9);
-        middleLayers.put(coords, Ammo);
-        break;
-      case 15:
-        Torch = new TorchEntity(this, coords, 15);
-        middleLayers.put(coords, Torch);
-        break;
-
-    }
+    addEntity("middle", coords, itemSelection);
     removeFromInventory(itemSelection, 1);
     }
   }
@@ -682,8 +656,7 @@ public class Survive
     int startY = y;
     switch (getRandomGround(x, y)) {
       case 0:
-        grass = new GrassEntity(this, "sprites/lowerlayer/grass.gif", newLocation, 11);
-        lowerLayers.put(newLocation, grass);
+        addEntity("lower", newLocation, 11);  
         chance = getRandomNum(treeLikely);
         if (chance == 1) {
           locs = PreSetGroups.tree(direction, startX, startY);
@@ -692,22 +665,19 @@ public class Survive
               y = locs[a][1];              
               final Coords treeCoords = new Coords(x, y);
               if (a == 4) {
-              Tree = new TreeEntity(this, treeCoords, 1);    
+              addEntity("middle", treeCoords, 16);    
               }
               if (a != 4) {
-              Tree = new LeavesEntity(this, treeCoords, 8);
+              addEntity("middle", treeCoords, 8);
               }
-              middleLayers.put(treeCoords, Tree);
           } 
         }
         break;
       case 1:
-        gravel = new GravelEntity(this, "sprites/lowerlayer/gravel.gif", newLocation, 12);
-        lowerLayers.put(newLocation, gravel);
+        addEntity("lower", newLocation, 12);
         chance = getRandomNum(boulderLikely);
         if (chance == 1) {
-          Boulder = new BoulderEntity(this, newLocation, 2);
-          middleLayers.put(newLocation, Boulder);
+          addEntity("middle", newLocation, 16);
         }
         break;
       case 2:
@@ -719,8 +689,7 @@ public class Survive
           final Coords waterCoords = new Coords(x, y);
           middleLayers.remove(waterCoords);
           lowerLayers.remove(waterCoords);
-          water = new WaterEntity(this, "sprites/lowerlayer/waterborder.png", waterCoords, 13);
-          lowerLayers.put(waterCoords, water);        
+          addEntity("lower", waterCoords, 13);        
         }
         break;
         case 3:
@@ -732,8 +701,7 @@ public class Survive
           final Coords floorCoords = new Coords(x, y);
           middleLayers.remove(floorCoords);
           lowerLayers.remove(floorCoords);
-          woodFloor = new WoodFloorEntity(this, "sprites/lowerlayer/woodfloor.gif", floorCoords, 14);
-          lowerLayers.put(floorCoords, woodFloor);
+          addEntity("lower", floorCoords, 14);
         }
         locs = PreSetGroups.houseWalls(direction, startX, startY, size);
         for (int a = 0; a < (400); a++) { 
@@ -741,8 +709,7 @@ public class Survive
           y = locs[a][1];
           if (a > 0 && x == 0 && y == 0) break;
           final Coords logWallCoords = new Coords(x, y);
-          LogWall = new LogWallEntity(this, logWallCoords, 3);
-          middleLayers.put(logWallCoords, LogWall);
+          addEntity("middle", logWallCoords, 3);
         }
         locs = PreSetGroups.houseItems(direction, 3, startX, startY, size);
         for (int a = 0; a < (3); a++) { 
@@ -750,8 +717,7 @@ public class Survive
           y = locs[a][1];
           if (a > 0 && x == 0 && y == 0) break;
           final Coords itemsCoords = new Coords(x, y);
-          Barrel = new BarrelEntity(this, itemsCoords, 4);
-          middleLayers.put(itemsCoords, Barrel);
+          addEntity("middle", itemsCoords, 4);
         }
         break;
     }
@@ -1547,11 +1513,17 @@ public class Survive
           }
           if (middleLayers.containsKey(coords)) {
               if (middleLayers.get(coords).getType() == 3 || middleLayers.get(coords).getType() == 8) {
-              Surrounding surround = setSimBlockImage(coords, middleLayers.get(coords).getType());
-              if (surround.getFrame() > 5) {surround.addRotate(90);}
-              middleLayers.get(coords).changeFrame(surround.getFrame());
-              middleLayers.get(coords).rotDraw(g, screenOffset, surround.getRotate());
+                Surrounding surround = setSimBlockImage(coords, middleLayers.get(coords).getType());
+                if (surround.getFrame() > 5) {surround.addRotate(90);}
+                 middleLayers.get(coords).changeFrame(surround.getFrame());
+                middleLayers.get(coords).rotDraw(g, screenOffset, surround.getRotate());
               }
+              else if (middleLayers.get(coords).getType() == 7 || middleLayers.get(coords).getType() == 18) {
+                Surrounding surround = setSimBlockImage(coords, 3);
+                if (surround.getFrame() > 5) {surround.addRotate(90);}
+                middleLayers.get(coords).changeFrame(surround.getFrame());
+                middleLayers.get(coords).rotDraw(g, screenOffset, surround.getRotate());
+              }    
               else {
                 middleLayers.get(coords).draw(g, screenOffset);
               }
@@ -1570,7 +1542,6 @@ public class Survive
       setVision(remove, 5);    
       }
       
-
       setVision(player.getCoords(), timeOfDay);
       
       //Check for Line of Sight
@@ -1775,16 +1746,7 @@ public class Survive
   private class MouseInputHandler
           extends MouseAdapter
   {
-    
-    /*public void mousePressed(MouseEvent e)
-    {
-        if (menuRunning) {
-            mouseMenuInteract();
-        }
-        else {
-            mouseInteract();
-        }
-    }*/
+
     public void mousePressed(MouseEvent e)
     {
         if (menuRunning) {

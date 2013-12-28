@@ -1,18 +1,19 @@
- package survive.Entities;
+package survive.Entities.lowerlayer;
  
  import survive.LowerLayer;
  import survive.Survive;
  import survive.Coords;
+import survive.SpriteStore;
  
  public class MudEntity
    extends LowerLayer
  {
    private Survive survive;
    
-   public MudEntity(Survive survive, String ref, final Coords coords, int type)
+   public MudEntity(Survive survive, final Coords coords, int type)
    {
-     super(ref, coords, type);
-     
+     super(coords, type);
+     setSprite(SpriteStore.get().getSprite("sprites/lowerlayer/mud.gif"));
      this.survive = survive;
    }
    public boolean passable()

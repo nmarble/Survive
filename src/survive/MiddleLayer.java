@@ -10,11 +10,11 @@ public abstract class MiddleLayer extends Drawable implements java.io.Serializab
   protected Sprite sprite;
   protected int modifiedX;
   protected int modifiedY;
+  
   public MiddleLayer(final Coords coords, int type)
   {
     super(coords, SpriteStore.get().getSprite("sprites/null.png"));
     this.type = type;
-
   }
 
   public void changeFrame(int frameNumber)
@@ -33,6 +33,10 @@ public abstract class MiddleLayer extends Drawable implements java.io.Serializab
    {
        return 0;
    }
+   public void specialInteract()
+  {
+     
+  }
   public abstract boolean interact();
 
   public abstract boolean passable();
