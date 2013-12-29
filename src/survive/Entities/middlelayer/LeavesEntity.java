@@ -29,7 +29,6 @@ public class LeavesEntity extends MiddleLayer
 
   public boolean interact()
   {
-    survive.addToInventory(1, 2);
     return true;
   }
   public void changeFrame(int frameNumber)

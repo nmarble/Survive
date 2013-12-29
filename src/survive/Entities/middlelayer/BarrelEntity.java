@@ -35,7 +35,7 @@ import survive.SpriteStore;
          itemQ = 1;
      }
      else {
-     itemQ = (int)(Math.random() * 5)+1;
+     itemQ = (int)(Math.random() * 2)+1;
      }
    }
    public int getItemCode()

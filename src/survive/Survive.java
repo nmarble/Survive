@@ -4,6 +4,7 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.MouseInfo;
@@ -108,7 +109,8 @@ public class Survive
   private int xRLimit = 0; 
   private int yULimit = 0;
   private int yDLimit = 0;
-   
+  
+  Font defaultFont = new Font("Arial", Font.PLAIN, 12);
   private Map<Coords, LowerLayer> lowerLayers = new HashMap<Coords, LowerLayer>();
   private Map<Coords, MiddleLayer> middleLayers = new HashMap<Coords, MiddleLayer>();
   private Map<Coords, UpperLayer> upperLayers = new HashMap<Coords, UpperLayer>();
@@ -121,7 +123,7 @@ public class Survive
   private ArrayList removeList = new ArrayList();
   private ArrayList<Hud> removeHudList = new ArrayList<Hud>();
   private ArrayList<Coords> removeUpperList = new ArrayList<Coords>();
-   
+  private ArrayList<TextScroll> textScroll = new ArrayList<TextScroll>(); 
   Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
   public Survive()
@@ -516,25 +518,22 @@ public class Survive
 
       final MiddleLayer middleLayer = middleLayers.get(interactCoords);
       if (middleLayer != null) {
-        if (middleLayer.interact() == true) {
             for (int i = 0; i < interacable.length; i++) {
                 if (middleLayer.getType() == interacable[i]) {
+                    if (middleLayer.interact() == true) {
                     if (middleLayer.getType() == 15) {
                         removeUpperList.remove(interactCoords);
                     }
                     if (middleLayer.getType() == 4) {
                         addToInventory(middleLayer.getItemCode(), middleLayer.getItemQ());
                     }
-                    middleLayers.remove(interactCoords);                   
+                    if (middleLayer.getType() == 18 && equipped[3] == 5) {
+                        addToInventory(18,1);
+                    }
+                    middleLayers.remove(interactCoords); 
+                    }   
                 }
-            }
-        }
-        else {
-           if (middleLayer.getType() == 18 && equipped[3] == 5) {
-               addToInventory(18,1);
-               middleLayers.remove(interactCoords);
-           }
-        }
+            }  
       }
       first = false;
      }
@@ -574,14 +573,10 @@ public class Survive
   public void addToInventory(int itemCode, int quantity)
   {
     //Add entities if none are available
-    if (itemCode == 19) {
-        itemCode = 18;
-    }
     for (Inventory inventory : inventorys) {
       if (inventory.getItemCode() == itemCode) {
-
-        inventory.addQuantity(quantity);
-
+        textScroll.add(new TextScroll(new ItemDescription(itemCode).getName(), 1, Color.BLACK));
+        inventory.addQuantity(quantity);       
       }
     }
   }
@@ -1002,7 +997,6 @@ public class Survive
       if (startCoord.getY() > endCoord.getY()) {
       deltaY = endCoord.getY() - startCoord.getY();
       }
-      
       double error = 0;
       double deltaError = abs((double)deltaY / (double)deltaX); 
       int y = startCoord.getY();
@@ -1122,15 +1116,8 @@ public class Survive
   }
   public double getPlayerDirection()
   {
-      double mouseX, mouseY;
-      try {
-      mouseX = MouseInfo.getPointerInfo().getLocation().x - (Global.xRes /2);
-      mouseY = MouseInfo.getPointerInfo().getLocation().y - (Global.yRes /2);
-      }
-      catch (NullPointerException ex) {
-          mouseX = 0;
-          mouseY = 0;  
-      }
+      double mouseX = (double)getMouseCoords().getX()- (Global.xRes /2);
+      double mouseY = (double)getMouseCoords().getY()- (Global.yRes /2);
       double xD = abs(10 - mouseX);
       double yD = abs(30 - mouseY);
       double playerRot = Math.toDegrees(Math.atan(xD/yD));
@@ -1435,11 +1422,25 @@ public class Survive
         if (timeOfDay < 10) {timeOfDay = 10; daySpeed = -daySpeed; dayTrans = false;darkness = .95f;}    
   
   }
+  public Coords getMouseCoords () {
+      double mouseX, mouseY;
+      try {
+      mouseX = MouseInfo.getPointerInfo().getLocation().x;
+      mouseY = MouseInfo.getPointerInfo().getLocation().y;
+      }
+      catch (NullPointerException ex) {
+          mouseX = 0;
+          mouseY = 0;  
+      }
+      Coords mouseCoords = new Coords((int)mouseX, (int)mouseY);
+      return mouseCoords;
+  } 
   //Loop of main game
   public void gameLoop()
   {
     long lastLoopTime = System.currentTimeMillis();
     long loopTime = 0;
+    int textTimer = 0;
     
     while (gameRunning) {
       long delta = System.currentTimeMillis() - lastLoopTime;
@@ -1447,9 +1448,9 @@ public class Survive
       lastLoopTime = System.currentTimeMillis();
 
       Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
+      g.setFont(defaultFont);
       g.setColor(Color.black);
       g.fillRect(0, 0, Global.xRes, Global.yRes);
-
       //Do Things Loop
       if (loopTime == 8) {
         // Moves applicable enemy within its speed compared to loop time
@@ -1538,7 +1539,8 @@ public class Survive
      // }
       
       //Remove black in accordance with time in transition
-      for (Coords remove : removeUpperList) {
+      for (int i = 0; i < removeUpperList.size(); i++) {
+      Coords remove = removeUpperList.get(i);
       setVision(remove, 5);    
       }
       
@@ -1677,12 +1679,19 @@ public class Survive
                 row ++;
             }
             drawX = (bagOverlayX - (col));
-            drawY = (bagOverlayY - 5) - (30 * row);
-
+            drawY = (bagOverlayY - 5) - (30 * row);        
+            
             inventory.draw(g, new Coords(drawX, drawY));
             String quantity = String.valueOf(inventory.getQuantity());
+            g.setColor(Color.white);
             g.drawString(quantity, -drawX, -drawY);
             inventory.setXY(drawX, drawY);
+            if (getMouseCoords().getX() >= abs(drawX) && getMouseCoords().getY() >= abs(drawY)-5 && getMouseCoords().getX() <= abs(drawX) + 20 && getMouseCoords().getY() <= abs(drawY) + 20) {
+                g.setColor(Color.black);
+                g.setFont(new Font("Arial", Font.PLAIN, 30));
+                g.drawString(new ItemDescription(inventory.getItemCode()).getName(), getMouseCoords().getX(), getMouseCoords().getY());
+                g.setFont(defaultFont);
+            }
           }
             
             if (equipped[0] == inventory.getItemCode()) {
@@ -1705,7 +1714,20 @@ public class Survive
           randomChance[i] = randomDefault[i] + 10;
         }
       }
-      
+      //Display scrolling text  
+      for (int i = 0; i < textScroll.size(); i++) {
+          TextScroll text = textScroll.get(i);
+          g.setFont(new Font("Arial", Font.PLAIN, 14));
+          g.setColor(text.getColor());
+          g.drawString(text.getText(), Global.xRes /2, Global.yRes/2 - (i *10));
+          g.setFont(defaultFont);
+      }
+      if (!textScroll.isEmpty()) {textTimer++;}
+      if (textTimer > 10 && !textScroll.isEmpty() || textScroll.size() > 5) {
+          textTimer = 0;
+          textScroll.remove(0);
+      }
+              
       //Draw hurt screen     
       if (hurtFlash == true) {
           for (int i = 0; i < huds.size(); i++) {
